@@ -1,12 +1,14 @@
 import {useLoadScript} from '@react-google-maps/api';
-// import MapContainer from './components/MapContainer';
+import MapContainer from './components/MapContainer';
 
+
+const libraries = ['geometry'];
 
 function App() {
-  // console.log('App');
+  console.log('App');
   const {isLoaded, loadError} = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries: ['geometry']
+    libraries: libraries
   });
 
   return (
@@ -15,7 +17,7 @@ function App() {
 
         {loadError && 'Error Loading Google Maps!'}
 
-        {/* {isLoaded && <MapContainer/>} */}
+        {isLoaded && <MapContainer/>}
       </div>
   );
 }
