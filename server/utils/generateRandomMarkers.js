@@ -1,4 +1,4 @@
-export const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
+const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
   const deg2rad = deg => deg * (Math.PI/180);  // function to convert degress to radians
   // const R = 6371; // Radius of the earth in km
   const R=6378137 // meters
@@ -43,7 +43,8 @@ const generateRandomMarkers = (lat, lng, distanceInMeters = 100)=>{
             y: Math.round(-r * Math.sin(theta))}
   }
 
-  for (let theta=0; theta<=360; theta += 10) {
+  // generate 360 markers
+  for (let theta=0; theta<360; theta += 1) {
     const randomDistance = Math.floor(Math.random() * distanceInMeters) + 3;
     const {x, y} = circleXY(randomDistance, theta);
     const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
@@ -57,7 +58,7 @@ const generateRandomMarkers = (lat, lng, distanceInMeters = 100)=>{
   return randomMarkers;
 }
 
-export const updateMarkerDistance = (lat, lng, markers) => {
+const updateMarkerDistance = (lat, lng, markers) => {
   return markers.map(marker => {
     return {
       position: marker.position,
@@ -67,4 +68,7 @@ export const updateMarkerDistance = (lat, lng, markers) => {
 }
 
 
-export default generateRandomMarkers;
+module.exports = {
+  generateRandomMarkers,
+  updateMarkerDistance
+}
