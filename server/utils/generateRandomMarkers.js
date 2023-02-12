@@ -45,11 +45,12 @@ const generateRandomMarkers = (lat, lng, distanceInMeters = 100)=>{
 
   // generate 360 markers
   for (let theta=0; theta<360; theta += 1) {
-    const randomDistance = Math.floor(Math.random() * distanceInMeters) + 3;
+    const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
     const {x, y} = circleXY(randomDistance, theta);
     const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
     const distance = getDistanceFromLatLonInMeters(lat, lng, position.lat, position.lng);
     randomMarkers.push({
+      id: theta,
       position,
       distance
     })
@@ -61,7 +62,7 @@ const generateRandomMarkers = (lat, lng, distanceInMeters = 100)=>{
 const updateMarkerDistance = (lat, lng, markers) => {
   return markers.map(marker => {
     return {
-      position: marker.position,
+      ...marker, 
       distance: getDistanceFromLatLonInMeters(lat, lng, marker.position.lat, marker.position.lng)
     }
   })

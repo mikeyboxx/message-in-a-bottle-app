@@ -5,13 +5,22 @@ const typeDefs = gql`
     lat: Float
     lng: Float
   }
+
   type Note {
+    id: Int
     position: Location
     distance: Float
+    inProximity: Boolean
   }
 
   type Query {
-    notesInBounds(swLat: Float!, swLng: Float!, neLat: Float!, neLng: Float!): [Note]
+    notesInBounds(
+      currLat: Float!,
+      currLng: Float!,
+      swLat: Float!, 
+      swLng: Float!, 
+      neLat: Float!, 
+      neLng: Float!): [Note]
   }
 
 `;
