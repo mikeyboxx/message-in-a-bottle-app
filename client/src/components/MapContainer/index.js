@@ -150,6 +150,48 @@ export default function MapContainer() {
             />
           )}
         </GoogleMap>}
+
+      {position &&       
+        <div 
+          style={{
+            position: 'absolute',
+            top: 2,
+            left: 2,
+            width: '220px',
+            height: '400px',
+            backgroundColor: 'black',
+            opacity: .3,
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: '.85em',
+            overflow: 'auto'
+          }}>
+
+            
+            <p style={{
+              color: 'white',
+              fontWeight: 'bold'
+              }}
+            >
+              SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
+              NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/>
+              geolocation Heading: {position.coords.heading} <br/><br/>
+              geolocation Speed: {position.coords.speed} <br/><br/>
+              geolocation accuracy: {position.coords.accuracy} <br/><br/>
+              Number of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+            </p>
+            
+
+            <ul>
+              {notesInBounds?.filter(marker => marker.inProximity === true)
+                ?.map(el => 
+                  <li key={el.id}>
+                      Note #: {el.id} <br/> Distance: {el.distance.toFixed(3)} meters <hr/> 
+                  </li>
+                )
+              }
+            </ul>  
+        </div>}
     </>
   )
 }
