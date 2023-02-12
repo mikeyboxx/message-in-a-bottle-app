@@ -23,6 +23,7 @@ app.use(express.json());
 
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
+    // If it's not https already, redirect the same url on https. header will contain the actual protocol string (eg, 'http' or 'https').
     if (req.header('x-forwarded-proto') !== 'https')
       res.redirect(`https://${req.header('host')}${req.url}`);
     else

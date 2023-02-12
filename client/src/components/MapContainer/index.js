@@ -70,7 +70,21 @@ export default function MapContainer() {
     const navId = navigator.geolocation.watchPosition( 
       newPos => {
         console.log('watchPosition');
-        setPosition(newPos);
+        setPosition(oldPos => {
+          newPos.diff =  {
+            lat: newPos.coords.latitude - oldPos?.coords.latitude || 0,
+            lng: newPos.coords.longitude - oldPos?.coords.longitude || 0,
+          };
+
+          return newPos;
+          // return {
+          //   ...newPos,
+          //   diff: {
+          //     lat: newPos.coords.latitude - oldPos?.coords.latitude || 0,
+          //     lng: newPos.coords.longitude - oldPos?.coords.longitude || 0,
+          //   }
+          // }
+        });
       },
       err => console.log(err),
       {
@@ -108,6 +122,16 @@ export default function MapContainer() {
               lat: neBound.lat(),
               lng: neBound.lng()
             },
+            diff: {
+              SW: {
+                lat: swBound.lat() - oldBounds?.SW.lat,
+                lng: swBound.lng() - oldBounds?.SW.lng
+              },
+              NE: {
+                lat: neBound.lat() - oldBounds?.NE.lat,
+                lng: neBound.lng() - oldBounds?.NE.lng
+              },
+            }
           }
       } else {
         return oldBounds;
@@ -157,7 +181,7 @@ export default function MapContainer() {
             position: 'absolute',
             top: 2,
             left: 2,
-            width: '220px',
+            width: '300px',
             height: '400px',
             backgroundColor: 'black',
             opacity: .3,
@@ -173,8 +197,14 @@ export default function MapContainer() {
               fontWeight: 'bold'
               }}
             >
+              Curr Lat: {position?.coords.latitude}<br/>
+              Curr Lng: {position?.coords.latitude}<br/><br/>
+              Diff Lat: {position?.diff.lat}<br/>
+              Diff Lng: {position?.diff.lng}<br/><br/>
               SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
               NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/>
+              Diff SW Lat: {bounds?.diff.SW.lat} <br/> Diff SW Lng: {bounds?.diff.SW.lng} <br/><br/>
+              Diff NE Lat: {bounds?.diff.NE.lat} <br/> Diff NE Lng: {bounds?.diff.NE.lng} <br/><br/>
               geolocation Heading: {position.coords.heading} <br/><br/>
               geolocation Speed: {position.coords.speed} <br/><br/>
               geolocation accuracy: {position.coords.accuracy} <br/><br/>
