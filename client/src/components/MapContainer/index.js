@@ -109,11 +109,11 @@ export default function MapContainer({startingPosition}) {
   useEffect(() => {
     if (map){
       map.panTo({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
+        lat: prevPosition.coords.latitude,
+        lng: prevPosition.coords.longitude
       })
     }
-  },[map, position])
+  },[map, prevPosition])
 
     
   const onLoad = useCallback(map => {
