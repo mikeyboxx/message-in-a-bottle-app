@@ -33,6 +33,11 @@ const mapContainerStyle = {
   position: 'relative' 
 };
 
+const locationHist = {
+  locationArr: [],
+  locationAvg: {}
+};
+
 
 export default function MapContainer({startingPosition}) {
   // console.log('MapContainer');
@@ -71,6 +76,30 @@ export default function MapContainer({startingPosition}) {
           if (oldPos?.coords.latitude !== newPos.coords.latitude || 
             oldPos?.coords.longitude !== newPos.coords.longitude){
             pos = newPos;
+            if (locationHist.locationArr.length > 4){
+              locationHist.locationArr.shift();
+            }
+            locationHist.locationArr.push({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            });
+            
+            const sum = locationHist.locationArr.reduce((prev, curr) => {
+              return {
+                lat: prev.lat + curr.lat,
+                lng: prev.lng + curr.lng
+              } 
+            }, {
+              lat: 0,
+              lng: 0
+            });
+
+            locationHist.locationAvg = {
+              lat: sum.lat / locationHist.locationArr.length,
+              lng: sum.lng / locationHist.locationArr.length,
+            };
+
+            console.log(locationHist);
           } else {
             pos = oldPos;
           };
@@ -177,8 +206,10 @@ export default function MapContainer({startingPosition}) {
         >
           <Marker
             position={{
-              lat: position?.coords.latitude,
-              lng: position?.coords.longitude,
+              lat: locationHist.locationAvg.lat,
+              lng: locationHist.locationAvg.lng,
+              // lat: position?.coords.latitude,
+              // lng: position?.coords.longitude,
             }}
             icon={{
               ...userIcon,
