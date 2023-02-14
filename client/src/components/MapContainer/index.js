@@ -106,6 +106,15 @@ export default function MapContainer({startingPosition}) {
       return () => navigator.geolocation.clearWatch(navId);
     },[]);
 
+  useEffect(() => {
+    if (map){
+      map.panTo({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      })
+    }
+  },[map, position])
+
     
   const onLoad = useCallback(map => {
     // console.log('onLoad');
