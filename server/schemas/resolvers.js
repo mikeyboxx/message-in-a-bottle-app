@@ -6,6 +6,8 @@ console.log('resolvers');
 const resolvers = {
   Query: {
     notesInBounds: async (parent, {currLat, currLng, swLat, swLng, neLat, neLng}) => {
+      console.log('notesInBounds');
+      console.log(currLat, currLng, swLat, swLng, neLat, neLng);
       const arr = updateMarkerDistance(currLat, currLng, randomMarkers.filter(marker => 
         marker.position.lat > swLat && 
         marker.position.lng > swLng && 
