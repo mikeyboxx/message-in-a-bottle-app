@@ -58,7 +58,9 @@ export default function MapContainer({startingPosition}) {
     }
   });
 
-  const notesInBounds = data?.notesInBounds || [];
+  // const notesInBounds = useMemo(()=> 
+  //   data?.notesInBounds || []
+  //   ,[]);
 
   
 
@@ -218,7 +220,7 @@ export default function MapContainer({startingPosition}) {
             }}
           />
           
-          {notesInBounds?.map((note, idx) =>
+          {data?.notesInBounds?.map((note, idx) =>
             <Marker
               key={idx}
               position={note.position}
@@ -253,13 +255,13 @@ export default function MapContainer({startingPosition}) {
               geolocation Heading: {position.coords.heading} <br/><br/>
               geolocation Speed: {position.coords.speed} <br/><br/>
               geolocation accuracy: {position.coords.accuracy} <br/><br/>
-              Number of notes in bounds: {notesInBounds?.length} <br/><br/>
-              Number of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+              Number of notes in bounds: {data?.notesInBounds?.length} <br/><br/>
+              Number of notes in proximity: {data?.notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
             </p>
             
 
             <ul>
-              {notesInBounds?.filter(marker => marker.inProximity === true)?.map(el => 
+              {data?.notesInBounds?.filter(marker => marker.inProximity === true)?.map(el => 
                 <li key={el.id}>
                     Note #: {el.id} <br/> Distance: {el.distance.toFixed(3)} meters <hr/> 
                 </li>
