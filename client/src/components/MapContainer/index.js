@@ -208,8 +208,6 @@ export default function MapContainer({startingPosition}) {
             position={{
               lat: locationHist.locationAvg.lat,
               lng: locationHist.locationAvg.lng,
-              // lat: position?.coords.latitude,
-              // lng: position?.coords.longitude,
             }}
             icon={{
               ...userIcon,
@@ -233,10 +231,10 @@ export default function MapContainer({startingPosition}) {
             position: 'absolute',
             top: 2,
             left: 2,
-            width: '300px',
+            width: '200px',
             height: '400px',
             backgroundColor: 'black',
-            opacity: .3,
+            opacity: .2,
             color: 'white',
             fontWeight: 'bold',
             fontSize: '.85em',
@@ -244,15 +242,11 @@ export default function MapContainer({startingPosition}) {
           }}>
 
             
-            <p style={{
-              color: 'white',
-              fontWeight: 'bold'
-              }}
-            >
+            <p >
               Curr Lat: {position?.coords.latitude}<br/>
               Curr Lng: {position?.coords.longitude}<br/><br/>
-              SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
-              NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/>
+              {/* SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
+              NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/> */}
               geolocation Heading: {position.coords.heading} <br/><br/>
               geolocation Speed: {position.coords.speed} <br/><br/>
               geolocation accuracy: {position.coords.accuracy} <br/><br/>
