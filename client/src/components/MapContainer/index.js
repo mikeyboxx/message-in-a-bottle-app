@@ -198,7 +198,7 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-      {(!position || loading) && 'Loading...'}
+      {/* {(!position || loading) && 'Loading...'} */}
 
       {position && 
         <GoogleMap
