@@ -158,10 +158,10 @@ export default function MapContainer({startingPosition}) {
         timeout: 5000,
         maximumAge: 0
       }
-      );
+    );
       
       return () => navigator.geolocation.clearWatch(navId);
-    },[map]);
+  },[map]);
 
   useEffect(() => {
     if (map){
