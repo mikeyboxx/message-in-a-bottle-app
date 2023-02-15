@@ -119,7 +119,33 @@ export default function MapContainer({startingPosition}) {
           
           // console.log('Distance between prevPosition: ', dist);
 
-          if (dist > 10) {
+          if (dist > 100) {
+            const newBounds = map.getBounds();
+            const neBound = newBounds.getNorthEast();
+            const swBound = newBounds.getSouthWest();
+
+
+            // set the bounds state variable, to be used to query the database for notes
+            setBounds(oldBounds => {
+              // if map bounds are different than return the new bounds
+              if (oldBounds?.SW.lat !== swBound.lat() ||
+                  oldBounds?.SW.lng !== swBound.lng() ||
+                  oldBounds?.NE.lat !== neBound.lat() ||
+                  oldBounds?.NE.lng !== neBound.lng()) {
+                  return {
+                    SW: {
+                      lat: swBound.lat(),
+                      lng: swBound.lng()
+                    },
+                    NE: {
+                      lat: neBound.lat(),
+                      lng: neBound.lng()
+                    },
+                  }
+              } else {
+                return oldBounds;
+              }
+            });
             return pos;
           } else {
             return prevPos;
@@ -135,16 +161,17 @@ export default function MapContainer({startingPosition}) {
       );
       
       return () => navigator.geolocation.clearWatch(navId);
-    },[]);
+    },[map]);
 
   useEffect(() => {
     if (map){
       map.panTo({
-        lat: prevPosition.coords.latitude,
-        lng: prevPosition.coords.longitude
-      })
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
+      map.setHeading(position.coords.heading);
     }
-  },[map, prevPosition])
+  },[map, position])
 
     
   const onLoad = useCallback(map => {
@@ -159,44 +186,112 @@ export default function MapContainer({startingPosition}) {
       }
     });
 
+    
+
     setMap(map);
   },[startingPosition]);
 
-
-  
   const onIdle = useCallback( () => {
-    // console.log('onIdle');
+    if (!bounds) {
+      const newBounds = map.getBounds();
+      const neBound = newBounds.getNorthEast();
+      const swBound = newBounds.getSouthWest();
 
-    const newBounds = map.getBounds();
-    const neBound = newBounds.getNorthEast();
-    const swBound = newBounds.getSouthWest();
 
-    map.setHeading(position.coords.heading);
+      // set the bounds state variable, to be used to query the database for notes
+      setBounds(
+        {
+          SW: {
+            lat: swBound.lat(),
+            lng: swBound.lng()
+          },
+          NE: {
+            lat: neBound.lat(),
+            lng: neBound.lng()
+          },
+        }
+      );
+    }
+  },[map, bounds]);
 
-    // set the bounds state variable, to be used to query the database for notes
-    setBounds(oldBounds => {
-      // if map bounds are different than return the new bounds
-      if (oldBounds?.SW.lat !== swBound.lat() ||
-          oldBounds?.SW.lng !== swBound.lng() ||
-          oldBounds?.NE.lat !== neBound.lat() ||
-          oldBounds?.NE.lng !== neBound.lng()) {
-          return {
-            SW: {
-              lat: swBound.lat(),
-              lng: swBound.lng()
-            },
-            NE: {
-              lat: neBound.lat(),
-              lng: neBound.lng()
-            },
-          }
-      } else {
-        return oldBounds;
-      }
-    });
-  },[map, position])
+  const onZoomChanged = useCallback( () => {
+    if (map) {
+      const newBounds = map.getBounds();
+      const neBound = newBounds.getNorthEast();
+      const swBound = newBounds.getSouthWest();
 
+
+      // set the bounds state variable, to be used to query the database for notes
+      setBounds(
+        {
+          SW: {
+            lat: swBound.lat(),
+            lng: swBound.lng()
+          },
+          NE: {
+            lat: neBound.lat(),
+            lng: neBound.lng()
+          },
+        }
+      );
+    }
+  },[map]);
+
+  const onDragEnd = useCallback( () => {
+    if (map) {
+      const newBounds = map.getBounds();
+      const neBound = newBounds.getNorthEast();
+      const swBound = newBounds.getSouthWest();
+
+
+      // set the bounds state variable, to be used to query the database for notes
+      setBounds(
+        {
+          SW: {
+            lat: swBound.lat(),
+            lng: swBound.lng()
+          },
+          NE: {
+            lat: neBound.lat(),
+            lng: neBound.lng()
+          },
+        }
+      );
+    }
+  },[map]);
   
+  // const onIdle = useCallback( () => {
+  //   // console.log('onIdle');
+
+  //   const newBounds = map.getBounds();
+  //   const neBound = newBounds.getNorthEast();
+  //   const swBound = newBounds.getSouthWest();
+
+  //   map.setHeading(position.coords.heading);
+
+  //   // set the bounds state variable, to be used to query the database for notes
+  //   setBounds(oldBounds => {
+  //     // if map bounds are different than return the new bounds
+  //     if (oldBounds?.SW.lat !== swBound.lat() ||
+  //         oldBounds?.SW.lng !== swBound.lng() ||
+  //         oldBounds?.NE.lat !== neBound.lat() ||
+  //         oldBounds?.NE.lng !== neBound.lng()) {
+  //         return {
+  //           SW: {
+  //             lat: swBound.lat(),
+  //             lng: swBound.lng()
+  //           },
+  //           NE: {
+  //             lat: neBound.lat(),
+  //             lng: neBound.lng()
+  //           },
+  //         }
+  //     } else {
+  //       return oldBounds;
+  //     }
+  //   });
+  // },[map, position]);
+
 
   return (
     <>
@@ -208,6 +303,8 @@ export default function MapContainer({startingPosition}) {
           mapContainerStyle={mapContainerStyle}
           onLoad={onLoad}
           onIdle={onIdle}
+          onZoomChanged={onZoomChanged}
+          onDragEnd={onDragEnd}
         >
           <Marker
             position={{
