@@ -161,12 +161,15 @@ export default function MapContainer({startingPosition}) {
   },[startingPosition]);
 
 
+  
   const onIdle = useCallback( () => {
     // console.log('onIdle');
 
     const newBounds = map.getBounds();
     const neBound = newBounds.getNorthEast();
     const swBound = newBounds.getSouthWest();
+
+    map.setHeading(position.coords.heading);
 
     // set the bounds state variable, to be used to query the database for notes
     setBounds(oldBounds => {
@@ -189,7 +192,7 @@ export default function MapContainer({startingPosition}) {
         return oldBounds;
       }
     });
-  },[map])
+  },[map, position])
 
   
 
