@@ -15,13 +15,15 @@ query notesInBounds($currLat: Float!, $currLng: Float!, $swLat: Float!, $swLng: 
 `;
 
 export const QUERY_NOTES_IN_PROXIMITY = gql`
-notesInProximity($currLat: Float!, $currLng: Float!) {
-  notesInProximity(currLat: $currLat, currLng: $currLng) {
+query notesInProximity($currLat: Float!, $currLng: Float!, $distance: Float!) {
+  notesInProximity(currLat: $currLat, currLng: $currLng, distance: $distance) {
     id
     position {
       lat
       lng
     }
+    distance
+    inProximity
   }
 }
 `;

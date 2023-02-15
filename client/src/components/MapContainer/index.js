@@ -1,7 +1,7 @@
 import {useState, useCallback, useEffect, useMemo} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useQuery } from '@apollo/client';
-import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
+import { QUERY_NOTES_IN_BOUNDS, QUERY_NOTES_IN_PROXIMITY } from '../../utils/queries';
 
 // Marker object's icon property of the User
 const userIcon = { 
@@ -47,19 +47,27 @@ export default function MapContainer({startingPosition}) {
   const [prevPosition, setPrevPosition] = useState(null);
   const [bounds, setBounds] = useState(null);
 
-  const { loading, data } = useQuery(QUERY_NOTES_IN_BOUNDS, {
+  let { loading, data } = useQuery(QUERY_NOTES_IN_PROXIMITY, {
     variables: {
       currLat: prevPosition?.coords.latitude || 0,
       currLng: prevPosition?.coords.longitude || 0,
-      swLat: bounds?.SW.lat || 0, 
-      swLng: bounds?.SW.lng || 0, 
-      neLat: bounds?.NE.lat || 0, 
-      neLng: bounds?.NE.lng || 0
+      distance: 8046 
     }
   });
+  // let { loading, data } = useQuery(QUERY_NOTES_IN_BOUNDS, {
+  //   variables: {
+  //     currLat: prevPosition?.coords.latitude || 0,
+  //     currLng: prevPosition?.coords.longitude || 0,
+  //     swLat: bounds?.SW.lat || 0, 
+  //     swLng: bounds?.SW.lng || 0, 
+  //     neLat: bounds?.NE.lat || 0, 
+  //     neLng: bounds?.NE.lng || 0
+  //   }
+  // });
 
-  // const notesInBounds = useMemo(()=> 
-  //   data?.notesInBounds || []
+  
+  // const notesInProximity = useMemo(()=> 
+  //   data?.notesInProximity || []
   //   ,[]);
 
   
@@ -101,6 +109,7 @@ export default function MapContainer({startingPosition}) {
               lng: sum.lng / locationHist.locationArr.length,
             };
 
+            console.log(pos);
             console.log(locationHist);
           } else {
             pos = oldPos;
@@ -120,32 +129,32 @@ export default function MapContainer({startingPosition}) {
           // console.log('Distance between prevPosition: ', dist);
 
           if (dist > 100) {
-            const newBounds = map.getBounds();
-            const neBound = newBounds.getNorthEast();
-            const swBound = newBounds.getSouthWest();
+            // const newBounds = map.getBounds();
+            // const neBound = newBounds.getNorthEast();
+            // const swBound = newBounds.getSouthWest();
 
 
-            // set the bounds state variable, to be used to query the database for notes
-            setBounds(oldBounds => {
-              // if map bounds are different than return the new bounds
-              if (oldBounds?.SW.lat !== swBound.lat() ||
-                  oldBounds?.SW.lng !== swBound.lng() ||
-                  oldBounds?.NE.lat !== neBound.lat() ||
-                  oldBounds?.NE.lng !== neBound.lng()) {
-                  return {
-                    SW: {
-                      lat: swBound.lat(),
-                      lng: swBound.lng()
-                    },
-                    NE: {
-                      lat: neBound.lat(),
-                      lng: neBound.lng()
-                    },
-                  }
-              } else {
-                return oldBounds;
-              }
-            });
+            // // set the bounds state variable, to be used to query the database for notes
+            // setBounds(oldBounds => {
+            //   // if map bounds are different than return the new bounds
+            //   if (oldBounds?.SW.lat !== swBound.lat() ||
+            //       oldBounds?.SW.lng !== swBound.lng() ||
+            //       oldBounds?.NE.lat !== neBound.lat() ||
+            //       oldBounds?.NE.lng !== neBound.lng()) {
+            //       return {
+            //         SW: {
+            //           lat: swBound.lat(),
+            //           lng: swBound.lng()
+            //         },
+            //         NE: {
+            //           lat: neBound.lat(),
+            //           lng: neBound.lng()
+            //         },
+            //       }
+            //   } else {
+            //     return oldBounds;
+            //   }
+            // });
             return pos;
           } else {
             return prevPos;
@@ -163,15 +172,15 @@ export default function MapContainer({startingPosition}) {
       return () => navigator.geolocation.clearWatch(navId);
   },[map]);
 
-  useEffect(() => {
-    if (map){
-      map.panTo({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      });
-      map.setHeading(position.coords.heading);
-    }
-  },[map, position])
+  // useEffect(() => {
+  //   if (map){
+  //     map.panTo({
+  //       lat: position.coords.latitude,
+  //       lng: position.coords.longitude
+  //     });
+  //     map.setHeading(position.coords.heading);
+  //   }
+  // },[map, position])
 
     
   const onLoad = useCallback(map => {
@@ -302,9 +311,9 @@ export default function MapContainer({startingPosition}) {
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
           onLoad={onLoad}
-          onIdle={onIdle}
-          onZoomChanged={onZoomChanged}
-          onDragEnd={onDragEnd}
+          // onIdle={onIdle}
+          // onZoomChanged={onZoomChanged}
+          // onDragEnd={onDragEnd}
         >
           <Marker
             position={{
@@ -317,7 +326,7 @@ export default function MapContainer({startingPosition}) {
             }}
           />
           
-          {data?.notesInBounds?.map((note, idx) =>
+          {data?.notesInProximity?.map((note, idx) =>
             <Marker
               key={idx}
               position={note.position}
@@ -352,13 +361,13 @@ export default function MapContainer({startingPosition}) {
               geolocation Heading: {position.coords.heading} <br/><br/>
               geolocation Speed: {position.coords.speed} <br/><br/>
               geolocation accuracy: {position.coords.accuracy} <br/><br/>
-              Number of notes in bounds: {data?.notesInBounds?.length} <br/><br/>
-              Number of notes in proximity: {data?.notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+              Number of notes in bounds: {data?.notesInProximity?.length} <br/><br/>
+              Number of notes in proximity: {data?.notesInProximity?.filter(marker => marker.inProximity === true).length}  <br/><br/>
             </p>
             
 
             <ul>
-              {data?.notesInBounds?.filter(marker => marker.inProximity === true)?.map(el => 
+              {data?.notesInProximity?.filter(marker => marker.inProximity === true)?.map(el => 
                 <li key={el.id}>
                     Note #: {el.id} <br/> Distance: {el.distance.toFixed(3)} meters <hr/> 
                 </li>

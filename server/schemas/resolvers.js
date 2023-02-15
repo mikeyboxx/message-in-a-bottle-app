@@ -1,7 +1,8 @@
 const { 
   generateRandomMarkers, 
   updateMarkerDistance, 
-  getLatLonBounds } = require('../utils/generateRandomMarkers');
+  getLatLonBounds,
+  getDistanceFromLatLonInMeters } = require('../utils/generateRandomMarkers');
 
 const randomMarkers = generateRandomMarkers(40.5736681, -74.0055502, 1000);
 console.log('resolvers');
@@ -25,17 +26,27 @@ const resolvers = {
       
       return arr;
     },
-    notesInProximity: async (parent, {currLat, currLng}) => {
-      // console.log('notesInBounds');
-      // console.log(currLat, currLng, swLat, swLng, neLat, neLng);
-      const bounds = getLatLonBounds(currLat, currLng, 20);
+    notesInProximity: async (parent, {currLat, currLng, distance}) => {
+      // console.log('notesInProximity');
+      if (currLat === 0 && currLng === 0){
+        return null;
+      }
+
+      const bounds = getLatLonBounds(currLat, currLng, distance);
 
       const arr = randomMarkers.filter(marker => 
         marker.position.lat > bounds.SW.lat && 
         marker.position.lng > bounds.SW.lng && 
         marker.position.lat < bounds.NE.lat && 
         marker.position.lng < bounds.NE.lng  
-      );
+      ).map(el=>{
+        const distance = getDistanceFromLatLonInMeters(currLat, currLng, el.position.lat, el.position.lng);
+        return {
+          ...el,
+          distance,
+          inProximity: distance <= 20
+        }
+      });
       
       return arr;
     },

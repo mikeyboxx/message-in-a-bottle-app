@@ -111,5 +111,6 @@ const updateMarkerDistance = (lat, lng, markers) => {
 module.exports = {
   generateRandomMarkers,
   updateMarkerDistance,
-  getLatLonBounds
+  getLatLonBounds,
+  getDistanceFromLatLonInMeters
 }
