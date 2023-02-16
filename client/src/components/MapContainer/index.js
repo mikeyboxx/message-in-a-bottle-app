@@ -86,7 +86,7 @@ export default function MapContainer({startingPosition}) {
     // console.log('useEffect []');
     const navId = navigator.geolocation.watchPosition( 
       newPos => {
-        // console.log('watchPosition');
+        console.log('watchPosition');
 
         let pos;
 
@@ -136,7 +136,7 @@ export default function MapContainer({startingPosition}) {
           
           // console.log('Distance between prevPosition: ', dist);
 
-          if (dist > 100) {
+          if (dist > 200) {
             const newBounds = map.getBounds();
             const neBound = newBounds.getNorthEast();
             const swBound = newBounds.getSouthWest();

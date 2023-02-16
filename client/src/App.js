@@ -45,7 +45,7 @@ function App() {
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition( 
       pos => {
-        // console.log('getCurrentPosition');
+        console.log('getCurrentPosition');
         setStartingPosition(pos);
       },
       err => console.log(err),

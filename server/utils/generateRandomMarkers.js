@@ -112,5 +112,7 @@ module.exports = {
   generateRandomMarkers,
   updateMarkerDistance,
   getLatLonBounds,
-  getDistanceFromLatLonInMeters
+  getDistanceFromLatLonInMeters,
+  getLatLonGivenDistanceAndBearing,
+  circleXY
 }
