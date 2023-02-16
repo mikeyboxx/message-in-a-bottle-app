@@ -73,7 +73,7 @@ export default function MapContainer({startingPosition}) {
     }
   });
 
-  data && console.log(data.notesInBounds);
+  // data && console.log(data.notesInBounds);
   // const notesInBounds = useMemo(()=> 
   //   data?.notesInBounds || []
   //   ,[]);
@@ -180,17 +180,22 @@ export default function MapContainer({startingPosition}) {
       return () => navigator.geolocation.clearWatch(navId);
   },[map]);
 
-  useEffect(() => {
-    if (map){
-      map.panTo({
-        lat: prevPosition.coords.latitude,
-        lng: prevPosition.coords.longitude
-      });
-    }
-  },[map, prevPosition])
+  // useEffect(() => {
+  //   if (map){
+  //     map.panTo({
+  //       lat: prevPosition.coords.latitude,
+  //       lng: prevPosition.coords.longitude
+  //     });
+  //     map.setHeading(position.coords.heading);
+  //   }
+  // },[map, prevPosition, position])
 
   useEffect(() => {
-    if (map){
+    if (map && position.coords.speed > 1){
+      map.panTo({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
       map.setHeading(position.coords.heading);
     }
   },[map, position])
