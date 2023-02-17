@@ -20,6 +20,9 @@ export default function MapContainer({startingPosition}) {
     headingAvg: 0
   });
 
+  const queryPosition = useRef({});
+  const queryBounds = useRef({});
+
   // Marker object's icon property of the User
   const userIcon = useMemo(()=>({ 
     fillColor: '#4285F4',
@@ -55,10 +58,12 @@ export default function MapContainer({startingPosition}) {
 
   const {data} = useQuery(QUERY_NOTES_IN_BOUNDS, {
     variables: {
+      currLat: queryPosition.current.lat || 0,
+      currLng:  queryPosition.current.lng || 0,
       // currLat: prevPosition?.coords.latitude || 0,
       // currLng: prevPosition?.coords.longitude || 0,
-      currLat: locationHist.current.locationArr.lat || 0,
-      currLng: locationHist.current.locationArr.lng || 0,
+      // currLat: locationHist.current.locationArr.lat || 0,
+      // currLng: locationHist.current.locationArr.lng || 0,
       swLat: bounds?.SW.lat || 0, 
       swLng: bounds?.SW.lng || 0, 
       neLat: bounds?.NE.lat || 0, 
@@ -76,6 +81,10 @@ export default function MapContainer({startingPosition}) {
           if (oldPos?.coords.latitude !== newPos.coords.latitude || 
             oldPos?.coords.longitude !== newPos.coords.longitude){
             pos = newPos;
+            queryPosition.current = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+            }
 
             locationHist.current.locationArr.length > 10 && locationHist.current.locationArr.shift();
             locationHist.current.locationArr.push({
@@ -113,6 +122,7 @@ export default function MapContainer({startingPosition}) {
             new window.google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
           
           if (dist > 40) {
+
             return pos;
           } else {
             return prevPos;
@@ -149,7 +159,7 @@ export default function MapContainer({startingPosition}) {
       });
       map.setHeading(position.coords.heading);
     }
-  },[map, position]);
+  },[map, position?.coords.latitude, position?.coords.longitude, position?.coords.heading]);
 
   useEffect(() => {
     const newBounds = map?.getBounds();
@@ -225,10 +235,10 @@ export default function MapContainer({startingPosition}) {
         >
           <Marker
             position={{
-              // lat: position.coords.latitude,
-              // lng: position.coords.longitude
-              lat: locationHist.current.locationAvg.lat,
-              lng: locationHist.current.locationAvg.lng,
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+              // lat: locationHist.current.locationAvg.lat,
+              // lng: locationHist.current.locationAvg.lng,
             }}
             icon={{
               ...userIcon,
