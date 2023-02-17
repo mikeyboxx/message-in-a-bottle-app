@@ -142,12 +142,13 @@ export default function MapContainer({startingPosition}) {
   // },[map, position]);
   useEffect(() => {
     // if (map && position.coords.speed > 1){
+    if (map){
       map.panTo({
         lat: position.coords.latitude,
         lng: position.coords.longitude
       });
       map.setHeading(position.coords.heading);
-    // }
+    }
   },[map, position]);
 
   useEffect(() => {
