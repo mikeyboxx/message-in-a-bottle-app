@@ -60,14 +60,14 @@ export default function MapContainer({startingPosition}) {
 
 
   const [getNotes, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS, {
-    variables: {
-      currLat: queryPosition.current.lat || 0,
-      currLng: queryPosition.current.lng || 0,
-      swLat: queryBounds.current.SW?.lat || 0, 
-      swLng: queryBounds.current.SW?.lng || 0, 
-      neLat: queryBounds.current.NE?.lat || 0, 
-      neLng: queryBounds.current.NE?.lng || 0
-    }
+    // variables: {
+    //   currLat: queryPosition.current.lat || 0,
+    //   currLng: queryPosition.current.lng || 0,
+    //   swLat: queryBounds.current.SW?.lat || 0, 
+    //   swLng: queryBounds.current.SW?.lng || 0, 
+    //   neLat: queryBounds.current.NE?.lat || 0, 
+    //   neLng: queryBounds.current.NE?.lng || 0
+    // }
   });
 
   // console.log(data?.notesInBounds);
@@ -97,10 +97,12 @@ export default function MapContainer({startingPosition}) {
           if (oldPos?.coords.latitude !== newPos.coords.latitude || 
             oldPos?.coords.longitude !== newPos.coords.longitude){
             pos = newPos;
-            queryPosition.current = {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            }
+            queryPosition.current.lat = pos.coords.latitude;
+            queryPosition.current.lng = pos.coords.longitude;
+            // queryPosition.current = {
+            //   lat: pos.coords.latitude,
+            //   lng: pos.coords.longitude,
+            // }
 
             // locationHist.current.locationArr.length > 10 && locationHist.current.locationArr.shift();
             // locationHist.current.locationArr.push({
@@ -126,30 +128,38 @@ export default function MapContainer({startingPosition}) {
             pos = oldPos;
           };
 
-          if (!prevPosition.current){
-            prevPosition.current = {
-              lat: pos.coords.lat,
-              lng: pos.coords.lng
-            }
+          if (Object.keys(prevPosition.current).length === 0){
+            prevPosition.current.lat = pos.coords.latitude;
+            prevPosition.current.lng = pos.coords.longitude;
           }
+            // prevPosition.current = {
+            //   lat: pos.coords.lat,
+            //   lng: pos.coords.lng
+            // }
   
           const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
             new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
             new window.google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
   
           if (dist > 40) {
-            prevPosition.current = {
-              lat: pos.coords.lat,
-              lng: pos.coords.lng
-            }
+            prevPosition.current.lat = pos.coords.latitude;
+            prevPosition.current.lng = pos.coords.longitude;
             const newBounds = map.current.getBounds();
   
             queryBounds.current.SW.lat = newBounds.getSouthWest().lat();
             queryBounds.current.SW.lng = newBounds.getSouthWest().lng();
             queryBounds.current.NE.lat = newBounds.getNorthEast().lat();
             queryBounds.current.NE.lng = newBounds.getNorthEast().lng();
-  
-            getNotes();
+            
+            // console.log('getNotes in setPosition');
+            getNotes({variables: {
+              currLat: queryPosition.current.lat || 0,
+              currLng: queryPosition.current.lng || 0,
+              swLat: queryBounds.current.SW?.lat || 0, 
+              swLng: queryBounds.current.SW?.lng || 0, 
+              neLat: queryBounds.current.NE?.lat || 0, 
+              neLng: queryBounds.current.NE?.lng || 0
+            }});
             
           }
           return pos;
@@ -195,16 +205,16 @@ export default function MapContainer({startingPosition}) {
   //     map.setHeading(position.coords.heading);
   //   }
   // },[map, position]);
-  useLayoutEffect(() => {
-    // if (map && position.coords.speed > 1){
-    if (map.current){
-      map.current.panTo({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      });
-      map.current.setHeading(position.coords.heading);
-    }
-  },[position]);
+  // useLayoutEffect(() => {
+  //   // if (map && position.coords.speed > 1){
+  //   if (map.current){
+  //     map.current.panTo({
+  //       lat: position.coords.latitude,
+  //       lng: position.coords.longitude
+  //     });
+  //     map.current.setHeading(position.coords.heading);
+  //   }
+  // },[position]);
 
   // useEffect(() => {
   //   const newBounds = map?.getBounds();
@@ -266,7 +276,15 @@ export default function MapContainer({startingPosition}) {
               lng: newBounds.getNorthEast().lng()
             },
         }
-        getNotes();
+        // console.log('getNotes in onIdle');
+        getNotes({variables: {
+          currLat: queryPosition.current.lat || 0,
+          currLng: queryPosition.current.lng || 0,
+          swLat: queryBounds.current.SW?.lat || 0, 
+          swLng: queryBounds.current.SW?.lng || 0, 
+          neLat: queryBounds.current.NE?.lat || 0, 
+          neLng: queryBounds.current.NE?.lng || 0
+        }});
       }
       // set the bounds state variable, to be used to query the database for notes
       // setBounds({

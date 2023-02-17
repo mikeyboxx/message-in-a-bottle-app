@@ -6,6 +6,8 @@ const resolvers = {
     notes: async () => Note.find(),
 
     notesInBounds: async (parent, {currLat, currLng, swLat, swLng, neLat, neLng}) => {
+      // console.log('notesInBounds');
+      // console.log(currLat, currLng, swLat, swLng, neLat, neLng);
       let notes = await Note.find(
         {
           $and: [
