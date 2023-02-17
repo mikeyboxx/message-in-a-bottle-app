@@ -121,9 +121,9 @@ export default function MapContainer({startingPosition}) {
       },
       err => console.log(err),
       {
-        enableHighAccuracy: true,
+        // enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 0
+        maximumAge: Infinity
       }
     );
       
@@ -131,24 +131,24 @@ export default function MapContainer({startingPosition}) {
   },[]);
 
 
-  useEffect(() => {
-    if (map){
-      // map.panTo({
-      //   lat: locationHist.current.locationAvg.lat,
-      //   lng: locationHist.current.locationAvg.lng
-      // });
-      map.setHeading(position.coords.heading);
-    }
-  },[map, position]);
   // useEffect(() => {
-  //   if (map && position.coords.speed > 2){
-  //     map.panTo({
-  //       lat: position.coords.latitude,
-  //       lng: position.coords.longitude
-  //     });
+  //   if (map){
+  //     // map.panTo({
+  //     //   lat: locationHist.current.locationAvg.lat,
+  //     //   lng: locationHist.current.locationAvg.lng
+  //     // });
   //     map.setHeading(position.coords.heading);
   //   }
   // },[map, position]);
+  useEffect(() => {
+    // if (map && position.coords.speed > 1){
+      map.panTo({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
+      map.setHeading(position.coords.heading);
+    // }
+  },[map, position]);
 
   useEffect(() => {
     const newBounds = map?.getBounds();
@@ -173,11 +173,7 @@ export default function MapContainer({startingPosition}) {
         }
       });
     }
-    map?.panTo({
-      lat: locationHist.current.locationAvg.lat,
-      lng: locationHist.current.locationAvg.lng
-    });
-    map?.setHeading(prevPosition.coords.heading);
+    
   },[map, prevPosition])
   
   const onLoad = useCallback(map => {
