@@ -177,6 +177,7 @@ export default function MapContainer({startingPosition}) {
       lat: locationHist.current.locationAvg.lat,
       lng: locationHist.current.locationAvg.lng
     });
+    map?.setHeading(prevPosition.coords.heading);
   },[map, prevPosition])
   
   const onLoad = useCallback(map => {
