@@ -205,16 +205,16 @@ export default function MapContainer({startingPosition}) {
   //     map.setHeading(position.coords.heading);
   //   }
   // },[map, position]);
-  // useLayoutEffect(() => {
-  //   // if (map && position.coords.speed > 1){
-  //   if (map.current){
-  //     map.current.panTo({
-  //       lat: position.coords.latitude,
-  //       lng: position.coords.longitude
-  //     });
-  //     map.current.setHeading(position.coords.heading);
-  //   }
-  // },[position]);
+  useLayoutEffect(() => {
+    if (map.current && position.coords.speed > 1){
+    // if (map.current){
+      map.current.panTo({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
+      map.current.setHeading(position.coords.heading);
+    }
+  },[position]);
 
   // useEffect(() => {
   //   const newBounds = map?.getBounds();
