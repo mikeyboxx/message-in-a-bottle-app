@@ -1,19 +1,18 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
-  type Location {
+  type Note {
+    _id: ID
+    noteText: String
     lat: Float
     lng: Float
-  }
-
-  type Note {
-    id: Int
-    position: Location
     distance: Float
     inProximity: Boolean
   }
 
   type Query {
+    notes: [Note]
+
     notesInBounds(
       currLat: Float!,
       currLng: Float!,
@@ -21,6 +20,7 @@ const typeDefs = gql`
       swLng: Float!, 
       neLat: Float!, 
       neLng: Float!): [Note]
+
 
     notesInProximity(
       currLat: Float!,

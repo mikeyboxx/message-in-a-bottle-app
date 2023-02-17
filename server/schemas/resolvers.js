@@ -1,3 +1,5 @@
+const { Note } = require('../models');
+
 const { 
   generateRandomMarkers, 
   updateMarkerDistance, 
@@ -9,23 +11,64 @@ console.log('resolvers');
 
 const resolvers = {
   Query: {
+    notes: async () => Note.find(),
+
+    // notesInBounds: async (parent, {currLat, currLng, swLat, swLng, neLat, neLng}) => {
+    //   // console.log('notesInBounds');
+    //   // console.log(currLat, currLng, swLat, swLng, neLat, neLng);
+    //   const arr = updateMarkerDistance(currLat, currLng, randomMarkers.filter(marker => 
+    //     marker.position.lat > swLat && 
+    //     marker.position.lng > swLng && 
+    //     marker.position.lat < neLat && 
+    //     marker.position.lng < neLng  
+    //   )).map(el => {
+    //       return {
+    //         ...el, 
+    //         inProximity: el.distance <= 20
+    //       } 
+    //   });
+      
+    //   return arr;
+    // },
+
     notesInBounds: async (parent, {currLat, currLng, swLat, swLng, neLat, neLng}) => {
       // console.log('notesInBounds');
       // console.log(currLat, currLng, swLat, swLng, neLat, neLng);
-      const arr = updateMarkerDistance(currLat, currLng, randomMarkers.filter(marker => 
-        marker.position.lat > swLat && 
-        marker.position.lng > swLng && 
-        marker.position.lat < neLat && 
-        marker.position.lng < neLng  
-      )).map(el => {
-          return {
-            ...el, 
-            inProximity: el.distance <= 20
-          } 
-      });
+      let notes = await Note.find(
+        {
+          $and: [
+            {lat: {$gt: swLat }},
+            {lng: {$gt: swLng }},
+            {lat: {$lt: neLat }},
+            {lng: {$lt: neLng }},
+          ]
+        },
+      ).lean();
+
+      notes =  notes.map(note =>{
+        const distance = getDistanceFromLatLonInMeters(currLat, currLng, note.lat, note.lng);
+        return {
+          ...note,
+          distance,
+          inProximity: distance <= 20
+        }
+      }); 
+
+      // const arr = updateMarkerDistance(currLat, currLng, randomMarkers.filter(marker => 
+      //   marker.position.lat > swLat && 
+      //   marker.position.lng > swLng && 
+      //   marker.position.lat < neLat && 
+      //   marker.position.lng < neLng  
+      // )).map(el => {
+      //     return {
+      //       ...el, 
+      //       inProximity: el.distance <= 20
+      //     } 
+      // });
       
-      return arr;
+      return notes;
     },
+
     notesInProximity: async (parent, {currLat, currLng, distance}) => {
       // console.log('notesInProximity');
       if (currLat === 0 && currLng === 0){

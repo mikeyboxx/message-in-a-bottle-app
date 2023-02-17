@@ -14,11 +14,10 @@ db.once('open', async () => {
     const {x, y} = circleXY(randomDistance, theta);
     const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
     const note = await Note.create({
-      noteText: `This is Note #: ${theta}`,
-      latitude: position.lat,
-      longitude: position.lng,
+      noteText: `This is Note #: ${theta + 1}`,
+      lat: position.lat,
+      lng: position.lng,
     });
-    console.log(note);
   }
 
   console.log('notes seeded');
