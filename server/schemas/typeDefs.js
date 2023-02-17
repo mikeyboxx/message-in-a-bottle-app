@@ -20,12 +20,6 @@ const typeDefs = gql`
       swLng: Float!, 
       neLat: Float!, 
       neLng: Float!): [Note]
-
-
-    notesInProximity(
-      currLat: Float!,
-      currLng: Float!,
-      distance: Float!): [Note]
   }
 
 `;
