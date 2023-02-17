@@ -3,7 +3,7 @@ const { Note } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('../utils/generateRandomMarkers');
 
 db.once('open', async () => {
-  const distanceInMeters = 100;
+  const distanceInMeters = 8046; // 5 miles
   const lat = 40.5736681;
   const lng = -74.0055502;
 
