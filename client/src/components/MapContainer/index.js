@@ -104,26 +104,26 @@ export default function MapContainer({startingPosition}) {
             //   lng: pos.coords.longitude,
             // }
 
-            // locationHist.current.locationArr.length > 10 && locationHist.current.locationArr.shift();
-            // locationHist.current.locationArr.push({
-            //   lat: pos.coords.latitude,
-            //   lng: pos.coords.longitude
-            // });
-            // const sumObj = locationHist.current.locationArr.reduce((prev, curr) => 
-            //   ({
-            //     lat: prev.lat + curr.lat,
-            //     lng: prev.lng + curr.lng
-            //   }) 
-            // );
-            // locationHist.current.locationAvg = {
-            //   lat: sumObj.lat / locationHist.current.locationArr.length,
-            //   lng: sumObj.lng / locationHist.current.locationArr.length,
-            // };
+            locationHist.current.locationArr.length > 10 && locationHist.current.locationArr.shift();
+            locationHist.current.locationArr.push({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            });
+            const sumObj = locationHist.current.locationArr.reduce((prev, curr) => 
+              ({
+                lat: prev.lat + curr.lat,
+                lng: prev.lng + curr.lng
+              }) 
+            );
+            locationHist.current.locationAvg = {
+              lat: sumObj.lat / locationHist.current.locationArr.length,
+              lng: sumObj.lng / locationHist.current.locationArr.length,
+            };
 
-            // locationHist.current.headingArr.length > 10 && locationHist.current.headingArr.shift();
-            // locationHist.current.headingArr.push(pos.coords.heading);
-            // const sum = locationHist.current.headingArr.reduce((prev, curr) => prev + curr, 0);
-            // locationHist.current.headingAvg = sum / locationHist.current.headingArr.length;
+            locationHist.current.headingArr.length > 10 && locationHist.current.headingArr.shift();
+            locationHist.current.headingArr.push(pos.coords.heading);
+            const sum = locationHist.current.headingArr.reduce((prev, curr) => prev + curr, 0);
+            locationHist.current.headingAvg = sum / locationHist.current.headingArr.length;
           } else {
             pos = oldPos;
           };
@@ -209,10 +209,13 @@ export default function MapContainer({startingPosition}) {
     if (map.current && position.coords.speed > .02){
     // if (map.current){
       map.current.panTo({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      });
-      map.current.setHeading(position.coords.heading);
+        // lat: position.coords.latitude,
+        // lng: position.coords.longitude
+        lat: locationHist.current.locationAvg.lat,
+        lng: locationHist.current.locationAvg.lng
+      }); 
+      map.current.setHeading(locationHist.current.headingAvg);
+      // map.current.setHeading(position.coords.heading);
     }
   },[position]);
 
