@@ -206,7 +206,7 @@ export default function MapContainer({startingPosition}) {
   //   }
   // },[map, position]);
   useLayoutEffect(() => {
-    if (map.current && position.coords.speed > 1){
+    if (map.current && position.coords.speed > .02){
     // if (map.current){
       map.current.panTo({
         lat: position.coords.latitude,
