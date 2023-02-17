@@ -133,11 +133,11 @@ export default function MapContainer({startingPosition}) {
 
   useEffect(() => {
     if (map){
-      map.panTo({
-        lat: locationHist.current.locationAvg.lat,
-        lng: locationHist.current.locationAvg.lng
-      });
-      map.setHeading(locationHist.current.headingAvg);
+      // map.panTo({
+      //   lat: locationHist.current.locationAvg.lat,
+      //   lng: locationHist.current.locationAvg.lng
+      // });
+      map.setHeading(position.coords.heading);
     }
   },[map, position]);
   // useEffect(() => {
@@ -173,6 +173,10 @@ export default function MapContainer({startingPosition}) {
         }
       });
     }
+    map?.panTo({
+      lat: locationHist.current.locationAvg.lat,
+      lng: locationHist.current.locationAvg.lng
+    });
   },[map, prevPosition])
   
   const onLoad = useCallback(map => {
