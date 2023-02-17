@@ -77,7 +77,7 @@ export default function MapContainer({startingPosition}) {
             oldPos?.coords.longitude !== newPos.coords.longitude){
             pos = newPos;
 
-            locationHist.current.locationArr.length > 4 && locationHist.current.locationArr.shift();
+            locationHist.current.locationArr.length > 10 && locationHist.current.locationArr.shift();
             locationHist.current.locationArr.push({
               lat: pos.coords.latitude,
               lng: pos.coords.longitude
@@ -93,7 +93,7 @@ export default function MapContainer({startingPosition}) {
               lng: sumObj.lng / locationHist.current.locationArr.length,
             };
 
-            locationHist.current.headingArr.length > 4 && locationHist.current.headingArr.shift();
+            locationHist.current.headingArr.length > 10 && locationHist.current.headingArr.shift();
             locationHist.current.headingArr.push(pos.coords.heading);
             const sum = locationHist.current.headingArr.reduce((prev, curr) => prev + curr, 0);
             locationHist.current.headingAvg = sum / locationHist.current.headingArr.length;
@@ -112,7 +112,7 @@ export default function MapContainer({startingPosition}) {
             new window.google.maps.LatLng(prevPos.coords.latitude, prevPos.coords.longitude),
             new window.google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
           
-          if (dist > 20) {
+          if (dist > 40) {
             return pos;
           } else {
             return prevPos;
