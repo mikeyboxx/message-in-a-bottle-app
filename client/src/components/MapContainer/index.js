@@ -35,10 +35,10 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap options
   const defaultMapOptions = useMemo(()=>({ 
     disableDefaultUI: true,
-    // isFractionalZoomEnabled: false,
     minZoom: 13,
-    // maxZoom: 20,
     mapId: '8dce6158aa71a36a',
+    // maxZoom: 20,
+    // isFractionalZoomEnabled: false,
   }),[]);
 
   // default GoogleMap styles
@@ -48,10 +48,12 @@ export default function MapContainer({startingPosition}) {
     position: 'relative' 
   }),[]);
   
+  // track google maps events
   const onDragEnd = useCallback(() => dragEnd.current = true,[]);
   const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
   const onBoundsChanged = useCallback(() => boundsChanged.current = true,[]);
 
+  // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
     if (map.current && 
       (zoomChanged.current === true || dragEnd.current === true || boundsChanged.current === true)){
@@ -70,6 +72,7 @@ export default function MapContainer({startingPosition}) {
     boundsChanged.current = false;
   },[getNotesInBounds]);
 
+  // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
     gMap.setOptions({
       zoom: 20,
@@ -83,7 +86,7 @@ export default function MapContainer({startingPosition}) {
     map.current = gMap;
   },[startingPosition]);
 
-  // first time get current gps position
+  // after initial render, start monitoring the user's gps location
   useEffect(()=>{
     const navId = navigator.geolocation.watchPosition( 
       newPos => 
@@ -105,6 +108,8 @@ export default function MapContainer({startingPosition}) {
     return () => navigator.geolocation.clearWatch(navId);
   },[]);
 
+  // each time gps position changes, save the position, and every 40 meters pan the map (chg center)
+  // if gps accuracy is less than 13 meters, change the heading of the map
   useEffect(() => {
     if (position) {
       if (Object.keys(prevPosition.current).length === 0){
@@ -113,8 +118,8 @@ export default function MapContainer({startingPosition}) {
       };
 
       const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-        new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
-        new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+        {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
+        {lat: position.coords.latitude, lng: position.coords.longitude});
 
       if (dist > 40) {
         prevPosition.current.lat = position.coords.latitude;
@@ -128,6 +133,7 @@ export default function MapContainer({startingPosition}) {
     }
   },[position]);
 
+  // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
     if (data?.notesInBounds) {
       const arr = data.notesInBounds.map(note => {
@@ -173,6 +179,7 @@ export default function MapContainer({startingPosition}) {
           )}
         </GoogleMap>}
 
+      {/* below code is used for debugging */}
       {position &&       
         <div 
           style={{
@@ -189,12 +196,10 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
-            {/* SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
-            NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/> */}
             Zoom: {map?.current?.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
-        new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
-        new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude))}<br/><br/>
+              {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
+              {lat: position.coords.latitude, lng: position.coords.longitude})}<br/><br/>
 
             Curr Lat: {position.coords.latitude}<br/>
             Curr Lng: {position.coords.longitude}<br/><br/>
