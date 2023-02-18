@@ -35,7 +35,7 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap options
   const defaultMapOptions = useMemo(()=>({ 
     disableDefaultUI: true,
-    isFractionalZoomEnabled: false,
+    // isFractionalZoomEnabled: false,
     minZoom: 13,
     // maxZoom: 20,
     mapId: '8dce6158aa71a36a',
@@ -192,6 +192,7 @@ export default function MapContainer({startingPosition}) {
                 lng: note.lng
               }}
               icon={{...noteIcon, fillColor: note.inProximity ? "red" : "black"}}
+              title={note.noteText}  
             />
           )}
         </GoogleMap>}
@@ -215,12 +216,18 @@ export default function MapContainer({startingPosition}) {
           <p>
             {/* SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
             NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/> */}
-            Zoom: {map?.current?.zoom} <br/>
+            {/* Zoom: {map?.current?.zoom} <br/> */}
+            Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
+        new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
+        new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude))}<br/>
+
             Curr Lat: {position.coords.latitude}<br/>
             Curr Lng: {position.coords.longitude}<br/><br/>
+
             geolocation Heading: {position.coords.heading} <br/><br/>
             geolocation Speed: {position.coords.speed} <br/><br/>
             geolocation accuracy: {position.coords.accuracy} <br/><br/>
+
             Number of notes in bounds: {notesInBounds?.length} <br/><br/>
             Number of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
           </p>
