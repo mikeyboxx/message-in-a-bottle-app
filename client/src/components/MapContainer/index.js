@@ -95,7 +95,6 @@ export default function MapContainer({startingPosition}) {
 
 
   useEffect(() => {
-    // data?.notesInBounds && console.log(data.notesInBounds);
     if (data?.notesInBounds) {
       const arr = data.notesInBounds.map(note => {
         const distance = getDistance(
@@ -120,7 +119,7 @@ export default function MapContainer({startingPosition}) {
     }
   },[data, getDistance, position]);
 
-  
+
   // first time get current gps position
   useLayoutEffect(()=>{
     const navId = navigator.geolocation.watchPosition( 
@@ -149,15 +148,17 @@ export default function MapContainer({startingPosition}) {
             prevPosition.current.lat = currPos.coords.latitude;
             prevPosition.current.lng = currPos.coords.longitude;
             const newBounds = map.current.getBounds();
-            console.log('getNotes in setPosition');
-            getNotesInBounds({variables: {
-              currLat: currPos.coords.latitude,
-              currLng: currPos.coords.longitude0,
-              swLat: newBounds.getSouthWest().lat(), 
-              swLng: newBounds.getSouthWest().lng(), 
-              neLat: newBounds.getNorthEast().lat(), 
-              neLng: newBounds.getNorthEast().lng()
-            }});
+            if (newBounds) {
+              console.log('getNotes in setPosition');
+              getNotesInBounds({variables: {
+                currLat: currPos.coords.latitude,
+                currLng: currPos.coords.longitude0,
+                swLat: newBounds.getSouthWest().lat(), 
+                swLng: newBounds.getSouthWest().lng(), 
+                neLat: newBounds.getNorthEast().lat(), 
+                neLng: newBounds.getNorthEast().lng()
+              }});
+            }
           }
           return currPos;
         });
