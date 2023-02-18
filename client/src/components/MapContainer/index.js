@@ -175,7 +175,7 @@ export default function MapContainer({startingPosition}) {
 
 
   useLayoutEffect(() => {
-    if (map.current && position.coords.speed > .02){
+    if (map.current && position.coords.accuracy < 15){
       map.current.panTo({
         lat: position.coords.latitude,
         lng: position.coords.longitude
