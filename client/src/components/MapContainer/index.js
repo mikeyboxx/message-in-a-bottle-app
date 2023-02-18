@@ -8,7 +8,7 @@ export default function MapContainer({startingPosition}) {
   // console.log('MapContainer');
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
+  const [getNotesInBounds, {loading, data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   
   const map = useRef(null);
   const prevPosition = useRef({});
@@ -135,31 +135,31 @@ export default function MapContainer({startingPosition}) {
             currPos = oldPos;
           };
 
-          // if (Object.keys(prevPosition.current).length === 0){
-          //   prevPosition.current.lat = currPos.coords.latitude;
-          //   prevPosition.current.lng = currPos.coords.longitude;
-          // };
+          if (Object.keys(prevPosition.current).length === 0){
+            prevPosition.current.lat = currPos.coords.latitude;
+            prevPosition.current.lng = currPos.coords.longitude;
+          };
   
-          // const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-          //   new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
-          //   new window.google.maps.LatLng(currPos.coords.latitude, currPos.coords.longitude));
+          const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
+            new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
+            new window.google.maps.LatLng(currPos.coords.latitude, currPos.coords.longitude));
   
-          // if (dist > 40) {
-          //   prevPosition.current.lat = currPos.coords.latitude;
-          //   prevPosition.current.lng = currPos.coords.longitude;
-          //   const newBounds = map.current.getBounds();
-          //   if (newBounds) {
-          //     console.log('getNotes in setPosition');
-          //     getNotesInBounds({variables: {
-          //       currLat: currPos.coords.latitude,
-          //       currLng: currPos.coords.longitude0,
-          //       swLat: newBounds.getSouthWest().lat(), 
-          //       swLng: newBounds.getSouthWest().lng(), 
-          //       neLat: newBounds.getNorthEast().lat(), 
-          //       neLng: newBounds.getNorthEast().lng()
-          //     }});
-          //   }
-          // }
+          if (dist > 40) {
+            // prevPosition.current.lat = currPos.coords.latitude;
+            // prevPosition.current.lng = currPos.coords.longitude;
+            const newBounds = map.current.getBounds();
+            if (newBounds) {
+              console.log('getNotes in setPosition');
+              getNotesInBounds({variables: {
+                currLat: currPos.coords.latitude,
+                currLng: currPos.coords.longitude0,
+                swLat: newBounds.getSouthWest().lat(), 
+                swLng: newBounds.getSouthWest().lng(), 
+                neLat: newBounds.getNorthEast().lat(), 
+                neLng: newBounds.getNorthEast().lng()
+              }});
+            }
+          }
           return currPos;
         });
       },
@@ -172,15 +172,11 @@ export default function MapContainer({startingPosition}) {
     );
       
     return () => navigator.geolocation.clearWatch(navId);
-  },[]);
+  },[getNotesInBounds]);
 
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (position) {
-      if (Object.keys(prevPosition.current).length === 0){
-        prevPosition.current.lat = position?.coords.latitude;
-        prevPosition.current.lng = position?.coords.longitude;
-      };
 
       const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
         new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
@@ -189,26 +185,26 @@ export default function MapContainer({startingPosition}) {
       if (dist > 40) {
         prevPosition.current.lat = position.coords.latitude;
         prevPosition.current.lng = position.coords.longitude;
-        const newBounds = map.current.getBounds();
-        if (newBounds) {
-          console.log('getNotes in setPosition');
-          getNotesInBounds({variables: {
-            currLat: position.coords.latitude,
-            currLng: position.coords.longitude0,
-            swLat: newBounds.getSouthWest().lat(), 
-            swLng: newBounds.getSouthWest().lng(), 
-            neLat: newBounds.getNorthEast().lat(), 
-            neLng: newBounds.getNorthEast().lng()
-          }});
-        }
+        // const newBounds = map.current.getBounds();
+        // if (newBounds) {
+        //   console.log('getNotes in setPosition');
+        //   getNotesInBounds({variables: {
+        //     currLat: position.coords.latitude,
+        //     currLng: position.coords.longitude0,
+        //     swLat: newBounds.getSouthWest().lat(), 
+        //     swLng: newBounds.getSouthWest().lng(), 
+        //     neLat: newBounds.getNorthEast().lat(), 
+        //     neLng: newBounds.getNorthEast().lng()
+        //   }});
+        // }
         if (map.current){
           map.current.panTo({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
-          position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
         } 
       }
+      position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
     }
   },[position, getNotesInBounds]);
 
@@ -235,7 +231,7 @@ export default function MapContainer({startingPosition}) {
             }}
           />
           
-          {notesInBounds?.map((note, idx) => 
+          {!loading && notesInBounds?.map((note, idx) => 
             <Marker
               key={idx}
               options={{
@@ -278,7 +274,7 @@ export default function MapContainer({startingPosition}) {
           </p>
           
           <ul>
-            {notesInBounds
+            {!loading && notesInBounds
               ?.filter(marker => marker.inProximity === true)
               ?.map((el, idx) => 
                 <li key={idx}>
