@@ -121,7 +121,7 @@ export default function MapContainer({startingPosition}) {
 
 
   // first time get current gps position
-  useLayoutEffect(()=>{
+  useEffect(()=>{
     const navId = navigator.geolocation.watchPosition( 
       newPos => {
         
@@ -175,14 +175,15 @@ export default function MapContainer({startingPosition}) {
   },[getNotesInBounds]);
 
 
-  useLayoutEffect(() => {
-    if (map.current && position.coords.accuracy < 15){
-      map.current.panTo({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      }); 
-      map.current.setHeading(position.coords.heading);
-    }
+  useEffect(() => {
+    if (map.current){
+      (position.coords.speed > .02) &&
+        map.current.panTo({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+      (position.coords.accuracy < 15) && map.current.setHeading(position.coords.heading);
+    } 
   },[position]);
 
 
