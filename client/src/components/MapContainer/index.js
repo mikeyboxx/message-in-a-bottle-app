@@ -127,8 +127,16 @@ export default function MapContainer({startingPosition}) {
         map.current && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
       }
 
-      if (position.coords.accuracy < 13 && map.current) {
-        map.current.setHeading(position.coords.heading);
+      if (map.current){
+        const newBounds = map.current.getBounds();
+        const inBounds = 
+          position.coords.lat > newBounds.getSouthWest().lat() && 
+          position.coords.lat >  newBounds.getSouthWest().lng() && 
+          position.coords.lat < newBounds.getNorthEast().lat() && 
+          position.coords.lat <  newBounds.getNorthEast().lng();
+        if (position.coords.accuracy < 13 && inBounds) {
+          map.current.setHeading(position.coords.heading);
+        }
       }
     }
   },[position]);
