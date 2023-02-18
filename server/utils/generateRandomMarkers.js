@@ -44,9 +44,6 @@ const getLatLonGivenDistanceAndBearing = (lat, lon, x, y) => {
 }
 
 function getLatLonBounds(currLat, currLng, distanceInMeters = 100){
- //Earth’s radius in meters, sphere
-  const R=6378137 // meters
-
   const bounds = {
     NE: {
       lat: null,

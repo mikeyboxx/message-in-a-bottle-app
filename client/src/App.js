@@ -8,6 +8,7 @@ import {
 } from '@apollo/client';
 // import { setContext } from '@apollo/client/link/context';
 import MapContainer from './components/MapContainer';
+// import {getLatLonBounds} from './utils/trigonometry';
 
 
 // used by google maps api param
