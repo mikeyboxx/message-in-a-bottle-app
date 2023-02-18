@@ -47,31 +47,9 @@ export default function MapContainer({startingPosition}) {
     width: '100%', 
     position: 'relative' 
   }),[]);
-
-  const getDistance = useCallback((source, destination) => {
-    return window.google.maps.geometry.spherical.computeDistanceBetween(
-      new window.google.maps.LatLng(source.lat, source.lng),
-      new window.google.maps.LatLng(destination.lat, destination.lng)
-    );
-  },[]);
-
-  const onLoad = useCallback(gMap => {
-    gMap.setOptions({
-      zoom: 20,
-      heading: startingPosition.coords.heading,
-      center:  {
-        lat: startingPosition.coords.latitude,
-        lng: startingPosition.coords.longitude,
-      }
-    });
-    
-    map.current = gMap;
-  },[startingPosition]);
   
   const onDragEnd = useCallback(() => dragEnd.current = true,[]);
-
   const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
-
   const onBoundsChanged = useCallback(() => boundsChanged.current = true,[]);
 
   const onIdle = useCallback(() => {
@@ -92,24 +70,18 @@ export default function MapContainer({startingPosition}) {
     boundsChanged.current = false;
   },[getNotesInBounds]);
 
-
-  useEffect(() => {
-    if (data?.notesInBounds) {
-      const arr = data.notesInBounds.map(note => {
-        const distance = getDistance(
-          {lat: position.coords.latitude, lng: position.coords.longitude},
-          {lat: note.lat, lng: note.lng});
-        
-        return {
-          ...note,
-          distance,
-          inProximity: distance < 30
-        }
-      });
-      setNotesInBounds(arr);
-    }
-  },[getDistance, data, position]);
-
+  const onLoad = useCallback(gMap => {
+    gMap.setOptions({
+      zoom: 20,
+      heading: startingPosition.coords.heading,
+      center:  {
+        lat: startingPosition.coords.latitude,
+        lng: startingPosition.coords.longitude,
+      }
+    });
+    
+    map.current = gMap;
+  },[startingPosition]);
 
   // first time get current gps position
   useEffect(()=>{
@@ -130,10 +102,8 @@ export default function MapContainer({startingPosition}) {
         maximumAge: Infinity
       }
     );
-      
     return () => navigator.geolocation.clearWatch(navId);
-  },[getNotesInBounds]);
-
+  },[]);
 
   useEffect(() => {
     if (position) {
@@ -146,16 +116,33 @@ export default function MapContainer({startingPosition}) {
         new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
         new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude));
 
-
       if (dist > 40) {
         prevPosition.current.lat = position.coords.latitude;
         prevPosition.current.lng = position.coords.longitude;
         map.current && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
       }
 
-      position.coords.accuracy < 13 && map.current && map.current.setHeading(position.coords.heading);
+      if (position.coords.accuracy < 13 && map.current) {
+        map.current.setHeading(position.coords.heading);
+      }
     }
-  },[position, getNotesInBounds]);
+  },[position]);
+
+  useEffect(() => {
+    if (data?.notesInBounds) {
+      const arr = data.notesInBounds.map(note => {
+        const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
+          {lat: position.coords.latitude, lng: position.coords.longitude},
+          {lat: note.lat, lng: note.lng});
+        return {
+          ...note,
+          distance,
+          inProximity: distance < 30
+        }
+      });
+      setNotesInBounds(arr);
+    }
+  },[data, position]);
 
 
   return (
@@ -171,26 +158,15 @@ export default function MapContainer({startingPosition}) {
           onDragEnd={onDragEnd}
         >
           <Marker
-            position={{
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            }}
-            icon={{
-              ...userIcon,
-              path: window.google.maps.SymbolPath.CIRCLE
-            }}
+            position={{lat: position.coords.latitude, lng: position.coords.longitude}}
+            icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
           
           {notesInBounds?.map((note, idx) => 
             <Marker
               key={idx}
-              options={{
-                optimized: true,
-              }}
-              position={{
-                lat: note.lat,
-                lng: note.lng
-              }}
+              options={{optimized: true}}
+              position={{lat: note.lat, lng: note.lng}}
               icon={{...noteIcon, fillColor: note.inProximity ? "red" : "black"}}
               title={note.noteText}  
             />
@@ -205,9 +181,8 @@ export default function MapContainer({startingPosition}) {
             left: 2,
             width: '200px',
             height: '400px',
-            backgroundColor: 'black',
-            opacity: .2,
-            color: 'white',
+            padding: 5,
+            color: 'black',
             fontWeight: 'bold',
             fontSize: '.85em',
             overflow: 'auto'
@@ -216,20 +191,20 @@ export default function MapContainer({startingPosition}) {
           <p>
             {/* SW Lat: {bounds?.SW.lat} <br/> SW Lng: {bounds?.SW.lng} <br/><br/>
             NE Lat: {bounds?.NE.lat} <br/> NE Lng: {bounds?.NE.lng} <br/><br/> */}
-            {/* Zoom: {map?.current?.zoom} <br/> */}
+            Zoom: {map?.current?.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
         new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
-        new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude))}<br/>
+        new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude))}<br/><br/>
 
             Curr Lat: {position.coords.latitude}<br/>
             Curr Lng: {position.coords.longitude}<br/><br/>
 
-            geolocation Heading: {position.coords.heading} <br/><br/>
-            geolocation Speed: {position.coords.speed} <br/><br/>
-            geolocation accuracy: {position.coords.accuracy} <br/><br/>
+            Heading: {position.coords.heading} <br/><br/>
+            Speed: {position.coords.speed} <br/><br/>
+            Aaccuracy: {position.coords.accuracy} <br/><br/>
 
-            Number of notes in bounds: {notesInBounds?.length} <br/><br/>
-            Number of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+            # of notes in bounds: {notesInBounds?.length} <br/><br/>
+            # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
           </p>
           
           <ul>
