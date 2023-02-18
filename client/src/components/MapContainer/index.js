@@ -1,29 +1,19 @@
 import {useState, useCallback, useEffect, useMemo, useRef, useLayoutEffect} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
-import { useQuery, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 
 export default function MapContainer({startingPosition}) {
   // console.log('MapContainer');
-  // const [map, setMap] = useState(null);
   const [position, setPosition] = useState(null);
-  // const [prevPosition, setPrevPosition] = useState(null);
-  // const [bounds, setBounds] = useState(null);
+  const [notesInBounds, setNotesInBounds] = useState(null);
+  const [getNotes, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   
   const map = useRef(null);
   const prevPosition = useRef({});
   const zoomChanged = useRef(false);
   const dragEnd = useRef(false);
-  const locationHist = useRef({
-    locationArr: [],
-    locationAvg: {},
-    headingArr: [],
-    headingAvg: 0
-  });
-
-  const queryPosition = useRef({});
-  const queryBounds = useRef({});
 
   // Marker object's icon property of the User
   const userIcon = useMemo(()=>({ 
@@ -58,34 +48,78 @@ export default function MapContainer({startingPosition}) {
     position: 'relative' 
   }),[]);
 
+  const getDistance = useCallback((source, destination) => {
+    return window.google.maps.geometry.spherical.computeDistanceBetween(
+      new window.google.maps.LatLng(source.lat, source.lng),
+      new window.google.maps.LatLng(destination.lat, destination.lng)
+    );
+  },[]);
 
-  const [getNotes, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS, {
-    // variables: {
-    //   currLat: queryPosition.current.lat || 0,
-    //   currLng: queryPosition.current.lng || 0,
-    //   swLat: queryBounds.current.SW?.lat || 0, 
-    //   swLng: queryBounds.current.SW?.lng || 0, 
-    //   neLat: queryBounds.current.NE?.lat || 0, 
-    //   neLng: queryBounds.current.NE?.lng || 0
-    // }
-  });
+  const onLoad = useCallback(gMap => {
+    // console.log('onLoad');
+    gMap.setOptions({
+      zoom: 20,
+      heading: startingPosition.coords.heading,
+      center:  {
+        lat: startingPosition.coords.latitude,
+        lng: startingPosition.coords.longitude,
+      }
+    });
+    
+    map.current = gMap;
+  },[startingPosition]);
+  
+  const onDragEnd = useCallback(() => dragEnd.current = true,[]);
 
-  // console.log(data?.notesInBounds);
-  // const {data} = useQuery(QUERY_NOTES_IN_BOUNDS, {
-  //   variables: {
-  //     currLat: queryPosition.current.lat || 0,
-  //     currLng:  queryPosition.current.lng || 0,
-  //     // currLat: prevPosition?.coords.latitude || 0,
-  //     // currLng: prevPosition?.coords.longitude || 0,
-  //     // currLat: locationHist.current.locationArr.lat || 0,
-  //     // currLng: locationHist.current.locationArr.lng || 0,
-  //     swLat: bounds?.SW.lat || 0, 
-  //     swLng: bounds?.SW.lng || 0, 
-  //     neLat: bounds?.NE.lat || 0, 
-  //     neLng: bounds?.NE.lng || 0
-  //   },
-  //   pollInterval: 1000,
-  // });
+  const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
+  
+  const onIdle = useCallback(() => {
+    // console.log('onIdle');
+    if (map.current && (zoomChanged.current === true || dragEnd.current === true)) {
+      const newBounds = map.current.getBounds();
+      if (newBounds) {
+        // console.log('getNotes in onIdle');
+        getNotes({variables: {
+          currLat: position.coords.latitude,
+          currLng: position.coords.longitude,
+          swLat: newBounds.getSouthWest().lat(), 
+          swLng: newBounds.getSouthWest().lng(), 
+          neLat: newBounds.getNorthEast().lat(), 
+          neLng: newBounds.getNorthEast().lng()
+        }});
+      }
+    }
+    zoomChanged.current = false;
+    dragEnd.current = false;
+  },[getNotes, position]);
+
+
+  useEffect(() => {
+    // data?.notesInBounds && console.log(data.notesInBounds);
+    if (data?.notesInBounds) {
+      const arr = data.notesInBounds.map(note => {
+        const distance = getDistance(
+          {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          },
+          {
+            lat: note.lat,
+            lng: note.lng
+          }
+        );
+        
+        return {
+          ...note,
+          distance,
+          inProximity: distance < 30
+        }
+      });
+      // console.log(arr);
+      setNotesInBounds(arr);
+    }
+  },[data, getDistance, position]);
+
   
   // first time get current gps position
   useLayoutEffect(()=>{
@@ -93,96 +127,40 @@ export default function MapContainer({startingPosition}) {
       newPos => {
         
         setPosition(oldPos => {
-          let pos;
+          let currPos;
+
           if (oldPos?.coords.latitude !== newPos.coords.latitude || 
             oldPos?.coords.longitude !== newPos.coords.longitude){
-            pos = newPos;
-            queryPosition.current.lat = pos.coords.latitude;
-            queryPosition.current.lng = pos.coords.longitude;
-            // queryPosition.current = {
-            //   lat: pos.coords.latitude,
-            //   lng: pos.coords.longitude,
-            // }
-
-            // locationHist.current.locationArr.length > 10 && locationHist.current.locationArr.shift();
-            // locationHist.current.locationArr.push({
-            //   lat: pos.coords.latitude,
-            //   lng: pos.coords.longitude
-            // });
-            // const sumObj = locationHist.current.locationArr.reduce((prev, curr) => 
-            //   ({
-            //     lat: prev.lat + curr.lat,
-            //     lng: prev.lng + curr.lng
-            //   }) 
-            // );
-            // locationHist.current.locationAvg = {
-            //   lat: sumObj.lat / locationHist.current.locationArr.length,
-            //   lng: sumObj.lng / locationHist.current.locationArr.length,
-            // };
-
-            // locationHist.current.headingArr.length > 10 && locationHist.current.headingArr.shift();
-            // locationHist.current.headingArr.push(pos.coords.heading);
-            // const sum = locationHist.current.headingArr.reduce((prev, curr) => prev + curr, 0);
-            // locationHist.current.headingAvg = sum / locationHist.current.headingArr.length;
+            currPos = newPos;
           } else {
-            pos = oldPos;
+            currPos = oldPos;
           };
 
           if (Object.keys(prevPosition.current).length === 0){
-            prevPosition.current.lat = pos.coords.latitude;
-            prevPosition.current.lng = pos.coords.longitude;
-          }
-            // prevPosition.current = {
-            //   lat: pos.coords.lat,
-            //   lng: pos.coords.lng
-            // }
+            prevPosition.current.lat = currPos.coords.latitude;
+            prevPosition.current.lng = currPos.coords.longitude;
+          };
   
           const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
             new window.google.maps.LatLng(prevPosition.current.lat, prevPosition.current.lng),
-            new window.google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+            new window.google.maps.LatLng(currPos.coords.latitude, currPos.coords.longitude));
   
           if (dist > 40) {
-            prevPosition.current.lat = pos.coords.latitude;
-            prevPosition.current.lng = pos.coords.longitude;
+            prevPosition.current.lat = currPos.coords.latitude;
+            prevPosition.current.lng = currPos.coords.longitude;
             const newBounds = map.current.getBounds();
-  
-            queryBounds.current.SW.lat = newBounds.getSouthWest().lat();
-            queryBounds.current.SW.lng = newBounds.getSouthWest().lng();
-            queryBounds.current.NE.lat = newBounds.getNorthEast().lat();
-            queryBounds.current.NE.lng = newBounds.getNorthEast().lng();
-            
-            // console.log('getNotes in setPosition');
+            console.log('getNotes in setPosition');
             getNotes({variables: {
-              currLat: queryPosition.current.lat || 0,
-              currLng: queryPosition.current.lng || 0,
-              swLat: queryBounds.current.SW?.lat || 0, 
-              swLng: queryBounds.current.SW?.lng || 0, 
-              neLat: queryBounds.current.NE?.lat || 0, 
-              neLng: queryBounds.current.NE?.lng || 0
+              currLat: currPos.coords.latitude,
+              currLng: currPos.coords.longitude0,
+              swLat: newBounds.getSouthWest().lat(), 
+              swLng: newBounds.getSouthWest().lng(), 
+              neLat: newBounds.getNorthEast().lat(), 
+              neLng: newBounds.getNorthEast().lng()
             }});
-            
           }
-          return pos;
+          return currPos;
         });
-
-       
-
-        // setPrevPosition(prevPos => {
-        //   if (!prevPos){
-        //     return pos;
-        //   }
-
-        //   const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-        //     new window.google.maps.LatLng(prevPos.coords.latitude, prevPos.coords.longitude),
-        //     new window.google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-          
-        //   if (dist > 40) {
-
-        //     return pos;
-        //   } else {
-        //     return prevPos;
-        //   }
-        // });
       },
       err => console.log(err),
       {
@@ -196,114 +174,16 @@ export default function MapContainer({startingPosition}) {
   },[getNotes]);
 
 
-  // useEffect(() => {
-  //   if (map){
-  //     // map.panTo({
-  //     //   lat: locationHist.current.locationAvg.lat,
-  //     //   lng: locationHist.current.locationAvg.lng
-  //     // });
-  //     map.setHeading(position.coords.heading);
-  //   }
-  // },[map, position]);
   useLayoutEffect(() => {
     if (map.current && position.coords.speed > .02){
-    // if (map.current){
       map.current.panTo({
         lat: position.coords.latitude,
         lng: position.coords.longitude
-        // lat: locationHist.current.locationAvg.lat,
-        // lng: locationHist.current.locationAvg.lng
       }); 
-      // map.current.setHeading(locationHist.current.headingAvg);
       map.current.setHeading(position.coords.heading);
     }
   },[position]);
 
-  // useEffect(() => {
-  //   const newBounds = map?.getBounds();
-  //   if (newBounds){
-  //     setBounds(oldBounds => {
-  //       if (oldBounds?.SW.lat !== newBounds.getSouthWest().lat() ||
-  //         oldBounds?.SW.lng !== newBounds.getSouthWest().lng() ||
-  //         oldBounds?.NE.lat !== newBounds.getNorthEast().lat() ||
-  //         oldBounds?.NE.lng !== newBounds.getNorthEast().lng()) {
-  //         return {
-  //           SW: {
-  //             lat: newBounds.getSouthWest().lat(),
-  //             lng: newBounds.getSouthWest().lng()
-  //           },
-  //           NE: {
-  //             lat: newBounds.getNorthEast().lat(),
-  //             lng: newBounds.getNorthEast().lng()
-  //           },
-  //         }
-  //       } else {
-  //         return oldBounds;
-  //       }
-  //     });
-  //   }
-    
-  // },[map, prevPosition])
-  
-  const onLoad = useCallback(gMap => {
-    // console.log('onLoad');
-    gMap.setOptions({
-      zoom: 20,
-      heading: startingPosition.coords.heading,
-      center:  {
-        lat: startingPosition.coords.latitude,
-        lng: startingPosition.coords.longitude,
-      }
-    });
-    
-    // setMap(map);
-    map.current = gMap;
-  },[startingPosition]);
-  
-  const onDragEnd = useCallback(() => dragEnd.current = true,[]);
-  const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
-  
-  const onIdle = useCallback(() => {
-    // console.log('onIdle');
-    // if (!bounds || zoomChanged.current === true || dragEnd.current === true) {
-    if (map.current && (zoomChanged.current === true || dragEnd.current === true)) {
-      const newBounds = map.current.getBounds();
-      if (newBounds) {
-        queryBounds.current = {
-            SW: {
-              lat: newBounds.getSouthWest().lat(),
-              lng: newBounds.getSouthWest().lng()
-            },
-            NE: {
-              lat: newBounds.getNorthEast().lat(),
-              lng: newBounds.getNorthEast().lng()
-            },
-        }
-        // console.log('getNotes in onIdle');
-        getNotes({variables: {
-          currLat: queryPosition.current.lat || 0,
-          currLng: queryPosition.current.lng || 0,
-          swLat: queryBounds.current.SW?.lat || 0, 
-          swLng: queryBounds.current.SW?.lng || 0, 
-          neLat: queryBounds.current.NE?.lat || 0, 
-          neLng: queryBounds.current.NE?.lng || 0
-        }});
-      }
-      // set the bounds state variable, to be used to query the database for notes
-      // setBounds({
-      //   SW: {
-      //     lat: newBounds.getSouthWest().lat(),
-      //     lng: newBounds.getSouthWest().lng()
-      //   },
-      //   NE: {
-      //     lat: newBounds.getNorthEast().lat(),
-      //     lng: newBounds.getNorthEast().lng()
-      //   },
-      // });
-    }
-    zoomChanged.current = false;
-    dragEnd.current = false;
-  },[getNotes]);
 
   return (
     <>
@@ -315,18 +195,11 @@ export default function MapContainer({startingPosition}) {
           onIdle={onIdle}
           onZoomChanged={onZoomChanged}
           onDragEnd={onDragEnd}
-          // center={{
-          //   lat: position.coords.latitude,
-          //   lng: position.coords.longitude
-          // }}
-          // heading={position.coords.heading}
         >
           <Marker
             position={{
               lat: position.coords.latitude,
               lng: position.coords.longitude
-              // lat: locationHist.current.locationAvg.lat,
-              // lng: locationHist.current.locationAvg.lng,
             }}
             icon={{
               ...userIcon,
@@ -334,7 +207,7 @@ export default function MapContainer({startingPosition}) {
             }}
           />
           
-          {data?.notesInBounds?.map((note, idx) => 
+          {notesInBounds?.map((note, idx) => 
             <Marker
               key={idx}
               options={{
@@ -367,17 +240,17 @@ export default function MapContainer({startingPosition}) {
             
           <p>
             Zoom: {map?.current?.zoom} <br/>
-            Curr Lat: {position?.coords.latitude}<br/>
-            Curr Lng: {position?.coords.longitude}<br/><br/>
+            Curr Lat: {position.coords.latitude}<br/>
+            Curr Lng: {position.coords.longitude}<br/><br/>
             geolocation Heading: {position.coords.heading} <br/><br/>
             geolocation Speed: {position.coords.speed} <br/><br/>
             geolocation accuracy: {position.coords.accuracy} <br/><br/>
-            Number of notes in bounds: {data?.notesInBounds?.length} <br/><br/>
-            Number of notes in proximity: {data?.notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+            Number of notes in bounds: {notesInBounds?.length} <br/><br/>
+            Number of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
           </p>
           
           <ul>
-            {data?.notesInBounds?.filter(marker => marker.inProximity === true)?.map((el, idx) => 
+            {notesInBounds?.filter(marker => marker.inProximity === true)?.map((el, idx) => 
               <li key={idx}>
                   {el.noteText}<br/> Distance: {el.distance.toFixed(3)} meters <hr/> 
               </li>

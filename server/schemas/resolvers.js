@@ -1,14 +1,13 @@
 const { Note } = require('../models');
-const { getDistanceFromLatLonInMeters } = require('../utils/generateRandomMarkers');
 
 const resolvers = {
   Query: {
     notes: async () => Note.find(),
 
-    notesInBounds: async (parent, {currLat, currLng, swLat, swLng, neLat, neLng}) => {
+    notesInBounds: async (parent, {swLat, swLng, neLat, neLng}) => {
       // console.log('notesInBounds');
       // console.log(currLat, currLng, swLat, swLng, neLat, neLng);
-      let notes = await Note.find(
+      return await Note.find(
         {
           $and: [
             {lat: {$gt: swLat }},
@@ -18,15 +17,6 @@ const resolvers = {
           ]
         },
       ).lean();
-
-      return notes.map(note =>{
-        const distance = getDistanceFromLatLonInMeters(currLat, currLng, note.lat, note.lng);
-        return {
-          ...note,
-          distance,
-          inProximity: distance <= 20
-        }
-      }); 
     },
   },
 };

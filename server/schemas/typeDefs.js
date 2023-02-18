@@ -6,16 +6,12 @@ const typeDefs = gql`
     noteText: String
     lat: Float
     lng: Float
-    distance: Float
-    inProximity: Boolean
   }
 
   type Query {
     notes: [Note]
 
     notesInBounds(
-      currLat: Float!,
-      currLng: Float!,
       swLat: Float!, 
       swLng: Float!, 
       neLat: Float!, 
