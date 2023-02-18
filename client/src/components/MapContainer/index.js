@@ -8,7 +8,7 @@ export default function MapContainer({startingPosition}) {
   // console.log('MapContainer');
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotes, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
+  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   
   const map = useRef(null);
   const prevPosition = useRef({});
@@ -79,7 +79,7 @@ export default function MapContainer({startingPosition}) {
       const newBounds = map.current.getBounds();
       if (newBounds) {
         // console.log('getNotes in onIdle');
-        getNotes({variables: {
+        getNotesInBounds({variables: {
           currLat: position.coords.latitude,
           currLng: position.coords.longitude,
           swLat: newBounds.getSouthWest().lat(), 
@@ -91,7 +91,7 @@ export default function MapContainer({startingPosition}) {
     }
     zoomChanged.current = false;
     dragEnd.current = false;
-  },[getNotes, position]);
+  },[getNotesInBounds, position]);
 
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function MapContainer({startingPosition}) {
             prevPosition.current.lng = currPos.coords.longitude;
             const newBounds = map.current.getBounds();
             console.log('getNotes in setPosition');
-            getNotes({variables: {
+            getNotesInBounds({variables: {
               currLat: currPos.coords.latitude,
               currLng: currPos.coords.longitude0,
               swLat: newBounds.getSouthWest().lat(), 
@@ -171,7 +171,7 @@ export default function MapContainer({startingPosition}) {
     );
       
     return () => navigator.geolocation.clearWatch(navId);
-  },[getNotes]);
+  },[getNotesInBounds]);
 
 
   useLayoutEffect(() => {
