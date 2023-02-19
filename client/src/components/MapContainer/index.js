@@ -116,6 +116,7 @@ export default function MapContainer({startingPosition}) {
 
   // each time gps position changes, save the position, and every 40 meters pan the map (chg center)
   // if gps accuracy is less than 13 meters, change the heading of the map
+  // do not pan or change heading, if user gps position is not in bounds of the google map, due to zoom or drag
   useEffect(() => {
     if (position) {
       if (Object.keys(prevPosition.current).length === 0){
@@ -123,26 +124,25 @@ export default function MapContainer({startingPosition}) {
         prevPosition.current.lng = position.coords.longitude;
       };
 
-      const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-        {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
-        {lat: position.coords.latitude, lng: position.coords.longitude});
-
-      if (dist > 40) {
-        prevPosition.current.lat = position.coords.latitude;
-        prevPosition.current.lng = position.coords.longitude;
-        map.current && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
-      }
-
       if (map.current){
         const newBounds = map.current.getBounds();
-        const inBounds = 
+        const isInBounds = 
           position.coords.lat > newBounds.getSouthWest().lat() && 
           position.coords.lat >  newBounds.getSouthWest().lng() && 
           position.coords.lat < newBounds.getNorthEast().lat() && 
           position.coords.lat <  newBounds.getNorthEast().lng();
-        if (position.coords.accuracy < 13 && inBounds) {
-          map.current.setHeading(position.coords.heading);
+
+        const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
+          {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
+          {lat: position.coords.latitude, lng: position.coords.longitude});
+
+        if (dist > 40) {
+          prevPosition.current.lat = position.coords.latitude;
+          prevPosition.current.lng = position.coords.longitude;
+          isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
         }
+
+        isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
       }
     }
   },[position]);
@@ -193,56 +193,60 @@ export default function MapContainer({startingPosition}) {
             />
           )}
           
-          <Button 
-            size="lg" 
-            variant="info"
-            style={{
-              position: 'absolute',
-              border: 'none',
-              borderRadius: 30,
-              boxShadow: '5px 5px 5px gray',
-              bottom: 30,
-              left: 20,
-              paddingTop: 8,
-              paddingBottom: 8,
-              paddingLeft: 18,
-              paddingRight: 18,
-              fontWeight: 'bold',
-              backgroundColor: 'white',
-              color: 'purple',
-              fontSize: '.85em',
-              cursor: 'pointer'
-            }}
-          >
-            <Journals /> Create Note
-          </Button>
           
-          {notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
-            <Button 
-              size="lg" 
-              variant="info"
-              style={{
-                position: 'absolute',
-                border: 'none',
-                borderRadius: 30,
-                boxShadow: '5px 5px 5px gray',
-                bottom: 30,
-                left: 210,
-                paddingTop: 8,
-                paddingBottom: 8,
-                paddingLeft: 18,
-                paddingRight: 18,
-                fontWeight: 'bold',
-                backgroundColor: 'white',
-                color: 'purple',
-                fontSize: '.85em',
-                cursor: 'pointer'
-              }}
-            >
-              <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
-            </Button>}
 
         </GoogleMap>}
+
+      {position && 
+        <Button 
+        size="lg" 
+        variant="info"
+        style={{
+          position: 'absolute',
+          border: 'none',
+          borderRadius: 30,
+          boxShadow: '5px 5px 5px gray',
+          bottom: 30,
+          left: 20,
+          paddingTop: 8,
+          paddingBottom: 8,
+          paddingLeft: 18,
+          paddingRight: 18,
+          fontWeight: 'bold',
+          backgroundColor: 'white',
+          color: 'purple',
+          fontSize: '.85em',
+          cursor: 'pointer'
+        }}
+      >
+        <Journals /> Create Note
+      </Button>}
+      
+      {position && 
+      notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
+        <Button 
+          size="lg" 
+          variant="info"
+          style={{
+            position: 'absolute',
+            border: 'none',
+            borderRadius: 30,
+            boxShadow: '5px 5px 5px gray',
+            bottom: 30,
+            left: 210,
+            paddingTop: 8,
+            paddingBottom: 8,
+            paddingLeft: 18,
+            paddingRight: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+            color: 'purple',
+            fontSize: '.85em',
+            cursor: 'pointer'
+          }}
+        >
+          <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
+        </Button>}
       
 
       {/* below code is used for debugging */}
