@@ -47,13 +47,13 @@ export default function MapContainer({startingPosition}) {
 
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
-    height: '100vh', 
+    height: '100svh', 
     // height: `${window.innerHeight}px`, 
     // height: '100%', 
     // height: 'calc(100vh - calc(100vh - 100%))',
     // width: `${window.innerWidth}px`,
     width: '100%',
-    position: 'relative' 
+    // position: 'relative' 
   }),[]);
   
   // track google maps events
