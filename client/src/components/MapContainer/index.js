@@ -48,6 +48,8 @@ export default function MapContainer({startingPosition}) {
   const mapContainerStyle = useMemo(()=>({ 
     height: '100vh', 
     // height: 'calc(100vh - calc(100vh - 100%))',
+    // border: 'none',
+    
     width: '100%',
     position: 'relative' 
   }),[]);
