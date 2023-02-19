@@ -76,7 +76,6 @@ export default function MapContainer({startingPosition}) {
 
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
-    window.scroll(0,1);
     gMap.setOptions({
       zoom: 20,
       heading: startingPosition.coords.heading,
@@ -123,23 +122,25 @@ export default function MapContainer({startingPosition}) {
 
       if (map.current){
         const newBounds = map.current.getBounds();
-        const isInBounds = 
-          position.coords.lat > newBounds.getSouthWest().lat() && 
-          position.coords.lat >  newBounds.getSouthWest().lng() && 
-          position.coords.lat < newBounds.getNorthEast().lat() && 
-          position.coords.lat <  newBounds.getNorthEast().lng();
+        if (newBounds) {
+          const isInBounds = 
+            position.coords.lat > newBounds.getSouthWest().lat() && 
+            position.coords.lat >  newBounds.getSouthWest().lng() && 
+            position.coords.lat < newBounds.getNorthEast().lat() && 
+            position.coords.lat <  newBounds.getNorthEast().lng();
 
-        const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-          {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
-          {lat: position.coords.latitude, lng: position.coords.longitude});
+          const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
+            {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
+            {lat: position.coords.latitude, lng: position.coords.longitude});
 
-        if (dist > 40) {
-          prevPosition.current.lat = position.coords.latitude;
-          prevPosition.current.lng = position.coords.longitude;
-          isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+          if (dist > 40) {
+            prevPosition.current.lat = position.coords.latitude;
+            prevPosition.current.lng = position.coords.longitude;
+            isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+          }
+
+          isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
         }
-
-        isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
       }
     }
   },[position]);
@@ -166,7 +167,7 @@ export default function MapContainer({startingPosition}) {
   return (
     <>
 
-      {position && 
+      {/* {position &&  */}
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
@@ -177,7 +178,9 @@ export default function MapContainer({startingPosition}) {
           onDragEnd={onDragEnd}
         >
           <Marker
-            position={{lat: position.coords.latitude, lng: position.coords.longitude}}
+            position={position ? 
+              {lat: position.coords.latitude, lng: position.coords.longitude} :
+              {lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude}}
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
           
@@ -190,7 +193,7 @@ export default function MapContainer({startingPosition}) {
               title={note.noteText}  
             />
           )}
-        </GoogleMap>}
+        </GoogleMap>
 
       {map.current && 
         <Button 
