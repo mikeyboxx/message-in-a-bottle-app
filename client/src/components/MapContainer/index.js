@@ -189,64 +189,58 @@ export default function MapContainer({startingPosition}) {
               title={note.noteText}  
             />
           )}
+          
+          <Button 
+            size="lg" 
+            variant="info"
+            style={{
+              position: 'absolute',
+              border: 'none',
+              borderRadius: 30,
+              boxShadow: '5px 5px 5px gray',
+              bottom: 30,
+              left: 20,
+              paddingTop: 8,
+              paddingBottom: 8,
+              paddingLeft: 18,
+              paddingRight: 18,
+              fontWeight: 'bold',
+              backgroundColor: 'white',
+              color: 'purple',
+              fontSize: '.85em',
+              cursor: 'pointer'
+            }}
+          >
+            <Journals /> Create Note
+          </Button>
+          
+          {notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
+            <Button 
+              size="lg" 
+              variant="info"
+              style={{
+                position: 'absolute',
+                border: 'none',
+                borderRadius: 30,
+                boxShadow: '5px 5px 5px gray',
+                bottom: 30,
+                left: 200,
+                paddingTop: 8,
+                paddingBottom: 8,
+                paddingLeft: 18,
+                paddingRight: 18,
+                fontWeight: 'bold',
+                backgroundColor: 'white',
+                color: 'purple',
+                fontSize: '.85em',
+                cursor: 'pointer'
+              }}
+            >
+              <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
+            </Button>}
+
         </GoogleMap>}
       
-      {position &&
-        <Button 
-          size="lg" 
-          variant="info"
-          style={{
-            position: 'absolute',
-            border: 'none',
-            borderRadius: 30,
-            // borderColor: 'purple',
-            boxShadow: '5px 5px 5px gray',
-            bottom: 20,
-            left: 40,
-            paddingTop: 8,
-            paddingBottom: 8,
-            paddingLeft: 18,
-            paddingRight: 18,
-            fontWeight: 'bold',
-            backgroundColor: 'white',
-            color: 'purple',
-            fontSize: '.85em',
-            cursor: 'pointer'
-            // zIndex: -1,
-          }}
-        >
-          <Journals /> Create Note
-        </Button>
-      }
-      {position && notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
-        <Button 
-          size="lg" 
-          variant="info"
-          style={{
-            position: 'absolute',
-            border: 'none',
-            borderRadius: 30,
-            // borderColor: 'purple',
-            boxShadow: '5px 5px 5px gray',
-            bottom: 20,
-            left: 220,
-            paddingTop: 8,
-            paddingBottom: 8,
-            paddingLeft: 18,
-            paddingRight: 18,
-            fontWeight: 'bold',
-            backgroundColor: 'white',
-            color: 'purple',
-            fontSize: '.85em',
-            cursor: 'pointer'
-            // zIndex: -1,
-          }}
-        >
-          <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
-        </Button>
-      }
-        
-
 
       {/* below code is used for debugging */}
       {position &&       
