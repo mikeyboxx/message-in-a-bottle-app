@@ -47,7 +47,7 @@ export default function MapContainer({startingPosition}) {
 
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
-    height: '100vh', 
+    height: '100%', 
     // height: 'calc(100vh - calc(100vh - 100%))',
     // border: 'none',
     
@@ -169,9 +169,9 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-      <Div100vh>
 
       {position && 
+      <Div100vh>
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
@@ -198,7 +198,8 @@ export default function MapContainer({startingPosition}) {
           
           
 
-        </GoogleMap>}
+        </GoogleMap>
+        </Div100vh>}
 
       {position && 
         <Button 
@@ -296,7 +297,6 @@ export default function MapContainer({startingPosition}) {
           </ul>
 
         </div>}
-      </Div100vh>
     </>
   )
 }
