@@ -48,6 +48,7 @@ export default function MapContainer({startingPosition}) {
   const mapContainerStyle = useMemo(()=>({ 
     height: '100svh', 
     width: '100%',
+    position: 'relative'
   }),[]);
   
   // track google map events
@@ -177,6 +178,11 @@ export default function MapContainer({startingPosition}) {
           onBoundsChanged={onBoundsChanged}
           onZoomChanged={onZoomChanged}
           onDragEnd={onDragEnd}
+          style={{ 
+            height: '100svh', 
+            width: '100%',
+            position: 'relative'
+          }}
         >
           <Marker
             position={position ? 
