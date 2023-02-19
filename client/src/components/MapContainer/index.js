@@ -1,7 +1,6 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {Button} from "react-bootstrap";
 import {Journals} from 'react-bootstrap-icons';
-import Div100vh from 'react-div-100vh';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
@@ -48,12 +47,7 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
     height: '100svh', 
-    // height: `${window.innerHeight}px`, 
-    // height: '100%', 
-    // height: 'calc(100vh - calc(100vh - 100%))',
-    // width: `${window.innerWidth}px`,
     width: '100%',
-    // position: 'relative' 
   }),[]);
   
   // track google maps events
@@ -223,7 +217,7 @@ export default function MapContainer({startingPosition}) {
       </Button>
       
       {/* {position &&  */}
-      notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
+      {notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
         <Button 
           size="lg" 
           variant="info"
@@ -246,7 +240,7 @@ export default function MapContainer({startingPosition}) {
           }}
         >
           <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
-        </Button>
+        </Button>}
       
 
       {/* below code is used for debugging */}
