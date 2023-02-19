@@ -50,7 +50,8 @@ export default function MapContainer({startingPosition}) {
     height: `${window.innerHeight}px`, 
     // height: '100%', 
     // height: 'calc(100vh - calc(100vh - 100%))',
-    width: '100%',
+    width: `${window.innerWidth}px`,
+    // width: '100%',
     position: 'relative' 
   }),[]);
   
@@ -170,7 +171,6 @@ export default function MapContainer({startingPosition}) {
     <>
 
       {position && 
-      <Div100vh>
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
@@ -194,11 +194,7 @@ export default function MapContainer({startingPosition}) {
               title={note.noteText}  
             />
           )}
-          
-          
-
-        </GoogleMap>
-        </Div100vh>}
+        </GoogleMap>}
 
       {position && 
         <Button 
