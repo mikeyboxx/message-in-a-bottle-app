@@ -7,12 +7,11 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 
 export default function MapContainer({startingPosition}) {
-  const [map, setMap] = useState(null);
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   
-  // const map = useRef(null);
+  const map = useRef(null);
   const prevPosition = useRef({});
   const numberOfNotesInProximity = useRef(0);
   const zoomChanged = useRef(false);
@@ -51,16 +50,16 @@ export default function MapContainer({startingPosition}) {
     width: '100%'
   }),[]);
   
-  // track google maps events
+  // track google map events
   const onDragEnd = useCallback(() => dragEnd.current = true,[]);
   const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
   const onBoundsChanged = useCallback(() => boundsChanged.current = true,[]);
 
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
-    if (map && 
+    if (map.current && 
       (zoomChanged.current === true || dragEnd.current === true || boundsChanged.current === true)){
-      const newBounds = map.getBounds();
+      const newBounds = map.current.getBounds();
       if (newBounds) {
         getNotesInBounds({variables: {
           swLat: newBounds.getSouthWest().lat(), 
@@ -73,7 +72,7 @@ export default function MapContainer({startingPosition}) {
     zoomChanged.current = false;
     dragEnd.current = false;
     boundsChanged.current = false;
-  },[map, getNotesInBounds]);
+  },[getNotesInBounds]);
 
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
@@ -86,9 +85,8 @@ export default function MapContainer({startingPosition}) {
       }
     });
     
-    setMap(gMap);
-    // map = gMap;
-    // map.panTo({lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude});
+    map.current = gMap;
+    // map.current.panTo({lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude});
   },[startingPosition]);
 
   // after initial render, start monitoring the user's gps location
@@ -123,8 +121,8 @@ export default function MapContainer({startingPosition}) {
         prevPosition.current.lng = position.coords.longitude;
       };
 
-      if (map){
-        const newBounds = map.getBounds();
+      if (map.current){
+        const newBounds = map.current.getBounds();
         if (newBounds) {
           const isInBounds = 
             position.coords.lat > newBounds.getSouthWest().lat() && 
@@ -139,14 +137,14 @@ export default function MapContainer({startingPosition}) {
           if (dist > 40) {
             prevPosition.current.lat = position.coords.latitude;
             prevPosition.current.lng = position.coords.longitude;
-            isInBounds && map.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+            isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
           }
 
-          isInBounds && position.coords.accuracy < 13 && map.setHeading(position.coords.heading);
+          isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
         }
       }
     }
-  },[map, position]);
+  },[position]);
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
@@ -170,7 +168,7 @@ export default function MapContainer({startingPosition}) {
   return (
     <>
 
-      {position && 
+      {/* {position &&  */}
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
@@ -196,9 +194,9 @@ export default function MapContainer({startingPosition}) {
               title={note.noteText}  
             />
           )}
-        </GoogleMap>}
+        </GoogleMap>
 
-      {map && notesInBounds && 
+      {map.current && notesInBounds && 
         <Button 
         size="lg" 
         variant="info"
@@ -223,7 +221,7 @@ export default function MapContainer({startingPosition}) {
         <Journals /> Create Note
       </Button>}
       
-      {map && notesInBounds &&
+      {map.current && notesInBounds &&
         notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
         <Button 
           size="lg" 
@@ -251,7 +249,7 @@ export default function MapContainer({startingPosition}) {
       
 
       {/* below code is used for debugging */}
-      {map && position && notesInBounds &&     
+      {map.current && position && notesInBounds &&     
         <div 
           style={{
             position: 'absolute',
@@ -267,7 +265,7 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
-            Zoom: {map.zoom} <br/> <br/>
+            Zoom: {map.current.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
               {lat: position.coords.latitude, lng: position.coords.longitude})}<br/><br/>
