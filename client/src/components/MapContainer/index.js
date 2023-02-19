@@ -178,11 +178,6 @@ export default function MapContainer({startingPosition}) {
           onBoundsChanged={onBoundsChanged}
           onZoomChanged={onZoomChanged}
           onDragEnd={onDragEnd}
-          style={{ 
-            height: '100svh', 
-            width: '100%',
-            position: 'relative'
-          }}
         >
           <Marker
             position={position ? 
