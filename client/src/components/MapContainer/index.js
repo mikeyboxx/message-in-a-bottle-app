@@ -38,9 +38,9 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap options
   const defaultMapOptions = useMemo(()=>({ 
     disableDefaultUI: true,
-    minZoom: 13,
+    minZoom: 15,
     mapId: '8dce6158aa71a36a',
-    // maxZoom: 20,
+    maxZoom: 20,
     // isFractionalZoomEnabled: false,
   }),[]);
 
