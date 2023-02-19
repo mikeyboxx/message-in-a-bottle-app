@@ -146,7 +146,7 @@ export default function MapContainer({startingPosition}) {
         }
       }
     }
-  },[position]);
+  },[map, position]);
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
