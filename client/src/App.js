@@ -1,5 +1,7 @@
 import {useState, useEffect} from 'react';
 import {useJsApiLoader} from '@react-google-maps/api';
+import Div100vh from 'react-div-100vh';
+
 import {
   ApolloClient,
   InMemoryCache,
@@ -60,13 +62,13 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-      <div>
+      <Div100vh>
         {(!isLoaded || !startingPosition) && 'Loading...'}
 
         {loadError && 'Error Loading Google Maps!'}
 
         {(isLoaded && startingPosition) && <MapContainer startingPosition={startingPosition}/>}
-      </div>
+      </Div100vh>
     </ApolloProvider>
   );
 }
