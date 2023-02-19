@@ -47,10 +47,9 @@ export default function MapContainer({startingPosition}) {
 
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
-    height: '100%', 
+    height: `${window.innerHeight}px`, 
+    // height: '100%', 
     // height: 'calc(100vh - calc(100vh - 100%))',
-    // border: 'none',
-    
     width: '100%',
     position: 'relative' 
   }),[]);
