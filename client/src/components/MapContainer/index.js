@@ -1,6 +1,7 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {Button} from "react-bootstrap";
 import {Journals} from 'react-bootstrap-icons';
+import Div100vh from 'react-div-100vh';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
@@ -168,6 +169,8 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
+      <Div100vh>
+
       {position && 
         <GoogleMap
           options={defaultMapOptions}
@@ -293,6 +296,7 @@ export default function MapContainer({startingPosition}) {
           </ul>
 
         </div>}
+      </Div100vh>
     </>
   )
 }
