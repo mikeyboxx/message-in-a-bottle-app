@@ -47,7 +47,7 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
     height: '100svh', 
-    width: '100%'
+    width: '100%',
   }),[]);
   
   // track google map events
