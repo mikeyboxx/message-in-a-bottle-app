@@ -86,6 +86,7 @@ export default function MapContainer({startingPosition}) {
     });
     
     map.current = gMap;
+    map.current.panTo({lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude});
   },[startingPosition]);
 
   // after initial render, start monitoring the user's gps location
