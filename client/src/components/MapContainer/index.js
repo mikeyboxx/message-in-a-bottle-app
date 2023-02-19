@@ -192,7 +192,7 @@ export default function MapContainer({startingPosition}) {
           )}
         </GoogleMap>}
 
-      {/* {position &&  */}
+      {map.current && 
         <Button 
         size="lg" 
         variant="info"
@@ -215,10 +215,10 @@ export default function MapContainer({startingPosition}) {
         }}
       >
         <Journals /> Create Note
-      </Button>
+      </Button>}
       
-      {/* {position &&  */}
-      {notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
+      {map.current && 
+        notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
         <Button 
           size="lg" 
           variant="info"
@@ -245,7 +245,7 @@ export default function MapContainer({startingPosition}) {
       
 
       {/* below code is used for debugging */}
-      {position &&       
+      {position && map.current &&      
         <div 
           style={{
             position: 'absolute',
