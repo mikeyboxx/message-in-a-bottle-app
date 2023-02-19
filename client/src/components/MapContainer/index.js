@@ -47,7 +47,7 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
     height: '100svh', 
-    width: '100%',
+    width: '100%'
   }),[]);
   
   // track google maps events
@@ -76,6 +76,7 @@ export default function MapContainer({startingPosition}) {
 
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
+    window.scroll(0,1);
     gMap.setOptions({
       zoom: 20,
       heading: startingPosition.coords.heading,
