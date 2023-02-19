@@ -1,4 +1,6 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
+import {Button} from "react-bootstrap";
+import {Journals} from 'react-bootstrap-icons';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
@@ -11,6 +13,7 @@ export default function MapContainer({startingPosition}) {
   
   const map = useRef(null);
   const prevPosition = useRef({});
+  const numberOfNotesInProximity = useRef(0);
   const zoomChanged = useRef(false);
   const boundsChanged = useRef(false);
   const dragEnd = useRef(false);
@@ -154,6 +157,7 @@ export default function MapContainer({startingPosition}) {
           inProximity: distance < 30
         }
       });
+      numberOfNotesInProximity.current = arr.filter(note => note.inProximity === true).length;
       setNotesInBounds(arr);
     }
   },[data, position]);
@@ -186,6 +190,63 @@ export default function MapContainer({startingPosition}) {
             />
           )}
         </GoogleMap>}
+      
+      {position &&
+        <Button 
+          size="lg" 
+          variant="info"
+          style={{
+            position: 'absolute',
+            border: 'none',
+            borderRadius: 30,
+            // borderColor: 'purple',
+            boxShadow: '5px 5px 5px gray',
+            bottom: 20,
+            left: 40,
+            paddingTop: 8,
+            paddingBottom: 8,
+            paddingLeft: 18,
+            paddingRight: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+            color: 'purple',
+            fontSize: '.85em',
+            cursor: 'pointer'
+            // zIndex: -1,
+          }}
+        >
+          <Journals /> Create Note
+        </Button>
+      }
+      {position && notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
+        <Button 
+          size="lg" 
+          variant="info"
+          style={{
+            position: 'absolute',
+            border: 'none',
+            borderRadius: 30,
+            // borderColor: 'purple',
+            boxShadow: '5px 5px 5px gray',
+            bottom: 20,
+            left: 220,
+            paddingTop: 8,
+            paddingBottom: 8,
+            paddingLeft: 18,
+            paddingRight: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+            color: 'purple',
+            fontSize: '.85em',
+            cursor: 'pointer'
+            // zIndex: -1,
+          }}
+        >
+          <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
+        </Button>
+      }
+        
+
 
       {/* below code is used for debugging */}
       {position &&       
