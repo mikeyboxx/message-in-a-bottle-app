@@ -85,9 +85,7 @@ export default function MapContainer({startingPosition}) {
         lng: startingPosition.coords.longitude,
       }
     });
-    
     map.current = gMap;
-    // map.current.panTo({lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude});
   },[startingPosition]);
 
   // after initial render, start monitoring the user's gps location
@@ -127,9 +125,9 @@ export default function MapContainer({startingPosition}) {
         if (newBounds) {
           const isInBounds = 
             position.coords.lat > newBounds.getSouthWest().lat() && 
-            position.coords.lat >  newBounds.getSouthWest().lng() && 
+            position.coords.lng >  newBounds.getSouthWest().lng() && 
             position.coords.lat < newBounds.getNorthEast().lat() && 
-            position.coords.lat <  newBounds.getNorthEast().lng();
+            position.coords.lng <  newBounds.getNorthEast().lng();
 
           const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
             {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
@@ -168,7 +166,6 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-
       {/* {position &&  */}
         <GoogleMap
           options={defaultMapOptions}
