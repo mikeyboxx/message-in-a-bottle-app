@@ -1,11 +1,15 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
-  type Note {
+  type GeoItem {
     _id: ID
-    noteText: String
     lat: Float
     lng: Float
+  }
+  type Note {
+    _id: ID
+    geoItemId: ID
+    noteText: String
   }
 
   type Query {
