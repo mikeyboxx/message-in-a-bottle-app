@@ -2,20 +2,31 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   type Note {
-    _id: ID
+    id: ID
     noteText: String
+    noteAuthor: String
+    noteOwner: String
     lat: Float
     lng: Float
+    createdTs: String
+    updatedTs: String
+  }
+
+  type NoteInBounds {
+    note: Note
+    distance: Float
   }
 
   type Query {
     notes: [Note]
 
     notesInBounds(
+      lat: Float,
+      lng: Float,
       swLat: Float!, 
       swLng: Float!, 
       neLat: Float!, 
-      neLng: Float!): [Note]
+      neLng: Float!): [NoteInBounds]
   }
 
 `;
