@@ -15,6 +15,7 @@ const typeDefs = gql`
   type NoteInBounds {
     note: Note
     distance: Float
+    inProximity: Boolean
   }
 
   type Query {
