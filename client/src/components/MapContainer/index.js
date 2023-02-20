@@ -267,6 +267,10 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
+            Inner height: {window.innerHeight} <br/> <br/>
+            Inner width: {window.innerWidth} <br/> <br/>
+            Outer height: {window.outerHeight} <br/> <br/>
+            Outer width: {window.outerWidth} <br/> <br/>
             Zoom: {map.current.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
