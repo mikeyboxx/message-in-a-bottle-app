@@ -125,10 +125,10 @@ export default function MapContainer({startingPosition}) {
         const newBounds = map.current.getBounds();
         if (newBounds) {
           const isInBounds = 
-            position.coords.lat > newBounds.getSouthWest().lat() && 
-            position.coords.lng >  newBounds.getSouthWest().lng() && 
-            position.coords.lat < newBounds.getNorthEast().lat() && 
-            position.coords.lng <  newBounds.getNorthEast().lng();
+            position.coords.latitude > newBounds.getSouthWest().lat() && 
+            position.coords.longitude >  newBounds.getSouthWest().lng() && 
+            position.coords.latitude < newBounds.getNorthEast().lat() && 
+            position.coords.longitude <  newBounds.getNorthEast().lng();
 
           const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
             {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
@@ -246,7 +246,7 @@ export default function MapContainer({startingPosition}) {
             cursor: 'pointer'
           }}
         >
-          <Journals /> Pickup {numberOfNotesInProximity.current > 1 ? numberOfNotesInProximity.current + ' Notes' : '1 Note'}
+          <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 && 's')}
         </Button>}
       
 
@@ -267,10 +267,14 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
-            Inner height: {window.innerHeight} <br/> <br/>
-            Inner width: {window.innerWidth} <br/> <br/>
-            Outer height: {window.outerHeight} <br/> <br/>
-            Outer width: {window.outerWidth} <br/> <br/>
+            Inner height: {window.innerHeight} <br/> 
+            Inner width: {window.innerWidth} <br/> 
+            Outer height: {window.outerHeight} <br/> 
+            Outer width: {window.outerWidth} <br/> 
+            Screen height:  {window.screen.height} <br/>
+            Screen width:  {window.screen.width} <br/>
+            Available height: {window.screen.availHeight} <br/>
+            Available width: {window.screen.availWidth} <br/> <br/>
             Zoom: {map.current.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
