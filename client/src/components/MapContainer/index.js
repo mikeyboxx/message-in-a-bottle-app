@@ -275,6 +275,8 @@ export default function MapContainer({startingPosition}) {
             Screen width:  {window.screen.width} <br/>
             Available height: {window.screen.availHeight} <br/>
             Available width: {window.screen.availWidth} <br/> <br/>
+            Body client height: {document.querySelector('body').clientHeight} <br/>
+            Body client width: {document.querySelector('body').clientWidth} <br/>
             Zoom: {map.current.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
