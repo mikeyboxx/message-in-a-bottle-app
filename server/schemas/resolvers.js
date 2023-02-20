@@ -6,7 +6,7 @@ const resolvers = {
 
     notesInBounds: async (parent, {swLat, swLng, neLat, neLng, lat, lng}) => {
       // console.log('notesInBounds');
-      // console.log(currLat, currLng, swLat, swLng, neLat, neLng);
+      // console.log(lat, lng, swLat, swLng, neLat, neLng);
       const data = await Note.find({
         $and: [
           {lat: {$gt: swLat }},
@@ -16,10 +16,14 @@ const resolvers = {
         ]
       });
       
-      const notes = data.map(note=>({
-        note,
-        distance: (lat && lng) && note.getDistance(lat, lng),
-      }));
+      const notes = data.map(note=> {
+        const distance = (lat && lng) && note.getDistance(lat, lng);
+        return {
+          note,
+          distance,
+          inProximity: distance && (distance < 30)
+        } 
+      });
 
       return notes;
     },

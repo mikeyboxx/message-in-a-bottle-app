@@ -56,25 +56,6 @@ export default function MapContainer({startingPosition}) {
   const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
   const onBoundsChanged = useCallback(() => boundsChanged.current = true,[]);
 
-  // check if specific google maps events were fired, in order to refresh data based on the new map bounds
-  const onIdle = useCallback(() => {
-    if (map.current && 
-      (zoomChanged.current === true || dragEnd.current === true || boundsChanged.current === true)){
-      const newBounds = map.current.getBounds();
-      if (newBounds) {
-        getNotesInBounds({variables: {
-          swLat: newBounds.getSouthWest().lat(), 
-          swLng: newBounds.getSouthWest().lng(), 
-          neLat: newBounds.getNorthEast().lat(), 
-          neLng: newBounds.getNorthEast().lng()
-        }});
-      }
-    }
-    zoomChanged.current = false;
-    dragEnd.current = false;
-    boundsChanged.current = false;
-  },[getNotesInBounds]);
-
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
     gMap.setOptions({
@@ -87,6 +68,26 @@ export default function MapContainer({startingPosition}) {
     });
     map.current = gMap;
   },[startingPosition]);
+
+  // check if specific google maps events were fired, in order to refresh data based on the new map bounds
+  const onIdle = useCallback(() => {
+    if (map.current && 
+      (zoomChanged.current === true || dragEnd.current === true || boundsChanged.current === true)){
+      const newBounds = map.current.getBounds();
+      if (newBounds) {
+        
+        getNotesInBounds({variables: {
+          swLat: newBounds.getSouthWest().lat(), 
+          swLng: newBounds.getSouthWest().lng(), 
+          neLat: newBounds.getNorthEast().lat(), 
+          neLng: newBounds.getNorthEast().lng()
+        }});
+      }
+    }
+    zoomChanged.current = false;
+    dragEnd.current = false;
+    boundsChanged.current = false;
+  },[getNotesInBounds]);
 
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
@@ -148,17 +149,18 @@ export default function MapContainer({startingPosition}) {
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
     if (data?.notesInBounds) {
-      const arr = data.notesInBounds.map(note => {
+      const arr = data.notesInBounds.map(el => {
+        const { note } = el;
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
           {lat: note.lat, lng: note.lng});
         return {
-          ...note,
+          note,
           distance,
           inProximity: distance < 30
         }
       });
-      numberOfNotesInProximity.current = arr.filter(note => note.inProximity === true).length;
+      numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
       setNotesInBounds(arr);
     }
   },[data, position]);
@@ -167,7 +169,6 @@ export default function MapContainer({startingPosition}) {
   return (
     <>
      <div style={{height: '100%'}}>
-      {/* {position &&  */}
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
@@ -184,15 +185,17 @@ export default function MapContainer({startingPosition}) {
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
           
-          {notesInBounds?.map((note, idx) => 
-            <Marker
-              key={idx}
-              options={{optimized: true}}
-              position={{lat: note.lat, lng: note.lng}}
-              icon={{...noteIcon, fillColor: note.inProximity ? "red" : "black"}}
-              title={note.noteText}  
-            />
-          )}
+          {notesInBounds?.map((el, idx) => {
+            const {note: {noteText, lat, lng}, inProximity} = el;
+            return (
+              <Marker
+                key={idx}
+                options={{optimized: true}}
+                position={{lat, lng}}
+                icon={{...noteIcon, fillColor: inProximity ? "red" : "black"}}
+                title={noteText}  
+              />)
+          })}
         </GoogleMap>
 
       {map.current && notesInBounds && 
@@ -283,11 +286,13 @@ export default function MapContainer({startingPosition}) {
           <ul>
             {notesInBounds
               ?.filter(marker => marker.inProximity === true)
-              ?.map((el, idx) => 
-                <li key={idx}>
-                    {el.noteText}<br/> Distance: {el.distance.toFixed(3)} meters <hr/> 
-                </li>
-              )}
+              ?.map((el, idx) => { 
+                const {note, distance} = el;
+                return (
+                  <li key={idx}>
+                      {note.noteText}<br/> Distance: {distance.toFixed(3)} meters <hr/> 
+                  </li>)
+                })}
           </ul>
 
         </div>}
