@@ -82,7 +82,7 @@ export default function MapContainer({startingPosition}) {
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
     const navId = navigator.geolocation.watchPosition( 
-      newPos => 
+      newPos => {
         setPosition(oldPos => {
           if (oldPos?.coords.latitude !== newPos.coords.latitude || 
             oldPos?.coords.longitude !== newPos.coords.longitude){
@@ -90,7 +90,36 @@ export default function MapContainer({startingPosition}) {
           } else {
             return oldPos;
           }
-        }),
+        })
+        if (Object.keys(prevPosition.current).length === 0){
+          prevPosition.current.lat = newPos.coords.latitude;
+          prevPosition.current.lng = newPos.coords.longitude;
+        };
+  
+        if (map.current){
+          const newBounds = map.current.getBounds();
+          if (newBounds) {
+            const isInBounds = 
+              newPos.coords.latitude > newBounds.getSouthWest().lat() && 
+              newPos.coords.longitude >  newBounds.getSouthWest().lng() && 
+              newPos.coords.latitude < newBounds.getNorthEast().lat() && 
+              newPos.coords.longitude <  newBounds.getNorthEast().lng();
+  
+            const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
+              {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
+              {lat: newPos.coords.latitude, lng: newPos.coords.longitude});
+  
+            if (dist > 20) {
+              prevPosition.current.lat = newPos.coords.latitude;
+              prevPosition.current.lng = newPos.coords.longitude;
+              isInBounds && map.current.panTo({lat: newPos.coords.latitude, lng: newPos.coords.longitude})
+            }
+  
+            isInBounds && newPos.coords.accuracy < 13 && map.current.setHeading(newPos.coords.heading);
+          }
+        }
+      },
+        
       err => console.log(err),
       {
         enableHighAccuracy: true,
@@ -104,61 +133,61 @@ export default function MapContainer({startingPosition}) {
   // each time gps position changes, save the position, and every 20 meters pan the map (chg center)
   // if gps accuracy is less than 13 meters, change the heading of the map
   // do not pan or change heading, if user gps position is not in bounds of the google map, due to zoom or drag
-  useEffect(() => {
-    // console.log('useEffect [position]');
-    if (position) {
-      if (Object.keys(prevPosition.current).length === 0){
-        prevPosition.current.lat = position.coords.latitude;
-        prevPosition.current.lng = position.coords.longitude;
-      };
+  // useEffect(() => {
+  //   // console.log('useEffect [position]');
+  //   if (position) {
+  //     if (Object.keys(prevPosition.current).length === 0){
+  //       prevPosition.current.lat = position.coords.latitude;
+  //       prevPosition.current.lng = position.coords.longitude;
+  //     };
 
-      if (map.current){
-        const newBounds = map.current.getBounds();
-        if (newBounds) {
-          const isInBounds = 
-            position.coords.latitude > newBounds.getSouthWest().lat() && 
-            position.coords.longitude >  newBounds.getSouthWest().lng() && 
-            position.coords.latitude < newBounds.getNorthEast().lat() && 
-            position.coords.longitude <  newBounds.getNorthEast().lng();
+  //     if (map.current){
+  //       const newBounds = map.current.getBounds();
+  //       if (newBounds) {
+  //         const isInBounds = 
+  //           position.coords.latitude > newBounds.getSouthWest().lat() && 
+  //           position.coords.longitude >  newBounds.getSouthWest().lng() && 
+  //           position.coords.latitude < newBounds.getNorthEast().lat() && 
+  //           position.coords.longitude <  newBounds.getNorthEast().lng();
 
-          const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-            {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
-            {lat: position.coords.latitude, lng: position.coords.longitude});
+  //         const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
+  //           {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
+  //           {lat: position.coords.latitude, lng: position.coords.longitude});
 
-          if (dist > 20) {
-            prevPosition.current.lat = position.coords.latitude;
-            prevPosition.current.lng = position.coords.longitude;
-            isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
-          }
+  //         if (dist > 20) {
+  //           prevPosition.current.lat = position.coords.latitude;
+  //           prevPosition.current.lng = position.coords.longitude;
+  //           isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+  //         }
 
-          isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
-        }
-      }
-    }
-  },[position]);
+  //         isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
+  //       }
+  //     }
+  //   }
+  // },[position]);
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
     // console.log('useEffect [data, position]');
-    if (data?.notesInBounds) {
-      setNotesInBounds(data?.notesInBounds);
-    }
     // if (data?.notesInBounds) {
-    //   const arr = data.notesInBounds.map(el => {
-    //     const { note } = el;
-    //     const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
-    //       {lat: position.coords.latitude, lng: position.coords.longitude},
-    //       {lat: note.lat, lng: note.lng});
-    //     return {
-    //       note,
-    //       distance,
-    //       inProximity: distance < 20
-    //     }
-    //   });
-    //   numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
-    //   setNotesInBounds(arr);
+    //   setNotesInBounds(data?.notesInBounds);
     // }
-  },[data]);
+    if (data?.notesInBounds && position) {
+      const arr = data.notesInBounds.map(el => {
+        const { note } = el;
+        const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
+          {lat: position.coords.latitude, lng: position.coords.longitude},
+          {lat: note.lat, lng: note.lng});
+        return {
+          note,
+          distance,
+          inProximity: distance < 20
+        }
+      });
+      numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
+      setNotesInBounds(arr);
+    }
+  },[position, data]);
 
 
   return (
@@ -196,15 +225,16 @@ export default function MapContainer({startingPosition}) {
           />
           
           {notesInBounds?.map((el, idx) => {
-            const {note: {noteText, lat, lng}} = el;
+            const {note: {noteText, lat, lng}, inProximity} = el;
             return (
               <Marker
                 key={idx}
                 options={{optimized: true}}
                 position={{lat, lng}}
-                icon={{...noteIcon, fillColor: (()=>{return window.google.maps.geometry.spherical.computeDistanceBetween(
-                  {lat: position.coords.latitude, lng: position.coords.longitude},
-                  {lat, lng})})() < 50 ? "red" : "black"}}
+                icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}
+                // icon={{...noteIcon, fillColor: (()=>{return window.google.maps.geometry.spherical.computeDistanceBetween(
+                //   {lat: position.coords.latitude, lng: position.coords.longitude},
+                //   {lat, lng})})() < 50 ? "red" : "black"}}
                 // icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
                 // icon={noteImg}
                 title={noteText}  
