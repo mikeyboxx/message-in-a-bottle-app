@@ -45,12 +45,11 @@ export default function MapContainer({startingPosition}) {
   }),[]);
 
   // default GoogleMap styles
-  const mapContainerStyle = useMemo(()=>({ 
-    height: '100svh', 
-    // height: `${window.innerHeight}px`, 
-    width: '100%',
-    position: 'relative'
-  }),[]);
+  // const mapContainerStyle = useMemo(()=>({ 
+  //   // height: '700px', 
+  //   height: `${window.innerHeight}px`, 
+  //   width: '100%',
+  // }),[]);
   
   // track google map events
   const onDragEnd = useCallback(() => dragEnd.current = true,[]);
@@ -174,7 +173,11 @@ export default function MapContainer({startingPosition}) {
       {position && 
         <GoogleMap
           options={defaultMapOptions}
-          mapContainerStyle={mapContainerStyle}
+          mapContainerStyle={{ 
+            // height: '700px', 
+            height: `${window.innerHeight}px`, 
+            width: '100%',
+          }}
           onLoad={onLoad}
           onIdle={onIdle}
           onBoundsChanged={onBoundsChanged}
