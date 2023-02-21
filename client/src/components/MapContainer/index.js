@@ -101,7 +101,7 @@ export default function MapContainer({startingPosition}) {
     return () => navigator.geolocation.clearWatch(navId);
   },[]);
 
-  // each time gps position changes, save the position, and every 40 meters pan the map (chg center)
+  // each time gps position changes, save the position, and every 20 meters pan the map (chg center)
   // if gps accuracy is less than 13 meters, change the heading of the map
   // do not pan or change heading, if user gps position is not in bounds of the google map, due to zoom or drag
   useEffect(() => {
@@ -141,21 +141,24 @@ export default function MapContainer({startingPosition}) {
   useEffect(() => {
     // console.log('useEffect [data, position]');
     if (data?.notesInBounds) {
-      const arr = data.notesInBounds.map(el => {
-        const { note } = el;
-        const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
-          {lat: position.coords.latitude, lng: position.coords.longitude},
-          {lat: note.lat, lng: note.lng});
-        return {
-          note,
-          distance,
-          inProximity: distance < 20
-        }
-      });
-      numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
-      setNotesInBounds(arr);
+      setNotesInBounds(data?.notesInBounds);
     }
-  },[data, position]);
+    // if (data?.notesInBounds) {
+    //   const arr = data.notesInBounds.map(el => {
+    //     const { note } = el;
+    //     const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
+    //       {lat: position.coords.latitude, lng: position.coords.longitude},
+    //       {lat: note.lat, lng: note.lng});
+    //     return {
+    //       note,
+    //       distance,
+    //       inProximity: distance < 20
+    //     }
+    //   });
+    //   numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
+    //   setNotesInBounds(arr);
+    // }
+  },[data]);
 
 
   return (
@@ -193,13 +196,15 @@ export default function MapContainer({startingPosition}) {
           />
           
           {notesInBounds?.map((el, idx) => {
-            const {note: {noteText, lat, lng}, inProximity} = el;
+            const {note: {noteText, lat, lng}} = el;
             return (
               <Marker
                 key={idx}
                 options={{optimized: true}}
                 position={{lat, lng}}
-                icon={{...noteIcon, fillColor: inProximity ? "red" : "black"}}
+                icon={{...noteIcon, fillColor: (()=>{return window.google.maps.geometry.spherical.computeDistanceBetween(
+                  {lat: position.coords.latitude, lng: position.coords.longitude},
+                  {lat, lng})})() < 50 ? "red" : "black"}}
                 // icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
                 // icon={noteImg}
                 title={noteText}  
@@ -317,10 +322,12 @@ export default function MapContainer({startingPosition}) {
             {notesInBounds
               ?.filter(marker => marker.inProximity === true)
               ?.map((el, idx) => { 
-                const {note, distance} = el;
+                const {note} = el;
                 return (
                   <li key={idx}>
-                      {note.noteText}<br/> Distance: {distance.toFixed(3)} meters <hr/> 
+                      {note.noteText}<br/> Distance: {window.google.maps.geometry.spherical.computeDistanceBetween(
+          {lat: position.coords.latitude, lng: position.coords.longitude},
+          {lat: note.lat, lng: note.lng}).toFixed(3)} meters <hr/> 
                   </li>)
                 })}
           </ul>
