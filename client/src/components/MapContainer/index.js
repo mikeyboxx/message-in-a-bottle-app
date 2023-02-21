@@ -9,7 +9,7 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
-  const [notesInBounds, setNotesInBounds] = useState(null);
+  // const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{
     fetchPolicy: 'network-only'
   });
@@ -67,6 +67,8 @@ export default function MapContainer({startingPosition}) {
       const newBounds = map.current.getBounds();
       if (newBounds) {
         getNotesInBounds({variables: {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
           swLat: newBounds.getSouthWest().lat(), 
           swLng: newBounds.getSouthWest().lng(), 
           neLat: newBounds.getNorthEast().lat(), 
@@ -77,7 +79,7 @@ export default function MapContainer({startingPosition}) {
     zoomChanged.current = false;
     dragEnd.current = false;
     boundsChanged.current = false;
-  },[getNotesInBounds]);
+  },[position, getNotesInBounds]);
 
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
@@ -158,6 +160,8 @@ export default function MapContainer({startingPosition}) {
             prevPosition.current.lat = position.coords.latitude;
             prevPosition.current.lng = position.coords.longitude;
             isInBounds && getNotesInBounds({variables: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
               swLat: newBounds.getSouthWest().lat(), 
               swLng: newBounds.getSouthWest().lng(), 
               neLat: newBounds.getNorthEast().lat(), 
@@ -166,28 +170,28 @@ export default function MapContainer({startingPosition}) {
             isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
           }
 
-          isInBounds && position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
+          isInBounds && position.coords.accuracy < 13 && position.coords.speed > .5 && map.current.setHeading(position.coords.heading);
         }
       }
 
-      if (data?.notesInBounds) {
-        const arr = data.notesInBounds.map(el => {
-          const { note } = el;
-          const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
-            {lat: position.coords.latitude, lng: position.coords.longitude},
-            {lat: note.lat, lng: note.lng});
-          return {
-            note,
-            distance,
-            inProximity: distance < 50
-          }
-        });
-        numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
-        setNotesInBounds(arr);
-      }
+      // if (data?.notesInBounds) {
+      //   const arr = data.notesInBounds.map(el => {
+      //     const { note } = el;
+      //     const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
+      //       {lat: position.coords.latitude, lng: position.coords.longitude},
+      //       {lat: note.lat, lng: note.lng});
+      //     return {
+      //       note,
+      //       distance,
+      //       inProximity: distance < 25
+      //     }
+      //   });
+      //   numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
+      //   setNotesInBounds(arr);
+      // }
     }
 
-  },[position, data, getNotesInBounds]);
+  },[position, getNotesInBounds]);
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   // useEffect(() => {
@@ -210,7 +214,7 @@ export default function MapContainer({startingPosition}) {
   //     numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
   //     setNotesInBounds(arr);
   //   }
-  // },[position, data]);
+  // },[data]);
 
 
   return (
@@ -247,7 +251,7 @@ export default function MapContainer({startingPosition}) {
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
           
-          {notesInBounds?.map((el, idx) => {
+          {data?.notesInBounds?.map((el, idx) => {
             const {note: {noteText, lat, lng}, inProximity} = el;
             return (
               <Marker
@@ -264,7 +268,7 @@ export default function MapContainer({startingPosition}) {
               />)
           })}
 
-          {map.current && notesInBounds && 
+          {map.current && data?.notesInBounds && 
             <Button 
                 size="lg" 
                 variant="info"
@@ -289,7 +293,7 @@ export default function MapContainer({startingPosition}) {
                 <Journals /> Create Note
             </Button>}
       
-            {map.current && notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
+            {map.current && data?.notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
               <Button 
                 size="lg" 
                 variant="info"
@@ -319,7 +323,7 @@ export default function MapContainer({startingPosition}) {
       
 
       {/* below code is used for debugging */}
-      {map.current && position && notesInBounds &&     
+      {map.current && position && data?.notesInBounds &&     
         <div 
           style={{
             position: 'absolute',
@@ -367,12 +371,12 @@ export default function MapContainer({startingPosition}) {
             Speed: {position.coords.speed} <br/><br/>
             Aaccuracy: {position.coords.accuracy} <br/><br/>
 
-            # of notes in bounds: {notesInBounds?.length} <br/><br/>
-            # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+            # of notes in bounds: {data?.notesInBounds?.length} <br/><br/>
+            # of notes in proximity: {data?.notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
           </p>
           
           <ul>
-            {notesInBounds
+            {data?.notesInBounds
               ?.filter(marker => marker.inProximity === true)
               ?.map((el, idx) => { 
                 const {note} = el;

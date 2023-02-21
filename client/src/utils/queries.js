@@ -11,6 +11,8 @@ query NotesInBounds($swLat: Float!, $swLng: Float!, $neLat: Float!, $neLng: Floa
       lat
       lng
     }
+    distance
+    inProximity
   }
 }
 `;
