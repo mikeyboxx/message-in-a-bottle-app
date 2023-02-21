@@ -4,7 +4,7 @@ import {Journals} from 'react-bootstrap-icons';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
-import noteImg from '../../img/note.png';
+// import noteImg from '../../img/note.png';
 
 
 export default function MapContainer({startingPosition}) {
@@ -53,13 +53,13 @@ export default function MapContainer({startingPosition}) {
   // }),[]);
   
   // track google map events
-  const onDragEnd = useCallback(() => {console.log('onDragEnd'); return dragEnd.current = true},[]);
-  const onZoomChanged = useCallback(() => {console.log('onZoomChanged'); return zoomChanged.current = true},[]);
-  const onBoundsChanged = useCallback(() => {console.log('onBoundsChanged'); return boundsChanged.current = true},[]);
+  const onDragEnd = useCallback(() => {/*console.log('onDragEnd');*/ return dragEnd.current = true},[]);
+  const onZoomChanged = useCallback(() => {/*console.log('onZoomChanged');*/ return zoomChanged.current = true},[]);
+  const onBoundsChanged = useCallback(() => {/*console.log('onBoundsChanged');*/ return boundsChanged.current = true},[]);
 
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
-    console.log('onLoad');
+    // console.log('onLoad');
     gMap.setOptions({
       zoom: 20,
       heading: startingPosition.coords.heading,
@@ -73,7 +73,7 @@ export default function MapContainer({startingPosition}) {
 
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
-    console.log('onIdle');
+    // console.log('onIdle');
     if (map.current && 
       (zoomChanged.current === true || dragEnd.current === true || boundsChanged.current === true)){
       const newBounds = map.current.getBounds();
@@ -117,7 +117,7 @@ export default function MapContainer({startingPosition}) {
   // if gps accuracy is less than 13 meters, change the heading of the map
   // do not pan or change heading, if user gps position is not in bounds of the google map, due to zoom or drag
   useEffect(() => {
-    console.log('useEffect [position]');
+    // console.log('useEffect [position]');
     if (position) {
       if (Object.keys(prevPosition.current).length === 0){
         prevPosition.current.lat = position.coords.latitude;
@@ -151,7 +151,7 @@ export default function MapContainer({startingPosition}) {
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
-    console.log('useEffect [data, position]');
+    // console.log('useEffect [data, position]');
     if (data?.notesInBounds) {
       const arr = data.notesInBounds.map(el => {
         const { note } = el;
@@ -281,6 +281,11 @@ export default function MapContainer({startingPosition}) {
             
           <p>
             DevicePixelRatio: {window.devicePixelRatio} <br/>
+            VisualViewport height: {window.VisualViewport.innerHeight} <br/> 
+            VisualViewport width: {window.VisualViewport.innerWidth} <br/> 
+            VisualViewport offsetTop: {window.VisualViewport.offsetTop} <br/> 
+            VisualViewport offsetLeft: {window.VisualViewport.offsetLeft} <br/> 
+            VisualViewport scale: {window.VisualViewport.scale} <br/> 
             Inner height: {window.innerHeight} <br/> 
             Inner width: {window.innerWidth} <br/> 
             Outer height: {window.outerHeight} <br/> 
