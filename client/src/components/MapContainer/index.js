@@ -66,9 +66,15 @@ export default function MapContainer({startingPosition}) {
       (zoomChanged.current === true || dragEnd.current === true)){
       const newBounds = map.current.getBounds();
       if (newBounds) {
+        const isInBounds = 
+            position.coords.latitude > newBounds.getSouthWest().lat() && 
+            position.coords.longitude >  newBounds.getSouthWest().lng() && 
+            position.coords.latitude < newBounds.getNorthEast().lat() && 
+            position.coords.longitude <  newBounds.getNorthEast().lng();
+            
         getNotesInBounds({variables: {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
+          lat: isInBounds ? position.coords.latitude : null,
+          lng: isInBounds ? position.coords.longitude : null,
           swLat: newBounds.getSouthWest().lat(), 
           swLng: newBounds.getSouthWest().lng(), 
           neLat: newBounds.getNorthEast().lat(), 
@@ -93,35 +99,7 @@ export default function MapContainer({startingPosition}) {
             return oldPos;
           }
         })
-        // if (Object.keys(prevPosition.current).length === 0){
-        //   prevPosition.current.lat = newPos.coords.latitude;
-        //   prevPosition.current.lng = newPos.coords.longitude;
-        // };
-  
-        // if (map.current){
-        //   const newBounds = map.current.getBounds();
-        //   if (newBounds) {
-        //     const isInBounds = 
-        //       newPos.coords.latitude > newBounds.getSouthWest().lat() && 
-        //       newPos.coords.longitude >  newBounds.getSouthWest().lng() && 
-        //       newPos.coords.latitude < newBounds.getNorthEast().lat() && 
-        //       newPos.coords.longitude <  newBounds.getNorthEast().lng();
-  
-        //     const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-        //       {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
-        //       {lat: newPos.coords.latitude, lng: newPos.coords.longitude});
-  
-        //     if (dist > 20) {
-        //       prevPosition.current.lat = newPos.coords.latitude;
-        //       prevPosition.current.lng = newPos.coords.longitude;
-        //       isInBounds && map.current.panTo({lat: newPos.coords.latitude, lng: newPos.coords.longitude})
-        //     }
-  
-        //     isInBounds && newPos.coords.accuracy < 13 && map.current.setHeading(newPos.coords.heading);
-        //   }
-        // }
       },
-        
       err => console.log(err),
       {
         enableHighAccuracy: true,
@@ -173,22 +151,6 @@ export default function MapContainer({startingPosition}) {
           isInBounds && position.coords.accuracy < 13 && position.coords.speed > .5 && map.current.setHeading(position.coords.heading);
         }
       }
-
-      // if (data?.notesInBounds) {
-      //   const arr = data.notesInBounds.map(el => {
-      //     const { note } = el;
-      //     const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
-      //       {lat: position.coords.latitude, lng: position.coords.longitude},
-      //       {lat: note.lat, lng: note.lng});
-      //     return {
-      //       note,
-      //       distance,
-      //       inProximity: distance < 25
-      //     }
-      //   });
-      //   numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
-      //   setNotesInBounds(arr);
-      // }
     }
 
   },[position, getNotesInBounds]);
