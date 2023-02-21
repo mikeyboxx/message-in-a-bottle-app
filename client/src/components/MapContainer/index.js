@@ -8,7 +8,6 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
-  const [gMap, setGMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   
@@ -41,7 +40,7 @@ export default function MapContainer({startingPosition}) {
     disableDefaultUI: true,
     minZoom: 15,
     mapId: '8dce6158aa71a36a',
-    maxZoom: 20,
+    maxZoom: 18,
     // isFractionalZoomEnabled: false,
   }),[]);
 
@@ -60,7 +59,7 @@ export default function MapContainer({startingPosition}) {
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
     gMap.setOptions({
-      zoom: 20,
+      zoom: 18,
       heading: startingPosition.coords.heading,
       center:  {
         lat: startingPosition.coords.latitude,
@@ -68,8 +67,6 @@ export default function MapContainer({startingPosition}) {
       }
     });
     map.current = gMap;
-    setGMap(gMap);
-
   },[startingPosition]);
 
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
@@ -177,7 +174,8 @@ export default function MapContainer({startingPosition}) {
           options={defaultMapOptions}
           mapContainerStyle={{ 
             // minHeight: '50', 
-            height: `${window.innerHeight}px`, 
+            height: '100%',
+            // height: `${window.innerHeight}px`, 
             width: '100%',
           }}
           onLoad={onLoad}
