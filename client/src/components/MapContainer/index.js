@@ -39,7 +39,7 @@ export default function MapContainer({startingPosition}) {
   // default GoogleMap options
   const defaultMapOptions = useMemo(()=>({ 
     disableDefaultUI: true,
-    minZoom: 18,
+    minZoom: 16,
     mapId: '8dce6158aa71a36a',
     maxZoom: 20,
     // isFractionalZoomEnabled: false,
@@ -176,10 +176,11 @@ export default function MapContainer({startingPosition}) {
      {/* <div> */}
       {position && 
         <GoogleMap
+          id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
             // minHeight: '50', 
-            height: '100%',
+            height: `${window.screen.height >= window.innerHeight ? window.innerHeight : window.screen.height - (window.innerHeight - window.screen.height)}px`, 
             // height: `${window.innerHeight}px`, 
             width: '100%',
           }}
@@ -280,22 +281,26 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
-            DevicePixelRatio: {window.devicePixelRatio} <br/>
-            VisualViewport height: {window.visualViewport.innerHeight} <br/> 
+            {/* DevicePixelRatio: {window.devicePixelRatio} <br/> */}
+            googleMap height: {document.getElementById('googleMap').getBoundingClientRect().height
+}<br/>
+            googleMap width: {document.getElementById('googleMap').getBoundingClientRect().width
+}<br/><br/>
+            {/* VisualViewport height: {window.visualViewport.innerHeight} <br/> 
             VisualViewport width: {window.visualViewport.innerWidth} <br/> 
             VisualViewport offsetTop: {window.visualViewport.offsetTop} <br/> 
             VisualViewport offsetLeft: {window.visualViewport.offsetLeft} <br/> 
-            VisualViewport scale: {window.visualViewport.scale} <br/> 
+            VisualViewport scale: {window.visualViewport.scale} <br/>  */}
             Inner height: {window.innerHeight} <br/> 
-            Inner width: {window.innerWidth} <br/> 
+            Inner width: {window.innerWidth} <br/> <br/>
             Outer height: {window.outerHeight} <br/> 
-            Outer width: {window.outerWidth} <br/> 
+            Outer width: {window.outerWidth} <br/> <br/>
             Screen height:  {window.screen.height} <br/>
-            Screen width:  {window.screen.width} <br/>
+            Screen width:  {window.screen.width} <br/><br/>
             Available height: {window.screen.availHeight} <br/>
             Available width: {window.screen.availWidth} <br/> <br/>
             Body client height: {document.querySelector('body').clientHeight} <br/>
-            Body client width: {document.querySelector('body').clientWidth} <br/>
+            Body client width: {document.querySelector('body').clientWidth} <br/><br/>
             Zoom: {map.current.zoom} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
