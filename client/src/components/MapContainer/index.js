@@ -180,8 +180,9 @@ export default function MapContainer({startingPosition}) {
           options={defaultMapOptions}
           mapContainerStyle={{ 
             // minHeight: '50', 
-            height: `${window.screen.height >= window.innerHeight ? window.innerHeight : window.screen.height - (window.innerHeight - window.screen.height)}px`, 
-            // height: `${window.innerHeight}px`, 
+            height: `${window.screen.height >= window.innerHeight ? 
+                       window.innerHeight : 
+                       window.screen.height - (window.innerHeight - window.screen.height)}px`, 
             width: '100%',
           }}
           onLoad={onLoad}
@@ -210,9 +211,7 @@ export default function MapContainer({startingPosition}) {
                 title={noteText}  
               />)
           })}
-        </GoogleMap>}
-
-      {map.current && notesInBounds && 
+          {map.current && notesInBounds && 
         <Button 
         size="lg" 
         variant="info"
@@ -262,6 +261,9 @@ export default function MapContainer({startingPosition}) {
         >
           <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 && 's')}
         </Button>}
+        </GoogleMap>}
+
+      
       
 
       {/* below code is used for debugging */}
