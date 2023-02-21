@@ -46,7 +46,8 @@ export default function MapContainer({startingPosition}) {
 
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
-    height: `${window.screen.availHeight}px`, 
+    height: '100svh', 
+    // height: `${window.innerHeight}px`, 
     width: '100%',
     position: 'relative'
   }),[]);
@@ -168,8 +169,8 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-     {/* <div style={{height: '100%'}}> */}
-     <div>
+     <div style={{height: '100%'}}>
+     {/* <div> */}
       {position && 
         <GoogleMap
           options={defaultMapOptions}
