@@ -183,7 +183,9 @@ export default function MapContainer({startingPosition}) {
             height: `${window.screen.height >= window.innerHeight ? 
                        window.innerHeight : 
                        window.screen.height - (window.innerHeight - window.screen.height)}px`, 
-            width: '100%',
+            width: `${window.screen.width >= window.innerWidth ? 
+                      window.innerWidth : 
+                      window.screen.width - (window.innerWidth - window.screen.width)}px`
           }}
           onLoad={onLoad}
           onIdle={onIdle}
@@ -211,6 +213,7 @@ export default function MapContainer({startingPosition}) {
                 title={noteText}  
               />)
           })}
+
           {map.current && notesInBounds && 
         <Button 
         size="lg" 
