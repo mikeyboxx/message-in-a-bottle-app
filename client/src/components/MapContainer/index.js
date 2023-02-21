@@ -125,7 +125,7 @@ export default function MapContainer({startingPosition}) {
             {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
             {lat: position.coords.latitude, lng: position.coords.longitude});
 
-          if (dist > 40) {
+          if (dist > 20) {
             prevPosition.current.lat = position.coords.latitude;
             prevPosition.current.lng = position.coords.longitude;
             isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
@@ -149,7 +149,7 @@ export default function MapContainer({startingPosition}) {
         return {
           note,
           distance,
-          inProximity: distance < 30
+          inProximity: distance < 20
         }
       });
       numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
@@ -169,7 +169,7 @@ export default function MapContainer({startingPosition}) {
             disableDefaultUI: true,
             minZoom: 16,
             mapId: '8dce6158aa71a36a',
-            maxZoom: 20,
+            // maxZoom: 20,
           }}
           mapContainerStyle={{ 
             height: `${window.screen.height >= window.innerHeight ? 
