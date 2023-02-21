@@ -46,7 +46,7 @@ export default function MapContainer({startingPosition}) {
 
   // default GoogleMap styles
   const mapContainerStyle = useMemo(()=>({ 
-    height: `${window.innerHeight}px`, 
+    height: `${window.screen.availHeight}px`, 
     width: '100%',
     position: 'relative'
   }),[]);
@@ -168,7 +168,9 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-     <div style={{display: 'flex', height: '100%', flexDirection: 'column'}}>
+     {/* <div style={{height: '100%'}}> */}
+     <div>
+      {position && 
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={mapContainerStyle}
@@ -196,7 +198,7 @@ export default function MapContainer({startingPosition}) {
                 title={noteText}  
               />)
           })}
-        </GoogleMap>
+        </GoogleMap>}
 
       {map.current && notesInBounds && 
         <Button 
