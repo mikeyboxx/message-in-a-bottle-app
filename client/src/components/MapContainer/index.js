@@ -281,11 +281,11 @@ export default function MapContainer({startingPosition}) {
             
           <p>
             DevicePixelRatio: {window.devicePixelRatio} <br/>
-            VisualViewport height: {window.VisualViewport.innerHeight} <br/> 
-            VisualViewport width: {window.VisualViewport.innerWidth} <br/> 
-            VisualViewport offsetTop: {window.VisualViewport.offsetTop} <br/> 
-            VisualViewport offsetLeft: {window.VisualViewport.offsetLeft} <br/> 
-            VisualViewport scale: {window.VisualViewport.scale} <br/> 
+            VisualViewport height: {window.visualViewport.innerHeight} <br/> 
+            VisualViewport width: {window.visualViewport.innerWidth} <br/> 
+            VisualViewport offsetTop: {window.visualViewport.offsetTop} <br/> 
+            VisualViewport offsetLeft: {window.visualViewport.offsetLeft} <br/> 
+            VisualViewport scale: {window.visualViewport.scale} <br/> 
             Inner height: {window.innerHeight} <br/> 
             Inner width: {window.innerWidth} <br/> 
             Outer height: {window.outerHeight} <br/> 
