@@ -172,8 +172,8 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-     <div style={{height: '100%'}}>
-     {/* <div> */}
+     {/* <div style={{height: '100%'}}> */}
+     <div>
       {position && 
         <GoogleMap
           id={'googleMap'}
