@@ -8,6 +8,7 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
+  const [gMap, setGMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   
@@ -67,6 +68,8 @@ export default function MapContainer({startingPosition}) {
       }
     });
     map.current = gMap;
+    setGMap(gMap);
+
   },[startingPosition]);
 
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
@@ -173,7 +176,7 @@ export default function MapContainer({startingPosition}) {
         <GoogleMap
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            // height: '700px', 
+            // minHeight: '50', 
             height: `${window.innerHeight}px`, 
             width: '100%',
           }}
