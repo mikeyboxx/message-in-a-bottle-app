@@ -75,7 +75,6 @@ export default function MapContainer({startingPosition}) {
       (zoomChanged.current === true || dragEnd.current === true || boundsChanged.current === true)){
       const newBounds = map.current.getBounds();
       if (newBounds) {
-        
         getNotesInBounds({variables: {
           swLat: newBounds.getSouthWest().lat(), 
           swLng: newBounds.getSouthWest().lng(), 
@@ -204,7 +203,7 @@ export default function MapContainer({startingPosition}) {
           })}
         </GoogleMap>}
 
-      {/* {map.current && notesInBounds && 
+      {map.current && notesInBounds && 
         <Button 
         size="lg" 
         variant="info"
@@ -253,11 +252,11 @@ export default function MapContainer({startingPosition}) {
           }}
         >
           <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 && 's')}
-        </Button>} */}
+        </Button>}
       
 
       {/* below code is used for debugging */}
-      {/* {map.current && position && notesInBounds &&     
+      {map.current && position && notesInBounds &&     
         <div 
           style={{
             position: 'absolute',
@@ -311,7 +310,7 @@ export default function MapContainer({startingPosition}) {
                 })}
           </ul>
 
-        </div>} */}
+        </div>}
       </div>
     </>
   )
