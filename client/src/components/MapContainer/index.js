@@ -4,6 +4,7 @@ import {Journals} from 'react-bootstrap-icons';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
+import noteImg from '../../img/note.png';
 
 
 export default function MapContainer({startingPosition}) {
@@ -203,6 +204,8 @@ export default function MapContainer({startingPosition}) {
                 options={{optimized: true}}
                 position={{lat, lng}}
                 icon={{...noteIcon, fillColor: inProximity ? "red" : "black"}}
+                // icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
+                // icon={noteImg}
                 title={noteText}  
               />)
           })}
@@ -277,6 +280,7 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
+            DevicePixelRatio: {window.devicePixelRatio} <br/>
             Inner height: {window.innerHeight} <br/> 
             Inner width: {window.innerWidth} <br/> 
             Outer height: {window.outerHeight} <br/> 
