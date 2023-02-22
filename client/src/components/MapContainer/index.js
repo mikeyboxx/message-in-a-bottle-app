@@ -143,18 +143,10 @@ export default function MapContainer({startingPosition}) {
             prevPosition.current.lat = position.coords.latitude;
             prevPosition.current.lng = position.coords.longitude;
             prevPosition.current.isChanged = true;
-            // isInBounds && map.current.zoom > 15 && getNotesInBounds({variables: {
-            //   lat: position.coords.latitude,
-            //   lng: position.coords.longitude,
-            //   swLat: newBounds.getSouthWest().lat(), 
-            //   swLng: newBounds.getSouthWest().lng(), 
-            //   neLat: newBounds.getNorthEast().lat(), 
-            //   neLng: newBounds.getNorthEast().lng()
-            // }});
           }
           
-          isInBounds && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
-          isInBounds && position.coords.accuracy < 13 && position.coords.speed > .5 && map.current.setHeading(position.coords.heading);
+          isInBounds && position.coords.speed > 1 && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+          isInBounds && position.coords.accuracy < 13 && position.coords.speed > 1 && map.current.setHeading(position.coords.heading);
         }
       }
     }
@@ -164,9 +156,6 @@ export default function MapContainer({startingPosition}) {
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
   useEffect(() => {
     // console.log('useEffect [data, position]');
-    // if (data?.notesInBounds) {
-    //   setNotesInBounds(data?.notesInBounds);
-    // }
     if (data?.notesInBounds && position && map.current.zoom > 17) {
       const arr = data.notesInBounds.map(el => {
         const { note } = el;
@@ -187,7 +176,6 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-     {/* <div style={{height: '100%'}}> */}
      <div>
       {position && 
         <GoogleMap
@@ -288,9 +276,6 @@ export default function MapContainer({startingPosition}) {
               </Button>}
         </GoogleMap>}
 
-      
-      
-
       {/* below code is used for debugging */}
       {map.current && position && notesInBounds &&     
         <div 
@@ -308,37 +293,17 @@ export default function MapContainer({startingPosition}) {
           }}>
             
           <p>
-            {/* DevicePixelRatio: {window.devicePixelRatio} <br/> */}
-            {/* googleMap height: {document.getElementById('googleMap').getBoundingClientRect().height
-}<br/>
-            googleMap width: {document.getElementById('googleMap').getBoundingClientRect().width
-}<br/><br/> */}
-            {/* VisualViewport height: {window.visualViewport.innerHeight} <br/> 
-            VisualViewport width: {window.visualViewport.innerWidth} <br/> 
-            VisualViewport offsetTop: {window.visualViewport.offsetTop} <br/> 
-            VisualViewport offsetLeft: {window.visualViewport.offsetLeft} <br/> 
-            VisualViewport scale: {window.visualViewport.scale} <br/>  */}
-            {/* Inner height: {window.innerHeight} <br/> 
-            Inner width: {window.innerWidth} <br/> <br/>
-            Outer height: {window.outerHeight} <br/> 
-            Outer width: {window.outerWidth} <br/> <br/>
-            Screen height:  {window.screen.height} <br/>
-            Screen width:  {window.screen.width} <br/><br/>
-            Available height: {window.screen.availHeight} <br/>
-            Available width: {window.screen.availWidth} <br/> <br/>
-            Body client height: {document.querySelector('body').clientHeight} <br/>
-            Body client width: {document.querySelector('body').clientWidth} <br/><br/> */}
-            Zoom: {map.current.zoom} <br/> <br/>
+            Zoom: {map.current.zoom.toFixed(3)} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
-              {lat: position.coords.latitude, lng: position.coords.longitude})}<br/><br/>
+              {lat: position.coords.latitude, lng: position.coords.longitude}).toFixed(3)}<br/><br/>
 
             Curr Lat: {position.coords.latitude}<br/>
             Curr Lng: {position.coords.longitude}<br/><br/>
 
-            Heading: {position.coords.heading} <br/><br/>
-            Speed: {position.coords.speed} <br/><br/>
-            Aaccuracy: {position.coords.accuracy} <br/><br/>
+            Heading: {position.coords.heading?.toFixed(3)} <br/><br/>
+            Speed: {position.coords.speed?.toFixed(3)} <br/><br/>
+            Aaccuracy: {position.coords.accuracy?.toFixed(3)} <br/><br/>
 
             # of notes in bounds: {notesInBounds?.length} <br/><br/>
             # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
@@ -346,18 +311,19 @@ export default function MapContainer({startingPosition}) {
           
           <ul>
             {notesInBounds
-              ?.filter(marker => marker.inProximity === true)
+              ?.filter(note => note.inProximity === true)
               ?.map((el, idx) => { 
                 const {note} = el;
                 return (
                   <li key={idx}>
-                      {note.noteText}<br/> Distance: {window.google.maps.geometry.spherical.computeDistanceBetween(
-          {lat: position.coords.latitude, lng: position.coords.longitude},
-          {lat: note.lat, lng: note.lng}).toFixed(3)} meters <hr/> 
+                      {note.noteText}<br/> Distance: {
+                        window.google.maps.geometry.spherical.computeDistanceBetween(
+                          {lat: position.coords.latitude, lng: position.coords.longitude},
+                          {lat: note.lat, lng: note.lng}).toFixed(3)
+                      } meters <hr/> 
                   </li>)
                 })}
           </ul>
-
         </div>}
       </div>
     </>
