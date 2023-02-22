@@ -21,7 +21,7 @@ const resolvers = {
         return {
           note,
           distance,
-          inProximity: distance && (distance < 30)
+          inProximity: distance && (distance < 10)
         } 
       });
 
