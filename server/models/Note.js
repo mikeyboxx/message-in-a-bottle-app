@@ -60,3 +60,5 @@ noteSchema.methods.getDistance = function (lat, lng) {
 
 
 module.exports = note;
+
+
