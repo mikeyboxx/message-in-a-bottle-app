@@ -10,6 +10,11 @@ const typeDefs = gql`
     updatedTs: String
   }
 
+  type Auth {
+    token: ID
+    user: User
+  }
+
   type Note {
     id: ID
     noteText: String
@@ -39,6 +44,12 @@ const typeDefs = gql`
       neLng: Float!): [NoteInBounds]
 
     users: [User]
+  }
+
+  type Mutation {
+    addUser(firstName: String!, lastName: String!, email: String!, userName: String!, password: String!): Auth
+    updateUser(firstName: String, lastName: String, email: String, password: String): User
+    login(email: String!, password: String!): Auth
   }
 
 `;
