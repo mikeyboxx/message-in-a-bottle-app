@@ -85,7 +85,7 @@ export default function MapContainer({startingPosition}) {
           
           // if user is not in bounds and (zoomed or dragged) OR he moved certain distance
           ((!isInBounds && (zoomChanged.current || dragEnd.current)) || 
-            (boundsChanged.current && prevPosition.current.isChanged)) && 
+            (boundsChanged.current )) && 
             getNotesInBounds({
               variables: {
                 swLat: newBounds.getSouthWest().lat(), 
