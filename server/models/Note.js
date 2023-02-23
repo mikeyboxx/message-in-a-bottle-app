@@ -49,6 +49,7 @@ noteSchema
     return `${new Date(this.updatedAt).toISOString()}`;
   })
 
+// distance from the coordinates passed to this method
 noteSchema.methods.getDistance = function (lat, lng) {
   const distance = getDistanceFromLatLonInMeters(lat, lng, this.lat, this.lng);
   return distance;

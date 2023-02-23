@@ -8,11 +8,11 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
-  const [notesInBounds, setNotesInBounds] = useState(null);
-  const [notesInProximityVisible, setNotesInProximityVisible] = useState('hidden');
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{
     fetchPolicy: 'network-only'
   });
+  const [notesInBounds, setNotesInBounds] = useState(null);
+  const [notesInProximityListVisible, setNotesInProximityListVisible] = useState('hidden');
   
   const map = useRef(null);
   const prevPosition = useRef({});
@@ -37,6 +37,7 @@ export default function MapContainer({startingPosition}) {
     scale: 8,
     strokeColor: 'rgb(255,255,255)',
     strokeWeight: 4,
+    path: window.google.maps.SymbolPath.CIRCLE
   }),[]);
 
   // Marker object's icon property of the Note
@@ -71,22 +72,26 @@ export default function MapContainer({startingPosition}) {
     // console.log('onIdle');
     if (map.current && 
         (zoomChanged.current || dragEnd.current || (boundsChanged.current  && prevPosition.current.isChanged))){
-      // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user pooint of view, markers disappear if you unzoom too much.   
+      // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user point of view, markers disappear if you unzoom too much.   
       if (map.current.zoom > 17) {
         const newBounds = map.current.getBounds();
         if (newBounds) {
+          // check if user is in new bounds, due to zoom or dragend
           const isInBounds = 
               position.coords.latitude > newBounds.getSouthWest().lat() && 
               position.coords.longitude >  newBounds.getSouthWest().lng() && 
               position.coords.latitude < newBounds.getNorthEast().lat() && 
               position.coords.longitude <  newBounds.getNorthEast().lng();
-              
-          ((!isInBounds && (zoomChanged.current || dragEnd.current)) || boundsChanged.current) && 
-            getNotesInBounds({variables: {
-              swLat: newBounds.getSouthWest().lat(), 
-              swLng: newBounds.getSouthWest().lng(), 
-              neLat: newBounds.getNorthEast().lat(), 
-              neLng: newBounds.getNorthEast().lng()
+          
+          // if user is not in bounds and (zoomed or dragged) OR he moved certain distance
+          ((!isInBounds && (zoomChanged.current || dragEnd.current)) || 
+            (boundsChanged.current && prevPosition.current.isChanged)) && 
+            getNotesInBounds({
+              variables: {
+                swLat: newBounds.getSouthWest().lat(), 
+                swLng: newBounds.getSouthWest().lng(), 
+                neLat: newBounds.getNorthEast().lat(), 
+                neLng: newBounds.getNorthEast().lng()
           }});
         }
       } else {
@@ -182,6 +187,7 @@ export default function MapContainer({startingPosition}) {
         }
       });
       numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
+      numberOfNotesInProximity.current === 0 && setNotesInProximityListVisible('hidden');
       setNotesInBounds(arr);
     }
   },[position, data]);
@@ -189,7 +195,6 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <>
-     <div>
       {position && 
         <GoogleMap
           id={'googleMap'}
@@ -210,7 +215,7 @@ export default function MapContainer({startingPosition}) {
         >
           <Marker
             position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
-            icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
+            icon={userIcon}
           />
           
           {notesInBounds?.map((el, idx) => {
@@ -277,7 +282,7 @@ export default function MapContainer({startingPosition}) {
                   fontSize: '.85em',
                   cursor: 'pointer'
                 }}
-                onClick={()=>setNotesInProximityVisible('visible')}
+                onClick={()=>setNotesInProximityListVisible('visible')}
               >
                 <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + 
                   (numberOfNotesInProximity.current > 1 ? 's' : '')}
@@ -287,53 +292,34 @@ export default function MapContainer({startingPosition}) {
 
       {map.current && position && notesInBounds && numberOfNotesInProximity.current > 0 &&    
         <div 
-        style={{
-          position: 'absolute',
-          border: '1px solid gray',
-          borderRadius: 30,
-          boxShadow: '5px 5px 5px gray',
-          paddingTop: 8,
-          paddingBottom: 8,
-          paddingLeft: 18,
-          paddingRight: 18,
-          fontWeight: 'bold',
-          backgroundColor: 'white',
-          color: 'purple',
-          fontSize: '.85em',
-          
-          // top: 2,
-          top: (Math.floor(window.screen.height >= window.innerHeight ? 
-            window.innerHeight : 
-            window.screen.height - (window.innerHeight - window.screen.height))/2) - 200,
-            // left: 2,
+          style={{
+            position: 'absolute',
+            border: '1px solid gray',
+            borderRadius: 30,
+            boxShadow: '5px 5px 5px gray',
+            paddingTop: 8,
+            paddingBottom: 8,
+            paddingLeft: 18,
+            paddingRight: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+            color: 'purple',
+            fontSize: '.85em',
+            
+            top: (Math.floor(window.screen.height >= window.innerHeight ? 
+              window.innerHeight : 
+              window.screen.height - (window.innerHeight - window.screen.height))/2) - 200,
+
             left: (Math.floor(window.screen.width >= window.innerWidth ? 
               window.innerWidth : 
               window.screen.width - (window.innerWidth - window.screen.width))/2) - 100,
-              width: '200px',
-              height: '400px',
-              padding: 5,
-              overflow: 'auto',
-              visibility: notesInProximityVisible
-            }}>
-            
-          {/* below code is used for debugging */}
-          {/* <p>
-            Zoom: {map.current.zoom.toFixed(3)} <br/> <br/>
-            Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
-              {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
-              {lat: position.coords.latitude, lng: position.coords.longitude}).toFixed(3)}<br/><br/>
 
-            Curr Lat: {position.coords.latitude}<br/>
-            Curr Lng: {position.coords.longitude}<br/><br/>
-
-            Heading: {position.coords.heading?.toFixed(3)} <br/><br/>
-            Speed: {position.coords.speed?.toFixed(3)} <br/><br/>
-            Accuracy: {position.coords.accuracy?.toFixed(3)} <br/><br/>
-
-            # of notes in bounds: {notesInBounds?.length} <br/><br/>
-            # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
-          </p> */}
-          
+            width: '200px',
+            height: '400px',
+            padding: 5,
+            visibility: notesInProximityListVisible
+          }}
+        >
           <div style={{overflow: 'auto'}}>
             <ul>
               {notesInBounds
@@ -346,7 +332,7 @@ export default function MapContainer({startingPosition}) {
                           window.google.maps.geometry.spherical.computeDistanceBetween(
                             {lat: position.coords.latitude, lng: position.coords.longitude},
                             {lat: note.lat, lng: note.lng}).toFixed(3)
-                        } meters <hr/> 
+                          } meters <hr/> 
                     </li>)
                   })}
             </ul>
@@ -361,18 +347,35 @@ export default function MapContainer({startingPosition}) {
               color: 'purple',
               fontSize: '.85em',
               cursor: 'pointer',
+              border: 'none',
               borderRadius: 30,
               boxShadow: '5px 5px 5px gray', 
             }}
             onClick={(e)=>{
               e.preventDefault();
-              setNotesInProximityVisible('hidden');
+              setNotesInProximityListVisible('hidden');
             }}
           >
             Close
           </Button>
+        {/* below code is used for debugging */}
+        {/* <p>
+              Zoom: {map.current.zoom.toFixed(3)} <br/> <br/>
+              Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
+                {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
+                {lat: position.coords.latitude, lng: position.coords.longitude}).toFixed(3)}<br/><br/>
+
+              Curr Lat: {position.coords.latitude}<br/>
+              Curr Lng: {position.coords.longitude}<br/><br/>
+
+              Heading: {position.coords.heading?.toFixed(3)} <br/><br/>
+              Speed: {position.coords.speed?.toFixed(3)} <br/><br/>
+              Accuracy: {position.coords.accuracy?.toFixed(3)} <br/><br/>
+
+              # of notes in bounds: {notesInBounds?.length} <br/><br/>
+              # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
+            </p> */}
         </div>}
-      </div>
     </>
   )
 }
