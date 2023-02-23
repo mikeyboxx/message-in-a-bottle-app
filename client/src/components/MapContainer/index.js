@@ -73,7 +73,7 @@ export default function MapContainer({startingPosition}) {
     if (map.current && 
         (zoomChanged.current || dragEnd.current || (boundsChanged.current  && prevPosition.current.isChanged))){
       // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user point of view, markers disappear if you unzoom too much.   
-      if (map.current.zoom > 17) {
+      if (map.current.zoom > 16) {
         const newBounds = map.current.getBounds();
         if (newBounds) {
           // check if user is in new bounds, due to zoom or dragend
@@ -175,7 +175,7 @@ export default function MapContainer({startingPosition}) {
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
     // console.log('useEffect [data, position]');
-    if (data?.notesInBounds && position && map.current.zoom > 17) {
+    if (data?.notesInBounds && position && map.current.zoom > 16) {
       const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
