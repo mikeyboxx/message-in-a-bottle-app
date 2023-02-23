@@ -45,9 +45,7 @@ const resolvers = {
     updateUser: async (parent, args, context) => {
       try {
         if (context.user) {
-          console.log(context.user, args);
           const user = await User.findByIdAndUpdate(context.user._id, args, { new: true });
-          // console.log(user);
           return user;
         }
       } catch (err) {
