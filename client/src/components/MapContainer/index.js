@@ -20,6 +20,15 @@ export default function MapContainer({startingPosition}) {
   const boundsChanged = useRef(false);
   const dragEnd = useRef(false);
 
+  // google maps options
+  const defaultMapOptions = useMemo(()=>({ 
+    disableDefaultUI: true,
+    mapId: '8dce6158aa71a36a',
+    // isFractionalZoomEnabled: false,
+    // minZoom: 16,
+    // maxZoom: 20,
+  }),[]);
+
   // Marker object's icon property of the User
   const userIcon = useMemo(()=>({ 
     fillColor: '#4285F4',
@@ -60,27 +69,27 @@ export default function MapContainer({startingPosition}) {
   const onIdle = useCallback(() => {
     // console.log('onIdle');
     if (map.current && 
-      (zoomChanged.current || dragEnd.current || (boundsChanged.current  && prevPosition.current.isChanged))){
-        if (map.current.zoom > 17) {
-          const newBounds = map.current.getBounds();
-          if (newBounds) {
-            const isInBounds = 
-                position.coords.latitude > newBounds.getSouthWest().lat() && 
-                position.coords.longitude >  newBounds.getSouthWest().lng() && 
-                position.coords.latitude < newBounds.getNorthEast().lat() && 
-                position.coords.longitude <  newBounds.getNorthEast().lng();
-                
-            ((!isInBounds && (zoomChanged.current || dragEnd.current)) || boundsChanged.current) && 
-              getNotesInBounds({variables: {
-                swLat: newBounds.getSouthWest().lat(), 
-                swLng: newBounds.getSouthWest().lng(), 
-                neLat: newBounds.getNorthEast().lat(), 
-                neLng: newBounds.getNorthEast().lng()
-            }});
-          }
-        } else {
-          setNotesInBounds([]);
+        (zoomChanged.current || dragEnd.current || (boundsChanged.current  && prevPosition.current.isChanged))){
+      if (map.current.zoom > 17) {
+        const newBounds = map.current.getBounds();
+        if (newBounds) {
+          const isInBounds = 
+              position.coords.latitude > newBounds.getSouthWest().lat() && 
+              position.coords.longitude >  newBounds.getSouthWest().lng() && 
+              position.coords.latitude < newBounds.getNorthEast().lat() && 
+              position.coords.longitude <  newBounds.getNorthEast().lng();
+              
+          ((!isInBounds && (zoomChanged.current || dragEnd.current)) || boundsChanged.current) && 
+            getNotesInBounds({variables: {
+              swLat: newBounds.getSouthWest().lat(), 
+              swLng: newBounds.getSouthWest().lng(), 
+              neLat: newBounds.getNorthEast().lat(), 
+              neLng: newBounds.getNorthEast().lng()
+          }});
         }
+      } else {
+        setNotesInBounds([]);
+      }
     }
     if (prevPosition.current.isChanged) prevPosition.current.isChanged = false;
 
@@ -112,9 +121,7 @@ export default function MapContainer({startingPosition}) {
     return () => navigator.geolocation.clearWatch(navId);
   },[]);
 
-  // each time gps position changes, save the position, and every 20 meters pan the map (chg center)
-  // if gps accuracy is less than 13 meters, change the heading of the map
-  // do not pan or change heading, if user gps position is not in bounds of the google map, due to zoom or drag
+
   useEffect(() => {
     // console.log('useEffect [position]');
     if (position) {
@@ -123,42 +130,46 @@ export default function MapContainer({startingPosition}) {
         prevPosition.current.isChanged = true;
         prevPosition.current.lat = position.coords.latitude;
         prevPosition.current.lng = position.coords.longitude;
-        
       };
 
       if (map.current){
         const newBounds = map.current.getBounds();
         if (newBounds) {
+          // check if user is in bounds of the google map
           const isInBounds = 
             position.coords.latitude > newBounds.getSouthWest().lat() && 
             position.coords.longitude >  newBounds.getSouthWest().lng() && 
             position.coords.latitude < newBounds.getNorthEast().lat() && 
             position.coords.longitude <  newBounds.getNorthEast().lng();
 
+          // calculate distance between current and previous positions
           const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
             {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
             {lat: position.coords.latitude, lng: position.coords.longitude});
-
+          
+          // every 100 meters, set flag which will trigger a DB query, upon map Idle event
+          // and save current position 
           if (dist > 100) {
             prevPosition.current.lat = position.coords.latitude;
             prevPosition.current.lng = position.coords.longitude;
             prevPosition.current.isChanged = true;
           }
           
-          isInBounds && position.coords.speed > 1 && map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
-          isInBounds && position.coords.accuracy < 13 && position.coords.speed > 1 && map.current.setHeading(position.coords.heading);
+          // pan and change heading of google map, if user is in bounds of the map, and is moving
+          if (isInBounds && position.coords.speed > 1) { 
+            map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+            position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
+          }
         }
       }
     }
-
   },[position, getNotesInBounds]);
 
-  // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user 
+  // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
     // console.log('useEffect [data, position]');
     if (data?.notesInBounds && position && map.current.zoom > 17) {
-      const arr = data.notesInBounds.map(el => {
-        const { note } = el;
+      const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
           {lat: note.lat, lng: note.lng});
@@ -180,13 +191,7 @@ export default function MapContainer({startingPosition}) {
       {position && 
         <GoogleMap
           id={'googleMap'}
-          options={{ 
-            disableDefaultUI: true,
-            // minZoom: 16,
-            mapId: '8dce6158aa71a36a',
-            // isFractionalZoomEnabled: false,
-            // maxZoom: 20,
-          }}
+          options={defaultMapOptions}
           mapContainerStyle={{ 
             height: `${window.screen.height >= window.innerHeight ? 
                        window.innerHeight : 
@@ -202,9 +207,7 @@ export default function MapContainer({startingPosition}) {
           onDragEnd={onDragEnd}
         >
           <Marker
-            position={position ? 
-              {lat: position.coords.latitude, lng: position.coords.longitude} :
-              {lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude}}
+            position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
           
@@ -248,7 +251,8 @@ export default function MapContainer({startingPosition}) {
                 }}
               >
                 <Journals /> Create Note
-            </Button>}
+              </Button>
+            }
       
             {map.current && notesInBounds?.filter(note => note.inProximity === true).length > 0 && 
               <Button 
@@ -272,8 +276,10 @@ export default function MapContainer({startingPosition}) {
                   cursor: 'pointer'
                 }}
               >
-                <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 ? 's' : '')}
-              </Button>}
+                <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + 
+                  (numberOfNotesInProximity.current > 1 ? 's' : '')}
+              </Button>
+            }
         </GoogleMap>}
 
       {/* below code is used for debugging */}
