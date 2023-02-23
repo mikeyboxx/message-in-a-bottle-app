@@ -9,6 +9,7 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
+  const [notesInProximityVisible, setNotesInProximityVisible] = useState('hidden');
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{
     fetchPolicy: 'network-only'
   });
@@ -70,6 +71,7 @@ export default function MapContainer({startingPosition}) {
     // console.log('onIdle');
     if (map.current && 
         (zoomChanged.current || dragEnd.current || (boundsChanged.current  && prevPosition.current.isChanged))){
+      // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user pooint of view, markers disappear if you unzoom too much.   
       if (map.current.zoom > 17) {
         const newBounds = map.current.getBounds();
         if (newBounds) {
@@ -275,6 +277,7 @@ export default function MapContainer({startingPosition}) {
                   fontSize: '.85em',
                   cursor: 'pointer'
                 }}
+                onClick={()=>setNotesInProximityVisible('visible')}
               >
                 <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + 
                   (numberOfNotesInProximity.current > 1 ? 's' : '')}
@@ -282,23 +285,39 @@ export default function MapContainer({startingPosition}) {
             }
         </GoogleMap>}
 
-      {/* below code is used for debugging */}
-      {map.current && position && notesInBounds &&     
+      {map.current && position && notesInBounds && numberOfNotesInProximity.current > 0 &&    
         <div 
-          style={{
-            position: 'absolute',
-            top: 2,
-            left: 2,
-            width: '200px',
-            height: '400px',
-            padding: 5,
-            color: 'black',
-            fontWeight: 'bold',
-            fontSize: '.85em',
-            overflow: 'auto'
-          }}>
+        style={{
+          position: 'absolute',
+          border: '1px solid gray',
+          borderRadius: 30,
+          boxShadow: '5px 5px 5px gray',
+          paddingTop: 8,
+          paddingBottom: 8,
+          paddingLeft: 18,
+          paddingRight: 18,
+          fontWeight: 'bold',
+          backgroundColor: 'white',
+          color: 'purple',
+          fontSize: '.85em',
+          
+          // top: 2,
+          top: (Math.floor(window.screen.height >= window.innerHeight ? 
+            window.innerHeight : 
+            window.screen.height - (window.innerHeight - window.screen.height))/2) - 200,
+            // left: 2,
+            left: (Math.floor(window.screen.width >= window.innerWidth ? 
+              window.innerWidth : 
+              window.screen.width - (window.innerWidth - window.screen.width))/2) - 100,
+              width: '200px',
+              height: '400px',
+              padding: 5,
+              overflow: 'auto',
+              visibility: notesInProximityVisible
+            }}>
             
-          <p>
+          {/* below code is used for debugging */}
+          {/* <p>
             Zoom: {map.current.zoom.toFixed(3)} <br/> <br/>
             Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
               {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
@@ -309,27 +328,49 @@ export default function MapContainer({startingPosition}) {
 
             Heading: {position.coords.heading?.toFixed(3)} <br/><br/>
             Speed: {position.coords.speed?.toFixed(3)} <br/><br/>
-            Aaccuracy: {position.coords.accuracy?.toFixed(3)} <br/><br/>
+            Accuracy: {position.coords.accuracy?.toFixed(3)} <br/><br/>
 
             # of notes in bounds: {notesInBounds?.length} <br/><br/>
             # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
-          </p>
+          </p> */}
           
-          <ul>
-            {notesInBounds
-              ?.filter(note => note.inProximity === true)
-              ?.map((el, idx) => { 
-                const {note} = el;
-                return (
-                  <li key={idx}>
-                      {note.noteText}<br/> Distance: {
-                        window.google.maps.geometry.spherical.computeDistanceBetween(
-                          {lat: position.coords.latitude, lng: position.coords.longitude},
-                          {lat: note.lat, lng: note.lng}).toFixed(3)
-                      } meters <hr/> 
-                  </li>)
-                })}
-          </ul>
+          <div style={{overflow: 'auto'}}>
+            <ul>
+              {notesInBounds
+                ?.filter(note => note.inProximity === true)
+                ?.map((el, idx) => { 
+                  const {note} = el;
+                  return (
+                    <li key={idx}>
+                        {note.noteText}<br/> Distance: {
+                          window.google.maps.geometry.spherical.computeDistanceBetween(
+                            {lat: position.coords.latitude, lng: position.coords.longitude},
+                            {lat: note.lat, lng: note.lng}).toFixed(3)
+                        } meters <hr/> 
+                    </li>)
+                  })}
+            </ul>
+          </div>
+          <Button 
+            style={{
+              position: 'absolute', 
+              marginLeft: '75px', 
+              bottom: 10,
+              fontWeight: 'bold',
+              backgroundColor: 'white',
+              color: 'purple',
+              fontSize: '.85em',
+              cursor: 'pointer',
+              borderRadius: 30,
+              boxShadow: '5px 5px 5px gray', 
+            }}
+            onClick={(e)=>{
+              e.preventDefault();
+              setNotesInProximityVisible('hidden');
+            }}
+          >
+            Close
+          </Button>
         </div>}
       </div>
     </>
