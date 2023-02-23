@@ -41,16 +41,29 @@ const resolvers = {
       return { token, user };
     },
     
+    // user must be logged in order to change name, email, or password
     updateUser: async (parent, args, context) => {
-      if (context.user) {
-        return await User.findByIdAndUpdate(context.user._id, args, { new: true });
+      try {
+        if (context.user) {
+          console.log(context.user, args);
+          const user = await User.findByIdAndUpdate(context.user._id, args, { new: true });
+          // console.log(user);
+          return user;
+        }
+      } catch (err) {
+        console.log(err);
       }
 
       throw new AuthenticationError('Not logged in');
     },
     
-    login: async (parent, { userName, password }) => {
+    login: async (parent, { userName, password }, context) => {
+      if (context.user) {
+        throw new AuthenticationError('Already logged in');
+      }
+
       const user = await User.findOne({ userName });
+      
 
       if (!user) {
         throw new AuthenticationError('Incorrect credentials');
@@ -65,7 +78,9 @@ const resolvers = {
       const token = signToken(user);
 
       return { token, user };
-    }
+    },
+
+    
   }
 };
 
