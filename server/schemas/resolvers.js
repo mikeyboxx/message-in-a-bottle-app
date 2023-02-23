@@ -1,4 +1,4 @@
-const { Note } = require('../models');
+const { Note, User } = require('../models');
 
 const resolvers = {
   Query: {
@@ -27,6 +27,8 @@ const resolvers = {
 
       return notes;
     },
+
+    users: async () => User.find(),
   },
 };
 

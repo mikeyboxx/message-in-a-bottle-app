@@ -6,6 +6,8 @@ const typeDefs = gql`
     firstName: String
     lastName: String
     email: String
+    createdTs: String
+    updatedTs: String
   }
 
   type Note {
@@ -35,6 +37,8 @@ const typeDefs = gql`
       swLng: Float!, 
       neLat: Float!, 
       neLng: Float!): [NoteInBounds]
+
+    users: [User]
   }
 
 `;
