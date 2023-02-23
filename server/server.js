@@ -2,17 +2,17 @@ const express = require('express');
 const path = require('path');
 const { ApolloServer } = require('apollo-server-express');
 
-// const { authMiddleware } = require('./utils/auth');
 const db = require('./config/connection');
 const { typeDefs, resolvers } = require('./schemas');
+const { authMiddleware } = require('./utils/auth');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  persistedQueries: false
-  // context: authMiddleware,
+  persistedQueries: false,
+  context: authMiddleware,
 });
 
 app.use(express.urlencoded({ extended: false }));
