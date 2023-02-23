@@ -163,9 +163,10 @@ export default function MapContainer({startingPosition}) {
           }
           
           // pan and change heading of google map, if user is in bounds of the map, and is moving
-          if (isInBounds && position.coords.speed > 1) { 
+          // if (isInBounds && position.coords.speed > 1) { 
+          if (isInBounds && position.coords.accuracy < 10) { 
             map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-            position.coords.accuracy < 13 && map.current.setHeading(position.coords.heading);
+            map.current.setHeading(position.coords.heading);
           }
         }
       }
