@@ -7,16 +7,16 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 
 export default function MapContainer({startingPosition}) {
-  const [viewPortDimensions, setViewPortDimensions] = useState({
-    height: window.screen.height >= window.innerHeight ? 
-      window.innerHeight : 
-      // window.screen.height, 
-      window.screen.height - (window.innerHeight - window.screen.height), 
-    width: window.screen.width >= window.innerWidth ? 
-      window.innerWidth : 
-      // window.screen.width 
-      window.screen.width - (window.innerWidth - window.screen.width)
-  });
+  // const [viewPortDimensions, setViewPortDimensions] = useState({
+  //   height: window.screen.height >= window.innerHeight ? 
+  //     window.innerHeight : 
+  //     // window.screen.height, 
+  //     window.screen.height - (window.innerHeight - window.screen.height), 
+  //   width: window.screen.width >= window.innerWidth ? 
+  //     window.innerWidth : 
+  //     // window.screen.width 
+  //     window.screen.width - (window.innerWidth - window.screen.width)
+  // });
   const [position, setPosition] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{
     fetchPolicy: 'network-only'
@@ -97,20 +97,20 @@ export default function MapContainer({startingPosition}) {
   
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
-    window.addEventListener('resize', () =>{ 
-      // console.log('resize');
-      // console.log(window.screen.height, window.innerHeight);
-      // console.log(window.screen.width , window.innerWidth);
-      setViewPortDimensions({
-        height: window.screen.height >= window.innerHeight ? 
-          window.innerHeight : 
-          // window.screen.height, 
-          window.screen.height - (window.innerHeight - window.screen.height), 
-        width: window.screen.width >= window.innerWidth ? 
-          window.innerWidth : 
-          // window.screen.width 
-          window.screen.width - (window.innerWidth - window.screen.width)
-    })});
+    // window.addEventListener('resize', () =>{ 
+    //   // console.log('resize');
+    //   // console.log(window.screen.height, window.innerHeight);
+    //   // console.log(window.screen.width , window.innerWidth);
+    //   setViewPortDimensions({
+    //     height: window.screen.height >= window.innerHeight ? 
+    //       window.innerHeight : 
+    //       // window.screen.height, 
+    //       window.screen.height - (window.innerHeight - window.screen.height), 
+    //     width: window.screen.width >= window.innerWidth ? 
+    //       window.innerWidth : 
+    //       // window.screen.width 
+    //       window.screen.width - (window.innerWidth - window.screen.width)
+    // })});
 
     const navId = navigator.geolocation.watchPosition( 
       newPos => {
@@ -203,8 +203,10 @@ export default function MapContainer({startingPosition}) {
           id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            height: `${viewPortDimensions.height}px`, 
-            width: `${viewPortDimensions.width}px`
+            height: `100vh`, 
+            width: `100%`
+            // height: `${viewPortDimensions.height}px`, 
+            // width: `${viewPortDimensions.width}px`
           }}
           onLoad={onLoad}
           onIdle={onIdle}
