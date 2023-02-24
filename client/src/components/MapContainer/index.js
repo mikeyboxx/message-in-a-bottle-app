@@ -15,19 +15,15 @@ export default function MapContainer({startingPosition}) {
   const [notesInProximityListVisible, setNotesInProximityListVisible] = useState('hidden');
   
   const map = useRef(null);
-  const prevPosition = useRef({});
   const numberOfNotesInProximity = useRef(0);
   const zoomChanged = useRef(false);
-  const boundsChanged = useRef(false);
   const dragEnd = useRef(false);
+  const maxZoom = useRef(16);
 
   // google maps options
   const defaultMapOptions = useMemo(()=>({ 
     disableDefaultUI: true,
     mapId: '8dce6158aa71a36a',
-    // isFractionalZoomEnabled: false,
-    // minZoom: 16,
-    // maxZoom: 20,
   }),[]);
 
   // Marker object's icon property of the User
@@ -51,11 +47,9 @@ export default function MapContainer({startingPosition}) {
   // track google map events
   const onDragEnd = useCallback(() => {/*console.log('onDragEnd');*/ return dragEnd.current = true},[]);
   const onZoomChanged = useCallback(() => {/*console.log('onZoomChanged');*/ return zoomChanged.current = true},[]);
-  const onBoundsChanged = useCallback(() => {/*console.log('onBoundsChanged');*/ return boundsChanged.current = true},[]);
 
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
-    // console.log('onLoad');
     gMap.setOptions({
       zoom: 20,
       heading: startingPosition.coords.heading,
@@ -69,41 +63,27 @@ export default function MapContainer({startingPosition}) {
 
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
-    // console.log('onIdle');
-    if (map.current && 
-        (zoomChanged.current || dragEnd.current || (boundsChanged.current  && prevPosition.current.isChanged))){
+    if (map.current && (zoomChanged.current || dragEnd.current )){
       // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user point of view, markers disappear if you unzoom too much.   
-      if (map.current.zoom > 16) {
+      if (map.current.zoom > maxZoom.current) {
         const newBounds = map.current.getBounds();
-        if (newBounds) {
-          // check if user is in new bounds, due to zoom or dragend
-          const isInBounds = 
-              position.coords.latitude > newBounds.getSouthWest().lat() && 
-              position.coords.longitude >  newBounds.getSouthWest().lng() && 
-              position.coords.latitude < newBounds.getNorthEast().lat() && 
-              position.coords.longitude <  newBounds.getNorthEast().lng();
-          
-          // if user is not in bounds and (zoomed or dragged) OR he moved certain distance
-          ((!isInBounds && (zoomChanged.current || dragEnd.current)) || 
-            (boundsChanged.current )) && 
-            getNotesInBounds({
-              variables: {
-                swLat: newBounds.getSouthWest().lat(), 
-                swLng: newBounds.getSouthWest().lng(), 
-                neLat: newBounds.getNorthEast().lat(), 
-                neLng: newBounds.getNorthEast().lng()
-          }});
-        }
-      } else {
+        (newBounds) && 
+          getNotesInBounds({
+            variables: {
+              swLat: newBounds.getSouthWest().lat(), 
+              swLng: newBounds.getSouthWest().lng(), 
+              neLat: newBounds.getNorthEast().lat(), 
+              neLng: newBounds.getNorthEast().lng()
+            }
+          });
+      } 
+      else {
         setNotesInBounds([]);
       }
     }
-    if (prevPosition.current.isChanged) prevPosition.current.isChanged = false;
-
     zoomChanged.current = false;
     dragEnd.current = false;
-    boundsChanged.current = false;
-  },[position, getNotesInBounds]);
+  },[getNotesInBounds]);
 
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
@@ -129,54 +109,50 @@ export default function MapContainer({startingPosition}) {
   },[]);
 
 
-  useEffect(() => {
-    // console.log('useEffect [position]');
-    if (position) {
-      // first time logic
-      if (Object.keys(prevPosition.current).length === 0){
-        prevPosition.current.isChanged = true;
-        prevPosition.current.lat = position.coords.latitude;
-        prevPosition.current.lng = position.coords.longitude;
-      };
-
-      if (map.current){
+  useEffect(()=>{
+    const timer = setInterval(()=>{
+      if (map.current.zoom > maxZoom.current) {
         const newBounds = map.current.getBounds();
         if (newBounds) {
-          // check if user is in bounds of the google map
-          const isInBounds = 
-            position.coords.latitude > newBounds.getSouthWest().lat() && 
-            position.coords.longitude >  newBounds.getSouthWest().lng() && 
-            position.coords.latitude < newBounds.getNorthEast().lat() && 
-            position.coords.longitude <  newBounds.getNorthEast().lng();
+          getNotesInBounds({
+            variables: {
+              swLat: newBounds.getSouthWest().lat(), 
+              swLng: newBounds.getSouthWest().lng(), 
+              neLat: newBounds.getNorthEast().lat(), 
+              neLng: newBounds.getNorthEast().lng()
+          }});
+        }
+      }
+    },3000);
+    return () => clearInterval(timer);
+  },[getNotesInBounds]);
 
-          // calculate distance between current and previous positions
-          const dist = window.google.maps.geometry.spherical.computeDistanceBetween(
-            {lat: prevPosition.current.lat, lng: prevPosition.current.lng},
-            {lat: position.coords.latitude, lng: position.coords.longitude});
-          
-          // every 100 meters, set flag which will trigger a DB query, upon map Idle event
-          // and save current position 
-          if (dist > 100) {
-            prevPosition.current.lat = position.coords.latitude;
-            prevPosition.current.lng = position.coords.longitude;
-            prevPosition.current.isChanged = true;
-          }
-          
-          // pan and change heading of google map, if user is in bounds of the map, and is moving
-          // if (isInBounds && position.coords.speed > 1) { 
-          if (isInBounds && position.coords.accuracy < 10) { 
-            map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-            map.current.setHeading(position.coords.heading);
-          }
+
+  useEffect(() => {
+    if (position && map.current){
+      const newBounds = map.current.getBounds();
+      if (newBounds) {
+        // check if user is in bounds of the google map
+        const isInBounds = 
+          position.coords.latitude > newBounds.getSouthWest().lat() && 
+          position.coords.longitude >  newBounds.getSouthWest().lng() && 
+          position.coords.latitude < newBounds.getNorthEast().lat() && 
+          position.coords.longitude <  newBounds.getNorthEast().lng();
+        
+        // pan and change heading of google map, if user is in bounds and gps has good accuracy, expressed in meters 
+        if (isInBounds && position.coords.accuracy < 10) { 
+          map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+          map.current.setHeading(position.coords.heading);
         }
       }
     }
-  },[position, getNotesInBounds]);
+  },[position]);
+
+  
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
-    // console.log('useEffect [data, position]');
-    if (data?.notesInBounds && position && map.current.zoom > 16) {
+    if (data?.notesInBounds && position && map.current.zoom > maxZoom.current) {
       const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
@@ -187,7 +163,8 @@ export default function MapContainer({startingPosition}) {
           inProximity: distance < 20
         }
       });
-      numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length;
+      // if there are no notes in proximty, hide the pickup notes list
+      numberOfNotesInProximity.current = arr.filter(el => el.inProximity === true).length ;
       numberOfNotesInProximity.current === 0 && setNotesInProximityListVisible('hidden');
       setNotesInBounds(arr);
     }
@@ -210,7 +187,6 @@ export default function MapContainer({startingPosition}) {
           }}
           onLoad={onLoad}
           onIdle={onIdle}
-          onBoundsChanged={onBoundsChanged}
           onZoomChanged={onZoomChanged}
           onDragEnd={onDragEnd}
         >
