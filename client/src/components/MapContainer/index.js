@@ -10,12 +10,12 @@ export default function MapContainer({startingPosition}) {
   const [viewPortDimensions, setViewPortDimensions] = useState({
     height: window.screen.height >= window.innerHeight ? 
       window.innerHeight : 
-      window.screen.height, 
-      // window.screen.height - (window.innerHeight - window.screen.height), 
+      // window.screen.height, 
+      window.screen.height - (window.innerHeight - window.screen.height), 
     width: window.screen.width >= window.innerWidth ? 
       window.innerWidth : 
-      window.screen.width 
-      // window.screen.width - (window.innerWidth - window.screen.width)
+      // window.screen.width 
+      window.screen.width - (window.innerWidth - window.screen.width)
   });
   const [position, setPosition] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{
@@ -104,12 +104,12 @@ export default function MapContainer({startingPosition}) {
       setViewPortDimensions({
         height: window.screen.height >= window.innerHeight ? 
           window.innerHeight : 
-          window.screen.height, 
-          // window.screen.height - (window.innerHeight - window.screen.height), 
+          // window.screen.height, 
+          window.screen.height - (window.innerHeight - window.screen.height), 
         width: window.screen.width >= window.innerWidth ? 
           window.innerWidth : 
-          window.screen.width 
-          // window.screen.width - (window.innerWidth - window.screen.width)
+          // window.screen.width 
+          window.screen.width - (window.innerWidth - window.screen.width)
     })});
 
     const navId = navigator.geolocation.watchPosition( 
