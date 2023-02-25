@@ -7,16 +7,6 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 
 export default function MapContainer({startingPosition}) {
-  // const [viewPortDimensions, setViewPortDimensions] = useState({
-  //   height: window.screen.height >= window.innerHeight ? 
-  //     window.innerHeight : 
-  //     // window.screen.height, 
-  //     window.screen.height - (window.innerHeight - window.screen.height), 
-  //   width: window.screen.width >= window.innerWidth ? 
-  //     window.innerWidth : 
-  //     // window.screen.width 
-  //     window.screen.width - (window.innerWidth - window.screen.width)
-  // });
   const [position, setPosition] = useState(null);
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{
     fetchPolicy: 'network-only'
@@ -29,7 +19,6 @@ export default function MapContainer({startingPosition}) {
   const zoomChanged = useRef(false);
   const dragEnd = useRef(false);
   const maxZoom = useRef(16);
-  const mapVisibility = useRef('hidden');
   
   // google maps options
   const defaultMapOptions = useMemo(()=>({ 
@@ -75,7 +64,6 @@ export default function MapContainer({startingPosition}) {
   
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
-    mapVisibility.current = 'visible';
     if (map.current && (zoomChanged.current || dragEnd.current )){
       // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user point of view, markers disappear if you unzoom too much.   
       if (map.current.zoom > maxZoom.current) {
@@ -212,12 +200,7 @@ export default function MapContainer({startingPosition}) {
                           window.innerHeight : 
                           window.screen.height - (window.innerHeight - window.screen.height) :  
                         Math.min(window.screen.height, window.innerHeight)}px`, 
-            // width: Math.min(window.screen.width, window.innerWidth) 
-            // height: `100vh`, 
-            width: `100%`,
-            // height: `${viewPortDimensions.height}px`, 
-            // width: `${viewPortDimensions.width}px`
-            visibility: mapVisibility.current
+            width: `100%`
           }}
           onLoad={onLoad}
           onIdle={onIdle}
