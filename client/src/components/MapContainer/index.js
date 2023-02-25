@@ -69,12 +69,13 @@ export default function MapContainer({startingPosition}) {
         lng: startingPosition.coords.longitude,
       }
     });
-    mapVisibility.current = 'visible';
+    
     map.current = gMap;
   },[startingPosition]);
   
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
+    mapVisibility.current = 'visible';
     if (map.current && (zoomChanged.current || dragEnd.current )){
       // only attempt to get data if zoom level is acceptable, otherwise clear out the notesInBounds state variable, causing a re-render. From user point of view, markers disappear if you unzoom too much.   
       if (map.current.zoom > maxZoom.current) {
