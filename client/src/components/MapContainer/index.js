@@ -206,9 +206,9 @@ export default function MapContainer({startingPosition}) {
           id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            // height: `${Math.min(window.screen.height, window.innerHeight)}px`, 
+            height: `${Math.min(window.screen.height, window.innerHeight)}px`, 
             // width: Math.min(window.screen.width, window.innerWidth) 
-            height: `100vh`, 
+            // height: `100vh`, 
             width: `100%`,
             // height: `${viewPortDimensions.height}px`, 
             // width: `${viewPortDimensions.width}px`
