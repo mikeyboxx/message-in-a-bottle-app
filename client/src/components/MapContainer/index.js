@@ -29,6 +29,7 @@ export default function MapContainer({startingPosition}) {
   const zoomChanged = useRef(false);
   const dragEnd = useRef(false);
   const maxZoom = useRef(16);
+  const mapVisibility = useRef('hidden');
   
   // google maps options
   const defaultMapOptions = useMemo(()=>({ 
@@ -68,6 +69,7 @@ export default function MapContainer({startingPosition}) {
         lng: startingPosition.coords.longitude,
       }
     });
+    mapVisibility.current = 'visible';
     map.current = gMap;
   },[startingPosition]);
   
@@ -203,12 +205,13 @@ export default function MapContainer({startingPosition}) {
           id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            height: Math.min(window.screen.height, window.innerHeight), 
+            // height: `${Math.min(window.screen.height, window.innerHeight)}px`, 
             // width: Math.min(window.screen.width, window.innerWidth) 
-            // height: `100%`, 
-            width: `100%`
+            height: `100vh`, 
+            width: `100%`,
             // height: `${viewPortDimensions.height}px`, 
             // width: `${viewPortDimensions.width}px`
+            visibility: mapVisibility.current
           }}
           onLoad={onLoad}
           onIdle={onIdle}
