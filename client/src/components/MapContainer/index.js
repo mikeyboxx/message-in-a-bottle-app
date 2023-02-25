@@ -201,12 +201,16 @@ export default function MapContainer({startingPosition}) {
 
   return (
     <div style={{height: '100%'}}>
-      {position && 
-        <GoogleMap
+      {position &&  
+        <GoogleMap    
           id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            height: `${Math.min(window.screen.height, window.innerHeight)}px`, 
+            height: `${navigator.userAgent.match(/mobile/) && navigator.userAgent.match(/chrome/) ?
+                        window.screen.height >= window.innerHeight ? 
+                          window.innerHeight : 
+                          window.screen.height - (window.innerHeight - window.screen.height) :  
+                        Math.min(window.screen.height, window.innerHeight)}px`, 
             // width: Math.min(window.screen.width, window.innerWidth) 
             // height: `100vh`, 
             width: `100%`,
