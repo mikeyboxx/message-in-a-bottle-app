@@ -197,13 +197,15 @@ export default function MapContainer({startingPosition}) {
 
 
   return (
-    <>
+    <div style={{height: '100%'}}>
       {position && 
         <GoogleMap
           id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            height: `100vh`, 
+            height: Math.min(window.screen.height, window.innerHeight), 
+            // width: Math.min(window.screen.width, window.innerWidth) 
+            // height: `100%`, 
             width: `100%`
             // height: `${viewPortDimensions.height}px`, 
             // width: `${viewPortDimensions.width}px`
@@ -376,6 +378,6 @@ export default function MapContainer({startingPosition}) {
               # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
             </p> */}
         </div>}
-    </>
+    </div>
   )
 }
