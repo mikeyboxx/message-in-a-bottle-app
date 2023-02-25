@@ -100,6 +100,7 @@ export default function MapContainer({startingPosition}) {
   
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
+    console.log();
     // window.addEventListener('resize', () =>{ 
     //   // console.log('resize');
     //   // console.log(window.screen.height, window.innerHeight);
@@ -206,7 +207,7 @@ export default function MapContainer({startingPosition}) {
           id={'googleMap'}
           options={defaultMapOptions}
           mapContainerStyle={{ 
-            height: `${navigator.userAgent.match(/mobile/) && navigator.userAgent.match(/chrome/) ?
+            height: `${/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
                         window.screen.height >= window.innerHeight ? 
                           window.innerHeight : 
                           window.screen.height - (window.innerHeight - window.screen.height) :  
@@ -347,6 +348,7 @@ export default function MapContainer({startingPosition}) {
                   })}
             </ul>
           </div>
+          {navigator.userAgent}
           <Button 
             style={{
               position: 'absolute', 
