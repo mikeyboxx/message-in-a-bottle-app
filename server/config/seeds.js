@@ -1,14 +1,30 @@
 const db = require('./connection');
 const { Note, User } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('../utils/generateRandomMarkers');
+const getRandomQuote = require('../utils/getRandomQuote');
 
 db.once('open', async () => {
   const distanceInMeters = 8046; // 5 miles
-  let lat = 40.5736681;
-  let lng = -74.0055502;
 
+  const userTargetArr = [
+    {
+      lat: 40.5736681,
+      lng: -74.0055502
+    },
+    {
+      lat: 34.1430296,
+      lng: -118.0996981
+    },
+    {
+      lat: 33.616935,
+      lng: -78.999047
+    },
+  ];
+  
   await Note.deleteMany();
 
+  let lat = 40.5736681;
+  let lng = -74.0055502;
   for (let theta=0; theta<360; theta += .1) {
     const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
     const {x, y} = circleXY(randomDistance, theta);
@@ -32,8 +48,9 @@ db.once('open', async () => {
       lng: position.lng,
     });
   }
+
   lat = 33.616935;
-  lng = -78.999047;
+  lng = -78.999047
   for (let theta=0; theta<360; theta += .1) {
     const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
     const {x, y} = circleXY(randomDistance, theta);
