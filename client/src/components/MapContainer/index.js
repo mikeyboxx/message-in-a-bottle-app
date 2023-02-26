@@ -242,14 +242,14 @@ export default function MapContainer({startingPosition}) {
               icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
             />
             
-            {notesInBounds?.map(({note: {noteText, lat, lng}, inProximity}, idx) => {
+            {notesInBounds?.map(({note: {noteText, noteAuthor, lat, lng, createdTs}, inProximity}, idx) => {
               return (
                 <Marker
                   key={idx}
                   options={{optimized: true}}
                   position={{lat, lng}}
                   icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}
-                  title={noteText}  
+                  title={noteText + '\nBy: ' + noteAuthor + '\nOn: ' + createdTs}  
                 />)
             })}
 
@@ -280,10 +280,12 @@ export default function MapContainer({startingPosition}) {
               <ul>
                 {notesInBounds
                   .filter(note => note.inProximity === true)
-                  .map(({note: {noteText, distance}}, idx) => { 
+                  .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
                     return ( 
                       <li key={idx}>
-                          {noteText}<br/> Distance: {distance} meters <hr/> 
+                          {noteText}<br/> 
+                          By: {noteAuthor} On: {createdTs}<br/> 
+                          Distance: {distance} meters <hr/> 
                       </li>)
                   })}
               </ul>
