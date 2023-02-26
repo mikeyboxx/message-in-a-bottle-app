@@ -21,14 +21,15 @@ module.exports = async () => {
     },
   ];
 
-  await Note.deleteMany();
+  // await Note.deleteMany();
+  
   
   let ctr = 0;
-  
-  const timer = setInterval(async () => {
-    ctr++;
 
-    if (ctr > 2880) {
+  const timer = setInterval(async () => {
+    const noteCount = await Note.find().count();
+
+    if (noteCount > 2880) {
       console.log('seedDaemon finished');
       clearInterval(timer); 
       return null;
