@@ -6,6 +6,7 @@ import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 
+
 // google maps options
 const defaultMapOptions = { 
   disableDefaultUI: true,
@@ -58,7 +59,7 @@ const closeButtonStyle =  {
 };
 
 // minimum zoom to retrieve data from database
-const MIN_ZOOM = 1;
+const MIN_ZOOM = 15;
 
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
@@ -174,7 +175,6 @@ export default function MapContainer({startingPosition}) {
   },[getBoundsData]);
 
 
-
   useEffect(() => {
     if (position && map.current){
       const newBounds = map.current.getBounds();
@@ -242,14 +242,16 @@ export default function MapContainer({startingPosition}) {
               icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
             />
             
-            {notesInBounds?.map(({note: {noteText, noteAuthor, lat, lng, createdTs}, inProximity}, idx) => {
+            {notesInBounds?.map(({note: {noteText, noteAuthor, lat, lng, createdTs}, inProximity, distance}, idx) => {
+              const dt = new Date(createdTs);
+              const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
               return (
                 <Marker
                   key={idx}
                   options={{optimized: true}}
                   position={{lat, lng}}
                   icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}
-                  title={noteText + '\nBy: ' + noteAuthor + '\nOn: ' + createdTs}  
+                  title={noteText + '\nBy: ' + noteAuthor + '\nOn: ' + dtString + '\nDistance: ' + distance.toFixed(1) + ' meters'}  
                 />)
             })}
 
@@ -281,10 +283,12 @@ export default function MapContainer({startingPosition}) {
                 {notesInBounds
                   .filter(note => note.inProximity === true)
                   .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
+                    const dt = new Date(createdTs);
+                    const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
                     return ( 
                       <li key={idx}>
-                          {noteText}<br/> 
-                          By: {noteAuthor} On: {createdTs}<br/> 
+                          {noteText}<br/><br/> 
+                          By: {noteAuthor} On: {dtString}<br/> 
                           Distance: {distance} meters <hr/> 
                       </li>)
                   })}
