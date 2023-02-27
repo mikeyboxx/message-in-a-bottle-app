@@ -1,5 +1,5 @@
 const { Note, User } = require('../models');
-const { circleXY, getLatLonGivenDistanceAndBearing } = require('./generateRandomMarkers');
+const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry');
 const getRandomQuote = require('./getRandomQuote');
 
 module.exports = async () => {
