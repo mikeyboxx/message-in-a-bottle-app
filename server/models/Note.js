@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const { getDistanceFromLatLonInMeters } = require('../utils/generateRandomMarkers');
+const { getDistanceFromLatLonInMeters } = require('../utils/trigonometry');
 
 const noteSchema = new Schema(
   {

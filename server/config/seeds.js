@@ -1,6 +1,6 @@
 const db = require('./connection');
 const { Note, User } = require('../models');
-const { circleXY, getLatLonGivenDistanceAndBearing } = require('../utils/generateRandomMarkers');
+const { circleXY, getLatLonGivenDistanceAndBearing } = require('../utils/trigonometry');
 const getRandomQuote = require('../utils/getRandomQuote');
 
 db.once('open', async () => {

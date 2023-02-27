@@ -78,36 +78,7 @@ function getLatLonBounds(currLat, currLng, distanceInMeters = 100){
  return bounds;
 }
 
-const generateRandomMarkers = (lat, lng, distanceInMeters = 100)=>{
-  const randomMarkers = [];
-  // generate 360 markers
-  for (let theta=0; theta<360; theta += 1) {
-    const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-    const {x, y} = circleXY(randomDistance, theta);
-    const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-    const distance = getDistanceFromLatLonInMeters(lat, lng, position.lat, position.lng);
-    randomMarkers.push({
-      id: theta,
-      position,
-      distance
-    })
-  }
-
-  return randomMarkers;
-}
-
-const updateMarkerDistance = (lat, lng, markers) => {
-  return markers.map(marker => {
-    return {
-      ...marker, 
-      distance: getDistanceFromLatLonInMeters(lat, lng, marker.position.lat, marker.position.lng)
-    }
-  })
-}
-
 module.exports = {
-  generateRandomMarkers,
-  updateMarkerDistance,
   getLatLonBounds,
   getDistanceFromLatLonInMeters,
   getLatLonGivenDistanceAndBearing,

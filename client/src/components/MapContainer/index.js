@@ -5,8 +5,6 @@ import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
-
-
 // google maps options
 const defaultMapOptions = { 
   disableDefaultUI: true,
@@ -52,6 +50,19 @@ const mapButtonStyle =  {
   paddingRight: 18,
 };
 
+// Create Note button style
+const createNoteButtonStyle =  {
+  ...buttonStyle, 
+  ...mapButtonStyle, 
+  left: 20
+};
+// Pickup Note button style
+const pickupNoteButtonStyle =  {
+  ...buttonStyle, 
+  ...mapButtonStyle, 
+  left: 210
+};
+
 // close button in notes list
 const closeButtonStyle =  {
   marginLeft: '75px', 
@@ -72,6 +83,8 @@ export default function MapContainer({startingPosition}) {
   const dragEnd = useRef(false);
   
   const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
+
+  // argument passed is a google map bounds object
   const getBoundsData = useCallback(bounds => {
     getNotesInBounds({
       variables: {
@@ -250,7 +263,7 @@ export default function MapContainer({startingPosition}) {
                   key={idx}
                   options={{optimized: true}}
                   position={{lat, lng}}
-                  icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}
+                  icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
                   title={noteText + '\nBy: ' + noteAuthor + '\nOn: ' + dtString + '\nDistance: ' + distance.toFixed(1) + ' meters'}  
                 />)
             })}
@@ -259,7 +272,7 @@ export default function MapContainer({startingPosition}) {
               <Button 
                   size="lg" 
                   variant="info"
-                  style={{...buttonStyle, ...mapButtonStyle, left: 20}}
+                  style={createNoteButtonStyle}
                 >
                   <Journals /> Create Note
               </Button>}
@@ -268,31 +281,30 @@ export default function MapContainer({startingPosition}) {
               <Button 
                 size="lg" 
                 variant="info"
-                style={{...buttonStyle, ...mapButtonStyle, left: 210}}
+                style={pickupNoteButtonStyle}
                 onClick={()=>setNotesInProximityListVisible('visible')}
               >
-                <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + 
-                  (numberOfNotesInProximity.current > 1 ? 's' : '')}
+                <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 ? 's' : '')}
               </Button>
             }
           </GoogleMap>}
 
         {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
           <div style={notesInProximityListStyle}>
-              <ul>
-                {notesInBounds
-                  .filter(note => note.inProximity === true)
-                  .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
-                    const dt = new Date(createdTs);
-                    const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-                    return ( 
-                      <li key={idx}>
-                          {noteText}<br/><br/> 
-                          By: {noteAuthor} On: {dtString}<br/> 
-                          Distance: {distance} meters <hr/> 
-                      </li>)
-                  })}
-              </ul>
+            <ul>
+              {notesInBounds
+                .filter(note => note.inProximity === true)
+                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
+                  const dt = new Date(createdTs);
+                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+                  return ( 
+                    <li key={idx}>
+                        {noteText}<br/><br/> 
+                        By: {noteAuthor} On: {dtString}<br/> 
+                        Distance: {distance.toFixed(1)} meters <hr/> 
+                    </li>)
+                })}
+            </ul>
             <Button 
               style={{...buttonStyle, ...closeButtonStyle}}
               onClick={(e)=>{
