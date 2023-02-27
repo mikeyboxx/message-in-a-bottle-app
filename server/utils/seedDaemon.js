@@ -35,24 +35,24 @@ module.exports = async () => {
       return null;
     }
 
-    try {
-      for (let i = 0; i < userTargetArr.length; i++){
-        const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-        const randomTheta = (Math.floor(Math.random() * 3600)/10).toFixed(1);
-        const {x, y} = circleXY(randomDistance, randomTheta);
-        
-        let {lat, lng} = userTargetArr[i];
-        let position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-        let {q, a} = await getRandomQuote();
-        await Note.create({
-          noteText: q,
-          noteAuthor: a,
-          lat: position.lat,
-          lng: position.lng,
-        });
+    for (let i = 0; i < userTargetArr.length; i++){
+      try {
+          const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
+          const randomTheta = (Math.floor(Math.random() * 3600)/10).toFixed(1);
+          const {x, y} = circleXY(randomDistance, randomTheta);
+          
+          let {lat, lng} = userTargetArr[i];
+          let position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
+          let {q, a} = await getRandomQuote();
+          await Note.create({
+            noteText: q,
+            noteAuthor: a,
+            lat: position.lat,
+            lng: position.lng,
+          });
+      } catch (err) {
+        clearInterval(timer);    
       }
-    } catch (err) {
-      clearInterval(timer);    
     }
   },30000);
 }
