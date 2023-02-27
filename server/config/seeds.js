@@ -23,44 +23,44 @@ db.once('open', async () => {
   
   await Note.deleteMany();
 
-  let lat = 40.5736681;
-  let lng = -74.0055502;
-  for (let theta=0; theta<360; theta += .1) {
-    const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-    const {x, y} = circleXY(randomDistance, theta);
-    const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-    const note = await Note.create({
-      noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
-      lat: position.lat,
-      lng: position.lng,
-    });
-  }
+  // let lat = 40.5736681;
+  // let lng = -74.0055502;
+  // for (let theta=0; theta<360; theta += .1) {
+  //   const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
+  //   const {x, y} = circleXY(randomDistance, theta);
+  //   const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
+  //   const note = await Note.create({
+  //     noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
+  //     lat: position.lat,
+  //     lng: position.lng,
+  //   });
+  // }
 
-  lat = 34.1430296530324;
-  lng = -118.09969814240472;
-  for (let theta=0; theta<360; theta += .1) {
-    const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-    const {x, y} = circleXY(randomDistance, theta);
-    const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-    const note = await Note.create({
-      noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
-      lat: position.lat,
-      lng: position.lng,
-    });
-  }
+  // lat = 34.1430296530324;
+  // lng = -118.09969814240472;
+  // for (let theta=0; theta<360; theta += .1) {
+  //   const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
+  //   const {x, y} = circleXY(randomDistance, theta);
+  //   const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
+  //   const note = await Note.create({
+  //     noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
+  //     lat: position.lat,
+  //     lng: position.lng,
+  //   });
+  // }
 
-  lat = 33.616935;
-  lng = -78.999047
-  for (let theta=0; theta<360; theta += .1) {
-    const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-    const {x, y} = circleXY(randomDistance, theta);
-    const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-    const note = await Note.create({
-      noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
-      lat: position.lat,
-      lng: position.lng,
-    });
-  }
+  // lat = 33.616935;
+  // lng = -78.999047
+  // for (let theta=0; theta<360; theta += .1) {
+  //   const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
+  //   const {x, y} = circleXY(randomDistance, theta);
+  //   const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
+  //   const note = await Note.create({
+  //     noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
+  //     lat: position.lat,
+  //     lng: position.lng,
+  //   });
+  // }
   
   console.log('notes seeded');
   

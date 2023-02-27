@@ -59,7 +59,7 @@ const closeButtonStyle =  {
 };
 
 // minimum zoom to retrieve data from database
-const MIN_ZOOM = 1;
+const MIN_ZOOM = 15;
 
 export default function MapContainer({startingPosition}) {
   const [position, setPosition] = useState(null);
