@@ -51,12 +51,6 @@ const mapButtonStyle =  {
   paddingRight: 15,
 };
 
-// Create Note button style
-// const createNoteButtonStyle =  {
-//   ...buttonStyle, 
-//   ...mapButtonStyle, 
-//   left: 20
-// };
 // Pickup Note button style
 const pickupNoteButtonStyle =  {
   ...buttonStyle, 
@@ -66,7 +60,6 @@ const pickupNoteButtonStyle =  {
 
 // close button in notes list
 const closeButtonStyle =  {
-  // marginLeft: '75px', 
   top: 10,
   right: 10,
 };
@@ -76,8 +69,6 @@ const MIN_ZOOM = 15;
 const DEFAULT_ZOOM = 18;
 
 export default function MapContainer({startingPosition}) {
-  console.log('MapContainer');
-  // console.log(startingPosition);
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [notesInProximityListVisible, setNotesInProximityListVisible] = useState('hidden');
@@ -151,6 +142,7 @@ export default function MapContainer({startingPosition}) {
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
     if (zoomChanged.current || dragEnd.current ){
+      // resetting the Action will cause a map pan to user's location
       setBottomNavigationAction(null);
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
@@ -235,6 +227,7 @@ export default function MapContainer({startingPosition}) {
     }
   },[position, data]);
 
+  // if location button is pressed on bottom navigation bar, pan back to user's location and reset the zoom
   useEffect(()=>{
     if (bottomNavigationAction === 'location' && map.current){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
@@ -294,6 +287,7 @@ export default function MapContainer({startingPosition}) {
               </Button>
             }
           </GoogleMap>}
+
           <LabelBottomNavigation handler={setBottomNavigationAction}/>
 
         {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
