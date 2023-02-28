@@ -10,7 +10,6 @@ export default function LabelBottomNavigation({handler}) {
   const [value, setValue] = React.useState('location');
 
   const handleChange = (event, newValue) => {
-    console.log(newValue);
     setValue(newValue);
     handler(newValue);
   };

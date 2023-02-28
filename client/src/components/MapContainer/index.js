@@ -276,7 +276,7 @@ export default function MapContainer({startingPosition}) {
             })}
 
         
-            {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && 
+            {map.current && map.current.zoom > MIN_ZOOM && notesInBounds && numberOfNotesInProximity.current > 0 && 
               <Button 
                 size="lg" 
                 variant="info"
