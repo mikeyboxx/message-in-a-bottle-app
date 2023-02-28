@@ -44,11 +44,11 @@ const buttonStyle = {
 
 // buttons displayed over the map
 const mapButtonStyle =  {
-  bottom: 60,
-  paddingTop: 8,
-  paddingBottom: 8,
-  paddingLeft: 18,
-  paddingRight: 18,
+  bottom: 70,
+  paddingTop: 6,
+  paddingBottom: 6,
+  paddingLeft: 15,
+  paddingRight: 15,
 };
 
 // Create Note button style
@@ -61,7 +61,7 @@ const mapButtonStyle =  {
 const pickupNoteButtonStyle =  {
   ...buttonStyle, 
   ...mapButtonStyle, 
-  left: 210
+  left: 20
 };
 
 // close button in notes list
