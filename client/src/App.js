@@ -1,8 +1,9 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import {useJsApiLoader} from '@react-google-maps/api';
 import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apollo/client';
 // import { setContext } from '@apollo/client/link/context';
 import MapContainer from './components/MapContainer';
+
 // import {getLatLonBounds} from './utils/trigonometry';
 
 // const authLink = setContext((_, { headers }) => {
@@ -32,20 +33,30 @@ function App() {
     libraries: googleLibraries
   });
 
-  useEffect(()=>{
+  const getGPSLocation = useCallback(() => {
+    // console.log('getGPSLocation');
+    console.log(navigator.geolocation);
     navigator.geolocation.getCurrentPosition( 
       pos => {
-        // console.log('getCurrentPosition');
-        setStartingPosition(pos);
+        // console.log(pos);
+        setStartingPosition((old)=> {
+          // console.log(old);
+          // console.log(pos);
+          return pos
+        });
       },
       err => console.log(err),
       {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: Infinity
+        maximumAge: 0
       }
     );
-  },[]);
+  },[])
+
+  useEffect(()=>{
+    getGPSLocation();
+  },[getGPSLocation]);
 
   return (
     <ApolloProvider client={client}>
@@ -53,7 +64,12 @@ function App() {
 
       {loadError && 'Error Loading Google Maps!'}
 
-      {(isLoaded && startingPosition) && <MapContainer startingPosition={startingPosition}/>}
+      {(isLoaded && startingPosition) && 
+      <div>
+        <MapContainer startingPosition={startingPosition}/>
+        
+      </div>
+      }
     </ApolloProvider>
   );
 }

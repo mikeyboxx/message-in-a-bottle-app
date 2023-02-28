@@ -3,6 +3,7 @@ import {Button} from "react-bootstrap";
 import {Journals} from 'react-bootstrap-icons';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
+import LabelBottomNavigation from '../LabelBottomNavigation';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 // google maps options
@@ -43,7 +44,7 @@ const buttonStyle = {
 
 // buttons displayed over the map
 const mapButtonStyle =  {
-  bottom: 30,
+  bottom: 60,
   paddingTop: 8,
   paddingBottom: 8,
   paddingLeft: 18,
@@ -51,11 +52,11 @@ const mapButtonStyle =  {
 };
 
 // Create Note button style
-const createNoteButtonStyle =  {
-  ...buttonStyle, 
-  ...mapButtonStyle, 
-  left: 20
-};
+// const createNoteButtonStyle =  {
+//   ...buttonStyle, 
+//   ...mapButtonStyle, 
+//   left: 20
+// };
 // Pickup Note button style
 const pickupNoteButtonStyle =  {
   ...buttonStyle, 
@@ -65,17 +66,22 @@ const pickupNoteButtonStyle =  {
 
 // close button in notes list
 const closeButtonStyle =  {
-  marginLeft: '75px', 
-  bottom: 10,
+  // marginLeft: '75px', 
+  top: 10,
+  right: 10,
 };
 
 // minimum zoom to retrieve data from database
 const MIN_ZOOM = 15;
+const DEFAULT_ZOOM = 18;
 
 export default function MapContainer({startingPosition}) {
+  console.log('MapContainer');
+  // console.log(startingPosition);
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [notesInProximityListVisible, setNotesInProximityListVisible] = useState('hidden');
+  const [bottomNavigationAction, setBottomNavigationAction] = useState('location');
   
   const map = useRef(null);
   const numberOfNotesInProximity = useRef(0);
@@ -101,17 +107,14 @@ export default function MapContainer({startingPosition}) {
     border: '1px solid gray',
     borderRadius: 30,
     boxShadow: '5px 5px 5px gray',
+    margin: 0,
     paddingTop: 8,
-    paddingBottom: 8,
-    paddingLeft: 18,
-    paddingRight: 18,
     fontWeight: 'bold',
     backgroundColor: 'white',
     color: 'purple',
     fontSize: '.85em',
     width: '200px',
     height: '400px',
-    padding: 5,
     overflow: 'auto',
     visibility: notesInProximityListVisible,
     top: (Math.floor(window.screen.height >= window.innerHeight ? 
@@ -125,7 +128,7 @@ export default function MapContainer({startingPosition}) {
 
   // initial map options (zoom, heading, center of the map)
   const initialMapOptions = useMemo(() => ({
-    zoom: 18,
+    zoom: DEFAULT_ZOOM,
     heading: startingPosition.coords.heading,
     center:  {
       lat: startingPosition.coords.latitude,
@@ -137,7 +140,9 @@ export default function MapContainer({startingPosition}) {
   const onLoad = useCallback(gMap => {
     gMap.setOptions(initialMapOptions);
     map.current = gMap;
-  },[initialMapOptions]);
+    map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+    map.current.setHeading(position.coords.heading);
+  },[position, initialMapOptions]);
 
   // track google map events
   const onDragEnd = useCallback(() => dragEnd.current = true,[]);
@@ -146,6 +151,7 @@ export default function MapContainer({startingPosition}) {
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
     if (zoomChanged.current || dragEnd.current ){
+      setBottomNavigationAction(null);
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
         newBounds && getBoundsData(newBounds)
@@ -229,6 +235,14 @@ export default function MapContainer({startingPosition}) {
     }
   },[position, data]);
 
+  useEffect(()=>{
+    if (bottomNavigationAction === 'location' && map.current){
+      map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+      map.current.setHeading(position.coords.heading);
+      map.current.setZoom(DEFAULT_ZOOM);
+    }
+  },[position, bottomNavigationAction])
+
 
   return (
     <div style={{height: '100%'}}>
@@ -268,14 +282,6 @@ export default function MapContainer({startingPosition}) {
                 />)
             })}
 
-            {map.current && notesInBounds && 
-              <Button 
-                  size="lg" 
-                  variant="info"
-                  style={createNoteButtonStyle}
-                >
-                  <Journals /> Create Note
-              </Button>}
         
             {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && 
               <Button 
@@ -288,10 +294,11 @@ export default function MapContainer({startingPosition}) {
               </Button>
             }
           </GoogleMap>}
+          <LabelBottomNavigation handler={setBottomNavigationAction}/>
 
         {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
           <div style={notesInProximityListStyle}>
-            <ul>
+            <ul style={{listStyleType: 'none', margin: 0, padding: 15}}>
               {notesInBounds
                 .filter(note => note.inProximity === true)
                 .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
@@ -312,7 +319,7 @@ export default function MapContainer({startingPosition}) {
                 setNotesInProximityListVisible('hidden');
               }}
             >
-              Close
+              x
             </Button>
           </div>}
     </div>
