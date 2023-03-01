@@ -13,7 +13,10 @@ const drawerBleeding = 56;
 
 
 const Root = styled('div')(({ theme }) => ({
+  borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
   height: '100%',
+  flex: 1,
   backgroundColor:
     theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
 }));
@@ -33,15 +36,12 @@ const Puller = styled(Box)(({ theme }) => ({
 }));
 
 export default function DrawerContainer(props) {
-  const { container } = props;
+  const { notesInProximity } = props;
   const [open, setOpen] = React.useState(false);
 
-  const toggleDrawer = (newOpen) => () => {
+  const toggleDrawer = React.useCallback((newOpen) => () => {
     setOpen(newOpen);
-  };
-
-  // This is used only for the example
-  // const container = window !== undefined ? () => window().document.body : undefined;
+  },[]);
 
   return (
     <Root>
@@ -51,6 +51,7 @@ export default function DrawerContainer(props) {
           '.MuiDrawer-root > .MuiPaper-root': {
             height: `calc(50% - ${drawerBleeding}px)`,
             overflow: 'visible',
+            
           },
         }}
       />
@@ -59,7 +60,8 @@ export default function DrawerContainer(props) {
       </Box> */}
       <SwipeableDrawer
       
-        // sx={{top: 0}}
+        styles={{borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,}}
         // container={container}
         anchor="bottom"
         open={open}
@@ -72,7 +74,7 @@ export default function DrawerContainer(props) {
         }}
       >
         <StyledBox
-        classes={{bottom: 100}}
+        // classes={{bottom: 100}}
           sx={{
             position: 'absolute',
             top: -drawerBleeding,
@@ -86,7 +88,7 @@ export default function DrawerContainer(props) {
           }}
         >
           <Puller />
-          <Typography sx={{ p: 2, color: 'text.secondary' }}>51 results</Typography>
+          <Typography variant="h5" sx={{ p: 2, color: 'purple' }}>{notesInProximity.length} Note{notesInProximity.length > 1 ? 's' : ''} in Proximity <small style={{fontSize: '.7em'}}>(swipe to view)</small></Typography>
         </StyledBox>
         <StyledBox
           sx={{
@@ -96,7 +98,21 @@ export default function DrawerContainer(props) {
             overflow: 'auto',
           }}
         >
-          <Skeleton variant="rectangular" height="100%" />
+          {/* <Skeleton variant="rectangular" height="100%"> */}
+          <ul style={{listStyleType: 'none', margin: 0, padding: 15}}>
+              {notesInProximity
+                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
+                  const dt = new Date(createdTs);
+                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+                  return ( 
+                    <li key={idx}>
+                        {noteText}<br/><br/> 
+                        By: {noteAuthor} -- {dtString}<br/> 
+                        Distance: {distance.toFixed(1)} meters <hr/> 
+                    </li>)
+                })}
+            </ul>
+            {/* </Skeleton> */}
         </StyledBox>
       </SwipeableDrawer>
     </Root>

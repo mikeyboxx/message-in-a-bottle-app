@@ -17,9 +17,9 @@ export default function BottomNav({handler}) {
   return (
     <BottomNavigation 
       sx={{ 
-        position: 'absolute', 
-        width: '100%', 
-        top: 0,
+        flex: 1,
+        width: '100%',
+        padding: '5px 5px', 
         borderRadius: '0 0 20px 20px'
       }} 
       value={value} 
@@ -29,9 +29,6 @@ export default function BottomNav({handler}) {
       <BottomNavigationAction
         sx={{
           color: 'purple',
-          selected: {
-            color: 'red'
-          }
         }}
         label="Location"
         value="location"
@@ -40,7 +37,6 @@ export default function BottomNav({handler}) {
       <BottomNavigationAction
         sx={{
           color: 'purple'
-        
         }}
        
         label="Create"

@@ -69,11 +69,11 @@ const closeButtonStyle =  {
 const MIN_ZOOM = 15;
 const DEFAULT_ZOOM = 18;
 
-export default function MapContainer({startingPosition}) {
+export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [notesInProximityListVisible, setNotesInProximityListVisible] = useState('hidden');
-  const [bottomNavigationAction, setBottomNavigationAction] = useState('location');
+  // const [bottomNavigationAction, setBottomNavigationAction] = useState('location');
   
   const map = useRef(null);
   const numberOfNotesInProximity = useRef(0);
@@ -144,7 +144,7 @@ export default function MapContainer({startingPosition}) {
   const onIdle = useCallback(() => {
     if (zoomChanged.current || dragEnd.current ){
       // resetting the Action will cause a map pan to user's location
-      setBottomNavigationAction(null);
+      // setBottomNavigationAction(null);
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
         newBounds && getBoundsData(newBounds)
@@ -181,6 +181,7 @@ export default function MapContainer({startingPosition}) {
     );
 
     return () => {
+      // console.log(navId, timer);
       navigator.geolocation.clearWatch(navId);
       clearInterval(timer);
     }
@@ -222,20 +223,24 @@ export default function MapContainer({startingPosition}) {
           inProximity: distance < 20
         }
       });
+
+      notesInProximityHandler(arr.filter(({inProximity}) => inProximity === true));
+      
       // if there are no notes in proximty, hide the pickup notes list
       numberOfNotesInProximity.current  === 0 && setNotesInProximityListVisible('hidden');
       setNotesInBounds(arr);
     }
-  },[position, data]);
+  },[position, data, notesInProximityHandler]);
 
   // if location button is pressed on bottom navigation bar, pan back to user's location and reset the zoom
   useEffect(()=>{
-    if (bottomNavigationAction === 'location' && map.current){
+    if (navAction === 'location' && map.current){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       map.current.setHeading(position.coords.heading);
       map.current.setZoom(DEFAULT_ZOOM);
+      navActionHandler(null);
     }
-  },[position, bottomNavigationAction])
+  },[position, navAction, navActionHandler])
 
 
   return (
@@ -251,8 +256,12 @@ export default function MapContainer({startingPosition}) {
                           window.screen.height >= window.innerHeight ? 
                             window.innerHeight : 
                             window.screen.height - (window.innerHeight - window.screen.height) :  
-                          Math.min(window.screen.height, window.innerHeight))}px`, 
-              width: `100%`
+                          Math.min(window.screen.height, window.innerHeight))-109}px`, 
+              // height: `calc(100% - 10px)` ,
+              // height: `${window.innerHeight - 109}px`,
+              // border: '1px solid black',
+              flex: 1,
+              width: window.innerWidth
             }}
             onLoad={onLoad}
             onIdle={onIdle}
@@ -278,7 +287,7 @@ export default function MapContainer({startingPosition}) {
             })}
 
         
-            {map.current && map.current.zoom > MIN_ZOOM && notesInBounds && numberOfNotesInProximity.current > 0 && 
+            {/* {map.current && map.current.zoom > MIN_ZOOM && notesInBounds && numberOfNotesInProximity.current > 0 && 
               <Button 
                 size="lg" 
                 variant="info"
@@ -287,7 +296,7 @@ export default function MapContainer({startingPosition}) {
               >
                 <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 ? 's' : '')}
               </Button>
-            }
+            } */}
 
             
           </GoogleMap>}
@@ -313,7 +322,7 @@ export default function MapContainer({startingPosition}) {
             <Button 
               style={{...buttonStyle, ...closeButtonStyle}}
               onClick={(e)=>{
-                e.preventDefault();
+                // e.preventDefault();
                 setNotesInProximityListVisible('hidden');
               }}
             >
