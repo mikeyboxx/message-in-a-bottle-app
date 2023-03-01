@@ -3,7 +3,8 @@ import {Button} from "react-bootstrap";
 import {Journals} from 'react-bootstrap-icons';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
-import LabelBottomNavigation from '../LabelBottomNavigation';
+// import BottomNav from '../BottomNav';
+// import DrawerContainer from '../DrawerContainer';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 // google maps options
@@ -103,7 +104,7 @@ export default function MapContainer({startingPosition}) {
     fontWeight: 'bold',
     backgroundColor: 'white',
     color: 'purple',
-    fontSize: '.85em',
+    fontSize: '1em',
     width: '200px',
     height: '400px',
     overflow: 'auto',
@@ -238,18 +239,19 @@ export default function MapContainer({startingPosition}) {
 
 
   return (
-    <div style={{height: '100%'}}>
+    <div>
+    {/* <div style={{height: '100%'}}> */}
         {position &&  
           <GoogleMap    
             id={'googleMap'}
             options={defaultMapOptions}
             mapContainerStyle={{ 
               // this fixes google chrome mobile issue with page height being > screen height
-              height: `${/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
+              height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
                           window.screen.height >= window.innerHeight ? 
                             window.innerHeight : 
                             window.screen.height - (window.innerHeight - window.screen.height) :  
-                          Math.min(window.screen.height, window.innerHeight)}px`, 
+                          Math.min(window.screen.height, window.innerHeight))}px`, 
               width: `100%`
             }}
             onLoad={onLoad}
@@ -271,7 +273,7 @@ export default function MapContainer({startingPosition}) {
                   options={{optimized: true}}
                   position={{lat, lng}}
                   icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
-                  title={noteText + '\nBy: ' + noteAuthor + '\nOn: ' + dtString + '\nDistance: ' + distance.toFixed(1) + ' meters'}  
+                  title={noteText + '\nBy: ' + noteAuthor + ' -- ' + dtString + '\nDistance: ' + distance.toFixed(1) + ' meters'}  
                 />)
             })}
 
@@ -286,9 +288,11 @@ export default function MapContainer({startingPosition}) {
                 <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 ? 's' : '')}
               </Button>
             }
-          </GoogleMap>}
 
-          <LabelBottomNavigation handler={setBottomNavigationAction}/>
+            
+          </GoogleMap>}
+          
+
 
         {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
           <div style={notesInProximityListStyle}>
@@ -301,7 +305,7 @@ export default function MapContainer({startingPosition}) {
                   return ( 
                     <li key={idx}>
                         {noteText}<br/><br/> 
-                        By: {noteAuthor} On: {dtString}<br/> 
+                        By: {noteAuthor} -- {dtString}<br/> 
                         Distance: {distance.toFixed(1)} meters <hr/> 
                     </li>)
                 })}

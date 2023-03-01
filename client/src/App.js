@@ -3,6 +3,8 @@ import {useJsApiLoader} from '@react-google-maps/api';
 import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apollo/client';
 // import { setContext } from '@apollo/client/link/context';
 import MapContainer from './components/MapContainer';
+import BottomNav from './components/BottomNav';
+import DrawerContainer from './components/DrawerContainer';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
@@ -32,18 +34,13 @@ function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: googleLibraries
   });
+  const [bottomNavigationAction, setBottomNavigationAction] = useState('location');
 
   const getGPSLocation = useCallback(() => {
-    // console.log('getGPSLocation');
-    console.log(navigator.geolocation);
     navigator.geolocation.getCurrentPosition( 
       pos => {
         // console.log(pos);
-        setStartingPosition((old)=> {
-          // console.log(old);
-          // console.log(pos);
-          return pos
-        });
+        setStartingPosition(pos);
       },
       err => console.log(err),
       {
@@ -67,8 +64,10 @@ function App() {
       {(isLoaded && startingPosition) && 
       <div>
         <MapContainer startingPosition={startingPosition}/>
-        
+        <DrawerContainer />
+        <BottomNav handler={setBottomNavigationAction}/> 
       </div>
+        
       }
     </ApolloProvider>
   );

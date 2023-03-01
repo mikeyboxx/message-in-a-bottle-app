@@ -6,7 +6,7 @@ import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
-export default function LabelBottomNavigation({handler}) {
+export default function BottomNav({handler}) {
   const [value, setValue] = React.useState('location');
 
   const handleChange = (event, newValue) => {
@@ -19,7 +19,8 @@ export default function LabelBottomNavigation({handler}) {
       sx={{ 
         position: 'absolute', 
         width: '100%', 
-        bottom: 0,
+        top: 0,
+        borderRadius: '0 0 20px 20px'
       }} 
       value={value} 
       onChange={handleChange}
@@ -39,7 +40,9 @@ export default function LabelBottomNavigation({handler}) {
       <BottomNavigationAction
         sx={{
           color: 'purple'
+        
         }}
+       
         label="Create"
         value="create"
         icon={<StickyNote2OutlinedIcon />}
