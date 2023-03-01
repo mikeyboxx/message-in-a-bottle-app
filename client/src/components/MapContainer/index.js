@@ -1,6 +1,6 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {Button} from "react-bootstrap";
-import {Journals} from 'react-bootstrap-icons';
+
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 // import BottomNav from '../BottomNav';
@@ -143,6 +143,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
     if (zoomChanged.current || dragEnd.current ){
+      navActionHandler(null);
       // resetting the Action will cause a map pan to user's location
       // setBottomNavigationAction(null);
       if (map.current.zoom > MIN_ZOOM) {
@@ -155,7 +156,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     }
     zoomChanged.current = false;
     dragEnd.current = false;
-  },[getBoundsData]);
+  },[getBoundsData, navActionHandler]);
   
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
@@ -200,13 +201,13 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
           position.coords.longitude <  newBounds.getNorthEast().lng();
         
         // pan and change heading of google map, if user is in bounds and gps has good accuracy, expressed in meters 
-        if (isInBounds && position.coords.accuracy < 10) { 
+        if (isInBounds && position.coords.accuracy < 10 && !navAction) { 
           map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
           map.current.setHeading(position.coords.heading);
         }
       }
     }
-  },[position]);
+  },[position, navAction]);
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
@@ -234,7 +235,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
   // if location button is pressed on bottom navigation bar, pan back to user's location and reset the zoom
   useEffect(()=>{
-    if (navAction === 'location' && map.current){
+    if (!navAction && map.current){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       map.current.setHeading(position.coords.heading);
       map.current.setZoom(DEFAULT_ZOOM);
