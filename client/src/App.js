@@ -96,14 +96,14 @@ function App() {
             //   Math.min(window.screen.height, window.innerHeight))}px`;
             // })()
           }}>
-          {/* <BottomNav handler={setNavigationAction}/>  */}
+          <BottomNav handler={setNavigationAction}/> 
           <MapContainer 
             startingPosition={startingPosition} 
             navActionHandler={setNavigationAction} 
             navAction={navigationAction}
             notesInProximityHandler={setNotesInProximity}  
           />
-          <DrawerContainer notesInProximity={notesInProximity}/>
+          {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
         </Box>}
         
     </ApolloProvider>
