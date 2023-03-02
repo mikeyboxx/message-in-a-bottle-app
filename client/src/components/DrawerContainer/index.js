@@ -38,7 +38,7 @@ export default function DrawerContainer(props) {
   },[]);
 
   return (
-    <Root>
+    <Root onClick={toggleDrawer(!open)}>
       <CssBaseline />
       <Global
         styles={{
@@ -53,9 +53,9 @@ export default function DrawerContainer(props) {
       <SwipeableDrawer
         anchor="bottom"
         open={open}
+        onClick={toggleDrawer(!open)}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
-        onClick={toggleDrawer(!open)}
         swipeAreaWidth={drawerBleeding}
         disableSwipeToOpen={false}
         ModalProps={{
@@ -63,9 +63,12 @@ export default function DrawerContainer(props) {
         }}
       >
         <StyledBox
+        
           sx={{
             position: 'absolute',
             top: -drawerBleeding,
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
             visibility: 'visible',
             right: 0,
             left: 0,

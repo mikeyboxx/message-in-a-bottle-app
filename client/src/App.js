@@ -78,14 +78,25 @@ function App() {
           sx={{
             display: 'flex', 
             flexDirection: 'column', 
-            // height: '100vh',
-            height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
-                          window.screen.height >= window.innerHeight ? 
-                            window.innerHeight : 
-                            window.screen.height - (window.innerHeight - window.screen.height) :  
-                          Math.min(window.screen.height, window.innerHeight))}px`, 
+            height: window.screen.height,
+            // height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
+            //               window.screen.height >= window.innerHeight ? 
+            //                 window.innerHeight : 
+            //                 window.screen.height - (window.innerHeight - window.screen.height) :  
+            //               Math.min(window.screen.height, window.innerHeight))}px`, 
+
+            // height: (()=>{
+            //   console.log('window.screen.height= ', window.screen.height);
+            //   console.log('window.innerHeight= ', window.innerHeight);
+            //   console.log('window.outerHeight= ', window.outerHeight);
+            //   return `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
+            //   window.screen.height >= window.innerHeight ? 
+            //     window.innerHeight : 
+            //     window.screen.height - (window.innerHeight - window.screen.height) :  
+            //   Math.min(window.screen.height, window.innerHeight))}px`;
+            // })()
           }}>
-          <BottomNav handler={setNavigationAction}/> 
+          {/* <BottomNav handler={setNavigationAction}/>  */}
           <MapContainer 
             startingPosition={startingPosition} 
             navActionHandler={setNavigationAction} 

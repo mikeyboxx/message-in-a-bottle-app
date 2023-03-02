@@ -259,7 +259,8 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
               //               window.innerHeight : 
               //               window.screen.height - (window.innerHeight - window.screen.height) :  
               //             Math.min(window.screen.height, window.innerHeight))-109}px`, 
-              height: `calc(100% - 62px)` ,
+              height: '100%',
+              // height: `calc(100% - 62px)` ,
               // height: `${window.innerHeight - 115}px`,
               // zIndex: 9999,
               // border: '1px solid black',
