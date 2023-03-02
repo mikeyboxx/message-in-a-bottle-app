@@ -6,13 +6,17 @@ import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
+const actionStyle = {
+  color: 'purple'
+};
+
 export default function BottomNav({handler}) {
   const [value, setValue] = React.useState('location');
 
-  const handleChange = (event, newValue) => {
+  const handleChange = React.useEffect((event, newValue) => {
     setValue(newValue);
     handler(newValue);
-  };
+  },[handler]);
 
   return (
     <BottomNavigation 
@@ -21,25 +25,25 @@ export default function BottomNav({handler}) {
       showLabels={true}
     >
       <BottomNavigationAction
-        sx={{color: 'purple'}}
+        sx={actionStyle}
         label="Location"
         value="location"
         icon={<LocationOnIcon />}
       />
       <BottomNavigationAction
-        sx={{color: 'purple'}}
+        sx={actionStyle}
         label="Create"
         value="create"
         icon={<StickyNote2OutlinedIcon />}
       />
       <BottomNavigationAction
-        sx={{color: 'purple'}}
+        sx={actionStyle}
         label="Favorites"
         value="favorites"
         icon={<FavoriteIcon />}
       />
       <BottomNavigationAction
-        sx={{color: 'purple'}}
+        sx={actionStyle}
         label="Login" 
         value="login" 
         icon={<LoginOutlinedIcon />} 

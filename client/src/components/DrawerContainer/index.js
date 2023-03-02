@@ -43,9 +43,11 @@ export default function DrawerContainer(props) {
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {
-            height: `calc(50% - ${drawerBleeding}px)`,
+            maxHeight: `calc(50% - ${drawerBleeding}px)`,
             overflow: 'visible',
             padding: 15,
+            display: 'flex'
+
           },
         }}
       />
@@ -115,7 +117,7 @@ export default function DrawerContainer(props) {
             </div>}
 
         </StyledBox>
-        <StyledBox sx={{overflow: 'auto'}}>
+        <StyledBox sx={{ flex: 1, overflow: 'auto'}}>
           <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
               {notesInProximity
                 .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 

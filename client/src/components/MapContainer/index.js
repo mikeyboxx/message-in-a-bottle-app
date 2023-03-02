@@ -1,8 +1,6 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
-// import BottomNav from '../BottomNav';
-// import DrawerContainer from '../DrawerContainer';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 // google maps options
@@ -35,13 +33,12 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
+  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
   
   const map = useRef(null);
   const zoomChanged = useRef(false);
   const dragEnd = useRef(false);
   
-  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
-
   // argument passed is a google map bounds object
   const getBoundsData = useCallback(bounds => {
     getNotesInBounds({
@@ -58,20 +55,14 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   const initialMapOptions = useMemo(() => ({
     zoom: DEFAULT_ZOOM,
     heading: startingPosition.coords.heading,
-    center:  {
-      lat: startingPosition.coords.latitude,
-      lng: startingPosition.coords.longitude,
-    }
+    center: {lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude}
   }),[startingPosition]);
 
   // initialize google map and save in useRef
   const onLoad = useCallback(gMap => {
     gMap.setOptions(initialMapOptions);
     map.current = gMap;
-    map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-    map.current.setHeading(position.coords.heading);
-    // navActionHandler('loaded');
-  },[position, initialMapOptions]);
+  },[initialMapOptions]);
 
   // track google map events
   const onDragEnd = useCallback(() => dragEnd.current = true,[]);
@@ -80,8 +71,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
     if (zoomChanged.current || dragEnd.current ){
-      // resetting the Action will cause a map pan to user's location
-      // setBottomNavigationAction(null);
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
         newBounds && getBoundsData(newBounds)
@@ -118,7 +107,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     );
 
     return () => {
-      // console.log(navId, timer);
       navigator.geolocation.clearWatch(navId);
       clearInterval(timer);
     }
@@ -165,7 +153,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     }
   },[position, data, notesInProximityHandler]);
 
-  // if location button is pressed on bottom navigation bar, pan back to user's location and reset the zoom
+  // if location button is pressed on navigation bar, pan back to user's location and reset the zoom
   useEffect(()=>{
     if (navAction === 'location' && map.current){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
@@ -178,26 +166,11 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
   return (
     <div style={{flex: '1 1 '}}>
-     {/* <div>  */}
         {position &&  
           <GoogleMap    
             id={'googleMap'}
+            mapContainerStyle={{height: '100%'}}
             options={defaultMapOptions}
-            mapContainerStyle={{ 
-              // this fixes google chrome mobile issue with page height being > screen height
-              // height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
-              //             window.screen.height >= window.innerHeight ? 
-              //               window.innerHeight : 
-              //               window.screen.height - (window.innerHeight - window.screen.height) :  
-              //             Math.min(window.screen.height, window.innerHeight))-109}px`, 
-              height: '100%',
-              // height: `calc(100% - 62px)` ,
-              // height: `${window.innerHeight - 115}px`,
-              // zIndex: 9999,
-              // border: '1px solid black',
-              // height: '100%',
-              // width: '100%'
-            }}
             onLoad={onLoad}
             onIdle={onIdle}
             onZoomChanged={onZoomChanged}
@@ -208,19 +181,14 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
               icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
             />
             
-            {notesInBounds?.map(({note: {noteText, noteAuthor, lat, lng, createdTs}, inProximity, distance}, idx) => {
-              const dt = new Date(createdTs);
-              const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-              return (
-                <Marker
-                  key={idx}
-                  options={{optimized: true}}
-                  position={{lat, lng}}
-                  icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
-                  title={noteText + '\nBy: ' + noteAuthor + ' -- ' + dtString + '\nDistance: ' + distance.toFixed(1) + ' meters'}  
-                />)
-            })}
-            
+            {notesInBounds?.map(({note: {noteText, noteAuthor, lat, lng, createdTs}, inProximity, distance}, idx) => 
+              <Marker
+                key={idx}
+                options={{optimized: true}}
+                position={{lat, lng}}
+                icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
+              />
+            )}
           </GoogleMap>}
     </div>
   )

@@ -64,48 +64,47 @@ function App() {
         {loadError && 
           <Alert variant="filled" severity="error">
             Error loading Google Maps!
-          </Alert>}
+          </Alert>
+        }
 
         {gpsLoadError && 
           <Alert variant="filled" severity="error">
             {gpsLoadError}
-          </Alert>}
+          </Alert>
+        }
 
-        {(!isLoaded || !startingPosition) && <CircularProgress/>}
+        {(!isLoaded || !startingPosition) && 
+          <CircularProgress/>
+        }
 
         {(isLoaded && startingPosition) && 
-        <Box 
-          sx={{
-            display: 'flex', 
-            flexDirection: 'column', 
-            // height: window.screen.height,
-            height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
-                          window.screen.height >= window.innerHeight ? 
-                            window.innerHeight : 
-                            window.screen.height - (window.innerHeight - window.screen.height) :  
-                          Math.min(window.screen.height, window.innerHeight))}px`, 
+          <Box 
+            sx={{
+              display: 'flex', 
+              flexDirection: 'column', 
+              height:
+               // this fixes google chrome mobile issue with page height being > screen height
+                `${
+                  (/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
+                    ? window.screen.height >= window.innerHeight 
+                      ? window.innerHeight 
+                      : window.screen.height - (window.innerHeight - window.screen.height) 
+                    : Math.min(window.screen.height, window.innerHeight))
+                }px`, 
+            }}>
 
-            // height: (()=>{
-            //   console.log('window.screen.height= ', window.screen.height);
-            //   console.log('window.innerHeight= ', window.innerHeight);
-            //   console.log('window.outerHeight= ', window.outerHeight);
-            //   return `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
-            //   window.screen.height >= window.innerHeight ? 
-            //     window.innerHeight : 
-            //     window.screen.height - (window.innerHeight - window.screen.height) :  
-            //   Math.min(window.screen.height, window.innerHeight))}px`;
-            // })()
-          }}>
-          <BottomNav handler={setNavigationAction}/> 
-          <MapContainer 
-            startingPosition={startingPosition} 
-            navActionHandler={setNavigationAction} 
-            navAction={navigationAction}
-            notesInProximityHandler={setNotesInProximity}  
-          />
-          {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
-        </Box>}
-        
+            <BottomNav handler={setNavigationAction}/> 
+
+            <MapContainer 
+              startingPosition={startingPosition} 
+              navActionHandler={setNavigationAction} 
+              navAction={navigationAction}
+              notesInProximityHandler={setNotesInProximity}  
+            />
+            
+            {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
+          </Box>
+        }
     </ApolloProvider>
   );
 }
