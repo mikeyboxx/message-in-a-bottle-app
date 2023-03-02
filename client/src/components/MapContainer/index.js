@@ -128,11 +128,11 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
 
   useEffect(() => {
-    if (position && map.current ){
+    if (position && map.current && navAction){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       map.current.setHeading(position.coords.heading);
     }
-  },[position]);
+  },[position, navAction]);
 
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
