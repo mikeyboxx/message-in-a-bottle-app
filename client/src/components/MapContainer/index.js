@@ -62,6 +62,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   const onLoad = useCallback(gMap => {
     gMap.setOptions(initialMapOptions);
     map.current = gMap;
+    map.current.setZoom(DEFAULT_ZOOM)
   },[initialMapOptions]);
 
   // track google map events
@@ -70,7 +71,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
-    if (zoomChanged.current || dragEnd.current ){
+    if (zoomChanged.current || dragEnd.current || navAction === 'location'){
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
         newBounds && getBoundsData(newBounds)
@@ -78,20 +79,22 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       else {
         setNotesInBounds([]);
       }
-    }
-    zoomChanged.current = false;
-    dragEnd.current = false;
-  },[getBoundsData]);
+
+      (zoomChanged.current || dragEnd.current) && navActionHandler(null);
+      zoomChanged.current = false;
+      dragEnd.current = false;
+    } 
+  },[getBoundsData, navAction, navActionHandler]);
   
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
-    const timer = setInterval(()=>{
-      if (map.current.zoom > MIN_ZOOM) {
-        const newBounds = map.current.getBounds();
-        newBounds && getBoundsData(newBounds);
-      }
-    },60000);
+    // const timer = setInterval(()=>{
+    //   if (map.current.zoom > MIN_ZOOM) {
+    //     const newBounds = map.current.getBounds();
+    //     newBounds && getBoundsData(newBounds);
+    //   }
+    // },60000);
     
     const navId = navigator.geolocation.watchPosition( 
       newPos => 
@@ -108,30 +111,19 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
     return () => {
       navigator.geolocation.clearWatch(navId);
-      clearInterval(timer);
+      // clearInterval(timer);
     }
   },[getBoundsData]);
 
 
   useEffect(() => {
-    if (position && map.current){
-      const newBounds = map.current.getBounds();
-      if (newBounds) {
-        // check if user is in bounds of the google map
-        const isInBounds = 
-          position.coords.latitude > newBounds.getSouthWest().lat() && 
-          position.coords.longitude >  newBounds.getSouthWest().lng() && 
-          position.coords.latitude < newBounds.getNorthEast().lat() && 
-          position.coords.longitude <  newBounds.getNorthEast().lng();
-        
-        // pan and change heading of google map, if user is in bounds and gps has good accuracy, expressed in meters 
-        if (isInBounds && position.coords.accuracy < 10 && !navAction) { 
-          map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-          map.current.setHeading(position.coords.heading);
-        }
-      }
+    if (position && map.current && navAction === 'location'){
+      map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+      map.current.setHeading(position.coords.heading);
+      map.current.setZoom(DEFAULT_ZOOM)
     }
   },[position, navAction]);
+
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
@@ -152,16 +144,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       setNotesInBounds(arr);
     }
   },[position, data, notesInProximityHandler]);
-
-  // if location button is pressed on navigation bar, pan back to user's location and reset the zoom
-  useEffect(()=>{
-    if (navAction === 'location' && map.current){
-      map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-      map.current.setHeading(position.coords.heading);
-      map.current.setZoom(DEFAULT_ZOOM);
-      navActionHandler(null);
-    }
-  },[position, navAction, navActionHandler])
 
 
   return (

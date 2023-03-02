@@ -61,22 +61,6 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-        {loadError && 
-          <Alert variant="filled" severity="error">
-            Error loading Google Maps!
-          </Alert>
-        }
-
-        {gpsLoadError && 
-          <Alert variant="filled" severity="error">
-            {gpsLoadError}
-          </Alert>
-        }
-
-        {(!isLoaded || !startingPosition) && 
-          <CircularProgress/>
-        }
-
         {(isLoaded && startingPosition) && 
           <Box 
             sx={{
@@ -104,6 +88,22 @@ function App() {
             
             {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
           </Box>
+        }
+
+        {loadError && 
+          <Alert variant="filled" severity="error">
+            Error loading Google Maps!
+          </Alert>
+        }
+
+        {gpsLoadError && 
+          <Alert variant="filled" severity="error">
+            {gpsLoadError}
+          </Alert>
+        }
+
+        {(!isLoaded || !startingPosition) && 
+          <CircularProgress/>
         }
     </ApolloProvider>
   );
