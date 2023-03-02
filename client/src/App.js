@@ -7,7 +7,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 
 import MapContainer from './components/MapContainer';
-import BottomNav from './components/BottomNav';
+import TopNav from './components/TopNav';
 import DrawerContainer from './components/DrawerContainer';
 
 // import {getLatLonBounds} from './utils/trigonometry';
@@ -93,7 +93,7 @@ function App() {
                 }px`, 
             }}>
 
-            <BottomNav handler={setNavigationAction}/> 
+            <TopNav handler={setNavigationAction}/> 
 
             <MapContainer 
               startingPosition={startingPosition} 

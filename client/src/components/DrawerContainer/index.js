@@ -46,7 +46,6 @@ export default function DrawerContainer(props) {
             overflow: 'visible',
             padding: 15,
             display: 'flex'
-
           },
         }}
       />
@@ -76,45 +75,43 @@ export default function DrawerContainer(props) {
         >
           <Puller />
 
-          {notesInProximity.length > 0 &&
-            <div style={{
-              display: 'flex', 
-              width: '100%', 
-              padding: 15,
+          <div style={{
+            display: 'flex', 
+            width: '100%', 
+            padding: 15,
+            }}
+          > 
+            <Typography variant="h7" 
+              sx={{ 
+                color: 'purple',
+                ml: 2,
+                mt: .5,
               }}
-            > 
-              <Typography 
-                variant="h7" 
-                sx={{ 
-                  color: 'purple',
-                  ml: 2,
-                  mt: .5,
-                }}
-              >
-                  {notesInProximity.length}
-              </Typography>
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  color: 'purple',
-                  position: 'absolute',
-                  ml: 1,
-                }}
-              >
-                  <Journals size={30} />  
-              </Typography>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  color: 'purple',
-                  ml: 3,
-                }}
-              >
-                 Pickup Notes 
-              </Typography>
-            </div>}
+            >
+              {notesInProximity.length}
+            </Typography>
 
+            <Typography variant="h5" 
+              sx={{ 
+                color: 'purple',
+                position: 'absolute',
+                ml: 1,
+              }}
+            >
+                <Journals size={30} />  
+            </Typography>
+
+            <Typography variant="h6" 
+              sx={{ 
+                color: 'purple',
+                ml: 3,
+              }}
+            >
+              Pickup Notes 
+            </Typography>
+          </div>
         </StyledBox>
+
         <StyledBox sx={{ flex: 1, overflow: 'auto'}}>
           <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
               {notesInProximity
