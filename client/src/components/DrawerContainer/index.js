@@ -98,7 +98,7 @@ export default function DrawerContainer(props) {
                 ml: 1,
               }}
             >
-                <Journals size={30} />  
+              <Journals size={30} />  
             </Typography>
 
             <Typography variant="h6" 
@@ -108,7 +108,7 @@ export default function DrawerContainer(props) {
               }}
             >
               Pickup Notes 
-            </Typography>
+            </Typography> 
           </div>
         </StyledBox>
 

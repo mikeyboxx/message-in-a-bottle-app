@@ -87,7 +87,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   },[navActionHandler, getBoundsData]);
   
   useEffect(()=>{
-    if (navAction === 'location' && map.current){
+    if (position && navAction === 'location' && map.current){
       const newBounds = map.current.getBounds();
       newBounds && getBoundsData(newBounds)
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
@@ -99,7 +99,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
-    if(!getBoundsData) {console.log('yes')};
     const timer = setInterval(()=>{
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
@@ -125,14 +124,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       clearInterval(timer);
     }
   },[getBoundsData]);
-
-
-  useEffect(() => {
-    if (position && map.current && navAction){
-      map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-      map.current.setHeading(position.coords.heading);
-    }
-  },[position, navAction]);
 
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 

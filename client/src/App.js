@@ -39,7 +39,7 @@ function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: googleLibraries
   });
-  const [navigationAction, setNavigationAction] = useState(null);
+  const [navigationAction, setNavigationAction] = useState('location');
   const [notesInProximity, setNotesInProximity] = useState([]);
 
   const getGPSLocation = useCallback(() => {
