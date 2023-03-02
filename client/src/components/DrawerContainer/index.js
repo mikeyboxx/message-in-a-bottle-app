@@ -7,23 +7,16 @@ import {Box, Typography} from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import {Journals} from 'react-bootstrap-icons';
 
-const drawerBleeding = 56;
+const drawerBleeding = 58;
 
 
 const Root = styled('div')(({ theme }) => ({
-  
-  // borderTopLeftRadius: 20,
-  // borderTopRightRadius: 20,
-  // height: '100%',
-  // flex: 1,
   backgroundColor:
-    theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
+  theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
 }));
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
-  borderTopLeftRadius: 20,
-  borderTopRightRadius: 20,
 }));
 
 const Puller = styled(Box)(({ theme }) => ({
@@ -50,12 +43,9 @@ export default function DrawerContainer(props) {
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {
-            // height: `calc(50% - ${drawerBleeding}px)`,
-            maxHeight: `calc(50% - ${drawerBleeding}px)`,
+            height: `calc(50% - ${drawerBleeding}px)`,
             overflow: 'visible',
-            // display: 'flex',
-            
-            
+            padding: 15,
           },
         }}
       />
@@ -65,6 +55,7 @@ export default function DrawerContainer(props) {
         open={open}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
+        onClick={toggleDrawer(!open)}
         swipeAreaWidth={drawerBleeding}
         disableSwipeToOpen={false}
         ModalProps={{
@@ -83,7 +74,12 @@ export default function DrawerContainer(props) {
           <Puller />
 
           {notesInProximity.length > 0 &&
-            <div style={{display: 'flex', position: 'relative', width: '100%', paddingTop: 15, paddingBottom: 15}}> 
+            <div style={{
+              display: 'flex', 
+              width: '100%', 
+              padding: 15,
+              }}
+            > 
               <Typography 
                 variant="h7" 
                 sx={{ 
@@ -100,7 +96,6 @@ export default function DrawerContainer(props) {
                   color: 'purple',
                   position: 'absolute',
                   ml: 1,
-                  // mt: .5
                 }}
               >
                   <Journals size={30} />  
@@ -110,7 +105,6 @@ export default function DrawerContainer(props) {
                 sx={{ 
                   color: 'purple',
                   ml: 3,
-                  // mt: .5
                 }}
               >
                  Pickup Notes 
@@ -118,16 +112,8 @@ export default function DrawerContainer(props) {
             </div>}
 
         </StyledBox>
-        <StyledBox
-          sx={{
-            px: 2,
-            pb: 2,
-            height: '100%',
-            overflow: 'auto',
-          }}
-        >
-          {/* <Skeleton variant="rectangular" height="100%"> */}
-          <ul style={{listStyleType: 'none', margin: 0, padding: 15}}>
+        <StyledBox sx={{overflow: 'auto'}}>
+          <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
               {notesInProximity
                 .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
                   const dt = new Date(createdTs);
@@ -140,9 +126,8 @@ export default function DrawerContainer(props) {
                     </li>)
                 })}
             </ul>
-            {/* </Skeleton> */}
         </StyledBox>
       </SwipeableDrawer>
-    </Root>
+     </Root>
   );
 }

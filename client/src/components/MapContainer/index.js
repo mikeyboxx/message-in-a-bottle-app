@@ -134,6 +134,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     map.current = gMap;
     map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
     map.current.setHeading(position.coords.heading);
+    // navActionHandler('loaded');
   },[position, initialMapOptions]);
 
   // track google map events
@@ -245,24 +246,25 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
 
   return (
-    <div>
-    {/* <div style={{height: '100%'}}> */}
+    <div style={{flex: '1 1 '}}>
+     {/* <div>  */}
         {position &&  
           <GoogleMap    
             id={'googleMap'}
             options={defaultMapOptions}
             mapContainerStyle={{ 
               // this fixes google chrome mobile issue with page height being > screen height
-              height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
-                          window.screen.height >= window.innerHeight ? 
-                            window.innerHeight : 
-                            window.screen.height - (window.innerHeight - window.screen.height) :  
-                          Math.min(window.screen.height, window.innerHeight))-109}px`, 
-              // height: `calc(100% - 10px)` ,
-              // height: `${window.innerHeight - 109}px`,
+              // height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
+              //             window.screen.height >= window.innerHeight ? 
+              //               window.innerHeight : 
+              //               window.screen.height - (window.innerHeight - window.screen.height) :  
+              //             Math.min(window.screen.height, window.innerHeight))-109}px`, 
+              height: `calc(100% - 62px)` ,
+              // height: `${window.innerHeight - 115}px`,
+              // zIndex: 9999,
               // border: '1px solid black',
-              flex: 1,
-              width: window.innerWidth
+              // height: '100%',
+              // width: '100%'
             }}
             onLoad={onLoad}
             onIdle={onIdle}
@@ -304,7 +306,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
           
 
 
-        {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
+        {/* {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
           <div style={notesInProximityListStyle}>
             <ul style={{listStyleType: 'none', margin: 0, padding: 15}}>
               {notesInBounds
@@ -329,7 +331,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
             >
               x
             </Button>
-          </div>}
+          </div>} */}
     </div>
   )
 }

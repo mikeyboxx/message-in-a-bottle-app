@@ -16,49 +16,34 @@ export default function BottomNav({handler}) {
 
   return (
     <BottomNavigation 
-      sx={{ 
-        flex: 1,
-        width: '100%',
-        padding: '5px 5px', 
-        borderRadius: '0 0 20px 20px'
-      }} 
       value={value} 
       onChange={handleChange}
       showLabels={true}
-      >
+    >
       <BottomNavigationAction
-        sx={{
-          color: 'purple',
-        }}
+        sx={{color: 'purple'}}
         label="Location"
         value="location"
         icon={<LocationOnIcon />}
       />
       <BottomNavigationAction
-        sx={{
-          color: 'purple'
-        }}
-       
+        sx={{color: 'purple'}}
         label="Create"
         value="create"
         icon={<StickyNote2OutlinedIcon />}
       />
       <BottomNavigationAction
-        sx={{
-          color: 'purple'
-        }}
+        sx={{color: 'purple'}}
         label="Favorites"
         value="favorites"
         icon={<FavoriteIcon />}
       />
-      
       <BottomNavigationAction
-        sx={{
-          color: 'purple'
-        }} 
+        sx={{color: 'purple'}}
         label="Login" 
         value="login" 
-        icon={<LoginOutlinedIcon />} />
+        icon={<LoginOutlinedIcon />} 
+      />
     </BottomNavigation>
   );
 }

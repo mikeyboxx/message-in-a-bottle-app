@@ -39,7 +39,7 @@ function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: googleLibraries
   });
-  const [navigationAction, setNavigationAction] = useState('null');
+  const [navigationAction, setNavigationAction] = useState(null);
   const [notesInProximity, setNotesInProximity] = useState([]);
 
   const getGPSLocation = useCallback(() => {
@@ -74,7 +74,17 @@ function App() {
         {(!isLoaded || !startingPosition) && <CircularProgress/>}
 
         {(isLoaded && startingPosition) && 
-        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+        <Box 
+          sx={{
+            display: 'flex', 
+            flexDirection: 'column', 
+            height: '100vh',
+            // height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
+            //               window.screen.height >= window.innerHeight ? 
+            //                 window.innerHeight : 
+            //                 window.screen.height - (window.innerHeight - window.screen.height) :  
+            //               Math.min(window.screen.height, window.innerHeight))}px`, 
+          }}>
           <BottomNav handler={setNavigationAction}/> 
           <MapContainer 
             startingPosition={startingPosition} 
@@ -82,7 +92,7 @@ function App() {
             navAction={navigationAction}
             notesInProximityHandler={setNotesInProximity}  
           />
-          { <DrawerContainer notesInProximity={notesInProximity}/>}
+          <DrawerContainer notesInProximity={notesInProximity}/>
         </Box>}
         
     </ApolloProvider>
