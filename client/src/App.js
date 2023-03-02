@@ -78,12 +78,12 @@ function App() {
           sx={{
             display: 'flex', 
             flexDirection: 'column', 
-            height: '100vh',
-            // height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
-            //               window.screen.height >= window.innerHeight ? 
-            //                 window.innerHeight : 
-            //                 window.screen.height - (window.innerHeight - window.screen.height) :  
-            //               Math.min(window.screen.height, window.innerHeight))}px`, 
+            // height: '100vh',
+            height: `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) ?
+                          window.screen.height >= window.innerHeight ? 
+                            window.innerHeight : 
+                            window.screen.height - (window.innerHeight - window.screen.height) :  
+                          Math.min(window.screen.height, window.innerHeight))}px`, 
           }}>
           <BottomNav handler={setNavigationAction}/> 
           <MapContainer 
