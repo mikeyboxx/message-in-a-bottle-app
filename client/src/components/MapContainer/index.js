@@ -90,13 +90,16 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     if (navAction === 'location' && map.current){
       const newBounds = map.current.getBounds();
       newBounds && getBoundsData(newBounds)
-      map.current.setZoom(DEFAULT_ZOOM)
+      map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+      map.current.setHeading(position.coords.heading);
+      map.current.setZoom(DEFAULT_ZOOM);
     }
-  },[navAction, getBoundsData])
+  },[position, navAction, getBoundsData])
 
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
+    if(!getBoundsData) {console.log('yes')};
     const timer = setInterval(()=>{
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
