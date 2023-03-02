@@ -1,6 +1,4 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
-import {Button} from "react-bootstrap";
-
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import { useLazyQuery } from '@apollo/client';
 // import BottomNav from '../BottomNav';
@@ -30,41 +28,6 @@ const noteIcon = {
   path: "M160.8 96.5c14 17 31 30.9 49.5 42.2c25.9 15.8 53.7 25.9 77.7 31.6V138.8C265.8 108.5 250 71.5 248.6 28c-.4-11.3-7.5-21.5-18.4-24.4c-7.6-2-15.8-.2-21 5.8c-13.3 15.4-32.7 44.6-48.4 87.2zM320 144v30.6l0 0v1.3l0 0 0 32.1c-60.8-5.1-185-43.8-219.3-157.2C97.4 40 87.9 32 76.6 32c-7.9 0-15.3 3.9-18.8 11C46.8 65.9 32 112.1 32 176c0 116.9 80.1 180.5 118.4 202.8L11.8 416.6C6.7 418 2.6 421.8 .9 426.8s-.8 10.6 2.3 14.8C21.7 466.2 77.3 512 160 512c3.6 0 7.2-1.2 10-3.5L245.6 448H320c88.4 0 160-71.6 160-160V128l29.9-44.9c1.3-2 2.1-4.4 2.1-6.8c0-6.8-5.5-12.3-12.3-12.3H400c-44.2 0-80 35.8-80 80zm80 16c-8.8 0-16-7.2-16-16s7.2-16 16-16s16 7.2 16 16s-7.2 16-16 16z",
 };
 
-// theme used by all buttons
-const buttonStyle = {
-  position: 'absolute',
-  border: 'none',
-  borderRadius: 30,
-  boxShadow: '5px 5px 5px gray',
-  fontWeight: 'bold',
-  backgroundColor: 'white',
-  color: 'purple',
-  fontSize: '.85em',
-  cursor: 'pointer'
-};
-
-// buttons displayed over the map
-const mapButtonStyle =  {
-  bottom: 70,
-  paddingTop: 6,
-  paddingBottom: 6,
-  paddingLeft: 15,
-  paddingRight: 15,
-};
-
-// Pickup Note button style
-const pickupNoteButtonStyle =  {
-  ...buttonStyle, 
-  ...mapButtonStyle, 
-  left: 20
-};
-
-// close button in notes list
-const closeButtonStyle =  {
-  top: 10,
-  right: 10,
-};
-
 // minimum zoom to retrieve data from database
 const MIN_ZOOM = 15;
 const DEFAULT_ZOOM = 18;
@@ -72,11 +35,8 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [notesInProximityListVisible, setNotesInProximityListVisible] = useState('hidden');
-  // const [bottomNavigationAction, setBottomNavigationAction] = useState('location');
   
   const map = useRef(null);
-  const numberOfNotesInProximity = useRef(0);
   const zoomChanged = useRef(false);
   const dragEnd = useRef(false);
   
@@ -93,30 +53,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       }
     })
   },[getNotesInBounds]);
-
-  const notesInProximityListStyle = useMemo(()=>({
-    position: 'absolute',
-    border: '1px solid gray',
-    borderRadius: 30,
-    boxShadow: '5px 5px 5px gray',
-    margin: 0,
-    paddingTop: 8,
-    fontWeight: 'bold',
-    backgroundColor: 'white',
-    color: 'purple',
-    fontSize: '1em',
-    width: '200px',
-    height: '400px',
-    overflow: 'auto',
-    visibility: notesInProximityListVisible,
-    top: (Math.floor(window.screen.height >= window.innerHeight ? 
-      window.innerHeight : 
-      window.screen.height - (window.innerHeight - window.screen.height))/2) - 200,
-    left: (Math.floor(window.screen.width >= window.innerWidth ? 
-      window.innerWidth : 
-      window.screen.width - (window.innerWidth - window.screen.width))/2) - 100
-  }),[notesInProximityListVisible]);
-
 
   // initial map options (zoom, heading, center of the map)
   const initialMapOptions = useMemo(() => ({
@@ -144,7 +80,6 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
     if (zoomChanged.current || dragEnd.current ){
-      navActionHandler(null);
       // resetting the Action will cause a map pan to user's location
       // setBottomNavigationAction(null);
       if (map.current.zoom > MIN_ZOOM) {
@@ -157,7 +92,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     }
     zoomChanged.current = false;
     dragEnd.current = false;
-  },[getBoundsData, navActionHandler]);
+  },[getBoundsData]);
   
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
@@ -213,12 +148,10 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
     if (data?.notesInBounds && position && map.current.zoom > MIN_ZOOM) {
-      numberOfNotesInProximity.current = 0;
       const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
           {lat: note.lat, lng: note.lng});
-          distance < 20 && ++numberOfNotesInProximity.current;
         return {
           note,
           distance,
@@ -228,15 +161,13 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
       notesInProximityHandler(arr.filter(({inProximity}) => inProximity === true));
       
-      // if there are no notes in proximty, hide the pickup notes list
-      numberOfNotesInProximity.current  === 0 && setNotesInProximityListVisible('hidden');
       setNotesInBounds(arr);
     }
   },[position, data, notesInProximityHandler]);
 
   // if location button is pressed on bottom navigation bar, pan back to user's location and reset the zoom
   useEffect(()=>{
-    if (!navAction && map.current){
+    if (navAction === 'location' && map.current){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       map.current.setHeading(position.coords.heading);
       map.current.setZoom(DEFAULT_ZOOM);
@@ -289,68 +220,8 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
                   title={noteText + '\nBy: ' + noteAuthor + ' -- ' + dtString + '\nDistance: ' + distance.toFixed(1) + ' meters'}  
                 />)
             })}
-
-        
-            {/* {map.current && map.current.zoom > MIN_ZOOM && notesInBounds && numberOfNotesInProximity.current > 0 && 
-              <Button 
-                size="lg" 
-                variant="info"
-                style={pickupNoteButtonStyle}
-                onClick={()=>setNotesInProximityListVisible('visible')}
-              >
-                <Journals /> Pickup {numberOfNotesInProximity.current + ' Note' + (numberOfNotesInProximity.current > 1 ? 's' : '')}
-              </Button>
-            } */}
-
             
           </GoogleMap>}
-          
-
-
-        {/* {map.current && notesInBounds && numberOfNotesInProximity.current > 0 && position &&    
-          <div style={notesInProximityListStyle}>
-            <ul style={{listStyleType: 'none', margin: 0, padding: 15}}>
-              {notesInBounds
-                .filter(note => note.inProximity === true)
-                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
-                  const dt = new Date(createdTs);
-                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-                  return ( 
-                    <li key={idx}>
-                        {noteText}<br/><br/> 
-                        By: {noteAuthor} -- {dtString}<br/> 
-                        Distance: {distance.toFixed(1)} meters <hr/> 
-                    </li>)
-                })}
-            </ul>
-            <Button 
-              style={{...buttonStyle, ...closeButtonStyle}}
-              onClick={(e)=>{
-                // e.preventDefault();
-                setNotesInProximityListVisible('hidden');
-              }}
-            >
-              x
-            </Button>
-          </div>} */}
     </div>
   )
 }
-
-// {/* below code is used for debugging */}
-//         {/* <p>
-//               Zoom: {map.current.zoom.toFixed(3)} <br/> <br/>
-//               Distance travelled: {window.google.maps.geometry.spherical.computeDistanceBetween(
-//                 {lat: prevPosition.current.lat || 0, lng: prevPosition.current.lng || 0},
-//                 {lat: position.coords.latitude, lng: position.coords.longitude}).toFixed(3)}<br/><br/>
-
-//               Curr Lat: {position.coords.latitude}<br/>
-//               Curr Lng: {position.coords.longitude}<br/><br/>
-
-//               Heading: {position.coords.heading?.toFixed(3)} <br/><br/>
-//               Speed: {position.coords.speed?.toFixed(3)} <br/><br/>
-//               Accuracy: {position.coords.accuracy?.toFixed(3)} <br/><br/>
-
-//               # of notes in bounds: {notesInBounds?.length} <br/><br/>
-//               # of notes in proximity: {notesInBounds?.filter(marker => marker.inProximity === true).length}  <br/><br/>
-//             </p> */}
