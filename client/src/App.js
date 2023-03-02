@@ -2,7 +2,13 @@ import {useState, useEffect, useCallback} from 'react';
 import {useJsApiLoader} from '@react-google-maps/api';
 import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apollo/client';
 // import { setContext } from '@apollo/client/link/context';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+
 import MapContainer from './components/MapContainer';
+import TopNav from './components/TopNav';
+import DrawerContainer from './components/DrawerContainer';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
@@ -28,24 +34,18 @@ const client = new ApolloClient({
 function App() {
   // console.log('App');
   const [startingPosition, setStartingPosition] = useState(null);
+  const [gpsLoadError, setGpsLoadError] = useState(null);
   const {isLoaded, loadError} = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: googleLibraries
   });
+  const [navigationAction, setNavigationAction] = useState(null);
+  const [notesInProximity, setNotesInProximity] = useState([]);
 
   const getGPSLocation = useCallback(() => {
-    // console.log('getGPSLocation');
-    console.log(navigator.geolocation);
     navigator.geolocation.getCurrentPosition( 
-      pos => {
-        // console.log(pos);
-        setStartingPosition((old)=> {
-          // console.log(old);
-          // console.log(pos);
-          return pos
-        });
-      },
-      err => console.log(err),
+      pos => setStartingPosition(pos),
+      err => setGpsLoadError(err),
       {
         enableHighAccuracy: true,
         timeout: 5000,
@@ -58,18 +58,53 @@ function App() {
     getGPSLocation();
   },[getGPSLocation]);
 
+
   return (
     <ApolloProvider client={client}>
-      {(!isLoaded || !startingPosition) && 'Loading...'}
+        {loadError && 
+          <Alert variant="filled" severity="error">
+            Error loading Google Maps!
+          </Alert>
+        }
 
-      {loadError && 'Error Loading Google Maps!'}
+        {gpsLoadError && 
+          <Alert variant="filled" severity="error">
+            {gpsLoadError}
+          </Alert>
+        }
 
-      {(isLoaded && startingPosition) && 
-      <div>
-        <MapContainer startingPosition={startingPosition}/>
-        
-      </div>
-      }
+        {(!isLoaded || !startingPosition) && 
+          <CircularProgress/>
+        }
+
+        {(isLoaded && startingPosition) && 
+          <Box 
+            sx={{
+              display: 'flex', 
+              flexDirection: 'column', 
+              height:
+               // this fixes google chrome mobile issue with page height being > screen height
+                `${
+                  (/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
+                    ? window.screen.height >= window.innerHeight 
+                      ? window.innerHeight 
+                      : window.screen.height - (window.innerHeight - window.screen.height) 
+                    : Math.min(window.screen.height, window.innerHeight))
+                }px`, 
+            }}>
+
+            <TopNav handler={setNavigationAction}/> 
+
+            <MapContainer 
+              startingPosition={startingPosition} 
+              navActionHandler={setNavigationAction} 
+              navAction={navigationAction}
+              notesInProximityHandler={setNotesInProximity}  
+            />
+            
+            {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
+          </Box>
+        }
     </ApolloProvider>
   );
 }
