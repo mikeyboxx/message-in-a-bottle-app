@@ -9,7 +9,6 @@ import {Journals} from 'react-bootstrap-icons';
 
 const drawerBleeding = 58;
 
-
 const Root = styled('div')(({ theme }) => ({
   backgroundColor:
   theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
@@ -65,7 +64,6 @@ export default function DrawerContainer(props) {
         }}
       >
         <StyledBox
-        
           sx={{
             position: 'absolute',
             top: -drawerBleeding,

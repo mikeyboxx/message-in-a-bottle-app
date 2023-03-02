@@ -13,7 +13,7 @@ const actionStyle = {
 export default function BottomNav({handler}) {
   const [value, setValue] = React.useState('location');
 
-  const handleChange = React.useEffect((event, newValue) => {
+  const handleChange = React.useCallback((event, newValue) => {
     setValue(newValue);
     handler(newValue);
   },[handler]);
