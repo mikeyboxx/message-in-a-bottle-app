@@ -71,7 +71,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   
   // check if specific google maps events were fired, in order to refresh data based on the new map bounds
   const onIdle = useCallback(() => {
-    if (zoomChanged.current || dragEnd.current || navAction === 'location'){
+    if (zoomChanged.current || dragEnd.current){
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
         newBounds && getBoundsData(newBounds)
@@ -80,21 +80,29 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
         setNotesInBounds([]);
       }
 
-      (zoomChanged.current || dragEnd.current) && navActionHandler(null);
+      navActionHandler(null);
       zoomChanged.current = false;
       dragEnd.current = false;
     } 
-  },[getBoundsData, navAction, navActionHandler]);
+  },[navActionHandler, getBoundsData]);
   
+  useEffect(()=>{
+    if (navAction === 'location' && map.current){
+      const newBounds = map.current.getBounds();
+      newBounds && getBoundsData(newBounds)
+      map.current.setZoom(DEFAULT_ZOOM)
+    }
+  },[navAction, getBoundsData])
+
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
-    // const timer = setInterval(()=>{
-    //   if (map.current.zoom > MIN_ZOOM) {
-    //     const newBounds = map.current.getBounds();
-    //     newBounds && getBoundsData(newBounds);
-    //   }
-    // },60000);
+    const timer = setInterval(()=>{
+      if (map.current.zoom > MIN_ZOOM) {
+        const newBounds = map.current.getBounds();
+        newBounds && getBoundsData(newBounds);
+      }
+    },60000);
     
     const navId = navigator.geolocation.watchPosition( 
       newPos => 
@@ -111,18 +119,17 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
     return () => {
       navigator.geolocation.clearWatch(navId);
-      // clearInterval(timer);
+      clearInterval(timer);
     }
   },[getBoundsData]);
 
 
   useEffect(() => {
-    if (position && map.current && navAction === 'location'){
+    if (position && map.current ){
       map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       map.current.setHeading(position.coords.heading);
-      map.current.setZoom(DEFAULT_ZOOM)
     }
-  },[position, navAction]);
+  },[position]);
 
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
@@ -163,7 +170,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
               icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
             />
             
-            {notesInBounds?.map(({note: {noteText, noteAuthor, lat, lng, createdTs}, inProximity, distance}, idx) => 
+            {notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
               <Marker
                 key={idx}
                 options={{optimized: true}}
