@@ -1,8 +1,9 @@
-const { Note, User } = require('../models');
+const db = require('../config/connection');
+const { Note } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry');
 const getRandomQuote = require('./getRandomQuote');
 
-module.exports = async () => {
+db.once('open', async () => {
   console.log('seedDaemon started');
   const distanceInMeters = 8046; // 5 miles
 
@@ -20,16 +21,15 @@ module.exports = async () => {
       lng: -78.999047
     },
   ];
-
-  // await Note.deleteMany();
   
-  
+  const ms = 5000;
   let ctr = 0;
 
   const timer = setInterval(async () => {
-    const noteCount = await Note.find().count();
+    ctr += ms / 1000;
+    // console.log('seedDaemon', ctr);
 
-    if (noteCount > 2880) {
+    if (ctr > 86400) {
       console.log('seedDaemon finished');
       clearInterval(timer); 
       return null;
@@ -44,18 +44,20 @@ module.exports = async () => {
           let {lat, lng} = userTargetArr[i];
           let position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
           let {q, a} = await getRandomQuote();
+
           await Note.create({
             noteText: q,
             noteAuthor: a,
             lat: position.lat,
             lng: position.lng,
+            bearing: Math.floor(Math.random() * 360) + 1
           });
       } catch (err) {
         clearInterval(timer);    
       }
     }
-  },30000);
-}
+  },ms);
+});
 
 
 

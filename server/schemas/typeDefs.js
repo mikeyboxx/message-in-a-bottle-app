@@ -24,6 +24,7 @@ const typeDefs = gql`
     noteOwner: String
     lat: Float
     lng: Float
+    bearing: Int
     createdTs: String
     updatedTs: String
   }

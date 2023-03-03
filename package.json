@@ -12,7 +12,9 @@
     "start:dev": "cd server && npm run watch",
     "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm start\"",
     "install": "cd server && npm i && cd ../client && npm i",
-    "seed": "cd server && npm run seed"
+    "seed": "cd server && npm run seed",
+    "seedD": "cd server && npm run seedD",
+    "moveD": "cd server && npm run moveD"
   },
   "keywords": [],
   "author": "",

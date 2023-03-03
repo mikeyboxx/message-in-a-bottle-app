@@ -27,6 +27,8 @@ const resolvers = {
         } 
       });
 
+      // console.log(notes.length);
+
       return notes;
     },
 

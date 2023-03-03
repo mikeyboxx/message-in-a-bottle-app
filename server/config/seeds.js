@@ -1,67 +1,10 @@
 const db = require('./connection');
 const { Note, User } = require('../models');
-const { circleXY, getLatLonGivenDistanceAndBearing } = require('../utils/trigonometry');
-const getRandomQuote = require('../utils/getRandomQuote');
 
 db.once('open', async () => {
-  const distanceInMeters = 8046; // 5 miles
-
-  const userTargetArr = [
-    {
-      lat: 40.5736681,
-      lng: -74.0055502
-    },
-    {
-      lat: 34.1430296,
-      lng: -118.0996981
-    },
-    {
-      lat: 33.616935,
-      lng: -78.999047
-    },
-  ];
   
   await Note.deleteMany();
 
-  // let lat = 40.5736681;
-  // let lng = -74.0055502;
-  // for (let theta=0; theta<360; theta += .1) {
-  //   const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-  //   const {x, y} = circleXY(randomDistance, theta);
-  //   const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-  //   const note = await Note.create({
-  //     noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
-  //     lat: position.lat,
-  //     lng: position.lng,
-  //   });
-  // }
-
-  // lat = 34.1430296530324;
-  // lng = -118.09969814240472;
-  // for (let theta=0; theta<360; theta += .1) {
-  //   const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-  //   const {x, y} = circleXY(randomDistance, theta);
-  //   const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-  //   const note = await Note.create({
-  //     noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
-  //     lat: position.lat,
-  //     lng: position.lng,
-  //   });
-  // }
-
-  // lat = 33.616935;
-  // lng = -78.999047
-  // for (let theta=0; theta<360; theta += .1) {
-  //   const randomDistance = Math.floor(Math.random() * distanceInMeters) + 10;
-  //   const {x, y} = circleXY(randomDistance, theta);
-  //   const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-  //   const note = await Note.create({
-  //     noteText: `This is Note #: ${(theta + 1).toFixed(1)}`,
-  //     lat: position.lat,
-  //     lng: position.lng,
-  //   });
-  // }
-  
   console.log('notes seeded');
   
   await User.deleteMany();
@@ -87,12 +30,6 @@ db.once('open', async () => {
     lastName: 'Generated',
     email: 'autoGen@autoGen.com',
     userName: 'autoGen',
-    password: 'password12345'
-    // orders: [
-    //   {
-    //     products: [products[0]._id, products[0]._id, products[1]._id]
-    //   }
-    // ]
   });
 
   console.log('users seeded');
