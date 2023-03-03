@@ -27,7 +27,7 @@ module.exports = () => {
     },
   ];
   
-  const ms = 5000;
+  const ms = 30000;
   let ctr = 0;
 
   const timer = setInterval(async () => {
