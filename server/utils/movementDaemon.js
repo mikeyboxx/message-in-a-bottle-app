@@ -18,8 +18,9 @@ db.once('open', async () => {
       return null;
     }
 
+    let notes = null;
     try {
-      const notes = await Note.find().lean();
+      notes = await Note.find().lean();
     } catch (err) {
       console.log(err);
       clearInterval(timer);  
