@@ -12,13 +12,18 @@ db.once('open', async () => {
     ctr = ctr + (ms / 1000);
     // console.log('movementDaemon', ctr);
 
-    if (ctr > 86400) {
+    if (ctr > 17280) {
       console.log('movementDaemon finished');
       clearInterval(timer); 
       return null;
     }
 
-    const notes = await Note.find().lean();
+    try {
+      const notes = await Note.find().lean();
+    } catch (err) {
+      console.log(err);
+      clearInterval(timer);  
+    }
 
     for (let i = 0; i < notes.length; i++){
       try {
@@ -36,6 +41,7 @@ db.once('open', async () => {
               lng: position.lng,
             });
       } catch (err) {
+        console.log(err);
         clearInterval(timer);    
       }
     }
