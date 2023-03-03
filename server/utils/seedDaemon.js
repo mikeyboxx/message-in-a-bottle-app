@@ -1,9 +1,10 @@
-const db = require('../config/connection');
+// const db = require('../config/connection');
 const { Note } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry');
 const getRandomQuote = require('./getRandomQuote');
 
-db.once('open', async () => {
+// db.once('open', async () => {
+module.exports = () => {
   console.log('seedDaemon started');
   const distanceInMeters = 8046; // 5 miles
 
@@ -61,7 +62,7 @@ db.once('open', async () => {
       }
     }
   },ms);
-});
+};
 
 
 
