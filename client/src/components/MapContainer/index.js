@@ -115,7 +115,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
-    const timer = setInterval(()=>{
+    const timer = setInterval(async ()=>{
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
         newBounds && getBoundsData(newBounds);
