@@ -4,8 +4,9 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
 const getRandomQuote = require('./getRandomQuote');
 
 // db.once('open', async () => {
-module.exports = () => {
+module.exports = async () => {
   console.log('seedDaemon started');
+  await Note.deleteMany();
   const distanceInMeters = 8046; // 5 miles
 
   const userTargetArr = [
