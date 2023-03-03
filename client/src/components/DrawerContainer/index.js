@@ -28,8 +28,7 @@ const Puller = styled(Box)(({ theme }) => ({
   left: 'calc(50% - 15px)',
 }));
 
-export default function DrawerContainer(props) {
-  const { notesInProximity } = props;
+export default function DrawerContainer({ notesInProximity }) {
   const [open, setOpen] = React.useState(false);
 
   const toggleDrawer = React.useCallback((newOpen) => () => {

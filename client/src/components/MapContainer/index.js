@@ -79,6 +79,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
         setNotesInBounds([]);
       }
 
+      // this will disable the pan and heading of the map
       if (dragEnd.current || (zoomChanged.current && (map.current.zoom !== DEFAULT_ZOOM )))
           navActionHandler(null);
 
@@ -89,13 +90,25 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   
 
   useEffect(()=>{
-    if (position && navAction === 'location' && map.current){
+    if (position &&  map.current){
       const newBounds = map.current.getBounds();
-      newBounds && getBoundsData(newBounds)
+      if (newBounds) {
+        const isInBounds = 
+          position.coords.latitude > newBounds.getSouthWest().lat() && 
+          position.coords.longitude >  newBounds.getSouthWest().lng() && 
+          position.coords.latitude < newBounds.getNorthEast().lat() && 
+          position.coords.longitude <  newBounds.getNorthEast().lng();
 
-      map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-      position.coords.accuracy < 10 && map.current.setHeading(position.coords.heading);
-      map.current.setZoom(DEFAULT_ZOOM);
+        if (map.current.zoom > MIN_ZOOM && isInBounds) {
+          getBoundsData(newBounds)
+        }
+      }   
+
+      if (navAction === 'location'){
+        map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+        position.coords.accuracy < 10 && map.current.setHeading(position.coords.heading);
+        map.current.setZoom(DEFAULT_ZOOM);
+      }
     }
   },[position, navAction, getBoundsData])
 
