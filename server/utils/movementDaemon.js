@@ -9,7 +9,7 @@ db.once('open', async () => {
   let ctr = 0;
 
   const timer = setInterval(async () => {
-    ctr += ms / 1000;
+    ctr = ctr + (ms / 1000);
     // console.log('movementDaemon', ctr);
 
     if (ctr > 86400) {
