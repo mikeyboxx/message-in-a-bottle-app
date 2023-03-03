@@ -24,12 +24,13 @@ db.once('open', async () => {
     userName: 'eliHolt',
     password: 'password12345'
   });
-
+  
   await User.create({
     firstName: 'System',
     lastName: 'Generated',
     email: 'autoGen@autoGen.com',
     userName: 'autoGen',
+    password: 'password12345'
   });
 
   console.log('users seeded');
