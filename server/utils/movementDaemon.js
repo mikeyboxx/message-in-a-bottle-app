@@ -13,7 +13,7 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
     ctr = ctr + (ms / 1000);
     // console.log('movementDaemon', ctr);
 
-    if (ctr > 17280) {
+    if (ctr > 86400) {
       console.log('movementDaemon finished');
       clearInterval(timer); 
       return null;
@@ -30,18 +30,21 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
     for (let i = 0; i < notes.length; i++){
       try {
           const {_id, lat, lng, bearing} = notes[i];
-          const distance = 10;
-          const {x, y} = circleXY(distance, bearing);
-          const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
-          
-          await Note.updateOne(
-            {
-              _id: _id
-            },
-            {
-              lat: position.lat,
-              lng: position.lng,
-            });
+          if (bearing) {
+            const distance = 10;
+            const {x, y} = circleXY(distance, bearing);
+            const position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
+            
+            await Note.updateOne(
+              {
+                _id: _id
+              },
+              {
+                lat: position.lat,
+                lng: position.lng,
+              }
+            );
+          }
       } catch (err) {
         console.log(err);
         clearInterval(timer);    

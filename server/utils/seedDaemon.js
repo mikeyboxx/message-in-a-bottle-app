@@ -6,7 +6,7 @@ const getRandomQuote = require('./getRandomQuote');
 // db.once('open', async () => {
 module.exports = async () => {
   console.log('seedDaemon started');
-  await Note.deleteMany();
+  // await Note.deleteMany();
   const distanceInMeters = 8046; // 5 miles
 
   const userTargetArr = [
@@ -35,7 +35,7 @@ module.exports = async () => {
     ctr = ctr + (ms / 1000);
     // console.log('seedDaemon', ctr);
 
-    if (ctr > 2880) {
+    if (ctr > 86400) {
       console.log('seedDaemon finished');
       clearInterval(timer); 
       return null;
