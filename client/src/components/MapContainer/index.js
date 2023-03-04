@@ -27,7 +27,7 @@ const noteIcon = {
 };
 
 // minimum zoom to retrieve data from database
-const MIN_ZOOM = 15;
+const MIN_ZOOM = 5;
 const DEFAULT_ZOOM = 18;
 
 export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
