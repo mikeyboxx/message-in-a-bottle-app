@@ -1,7 +1,7 @@
 import {useState, useEffect, useCallback} from 'react';
 import {useJsApiLoader} from '@react-google-maps/api';
 import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apollo/client';
-// import { setContext } from '@apollo/client/link/context';
+import { setContext } from '@apollo/client/link/context';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -12,22 +12,22 @@ import DrawerContainer from './components/DrawerContainer';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
-// const authLink = setContext((_, { headers }) => {
-//   const token = localStorage.getItem('id_token');
-//   return {
-//     headers: {
-//       ...headers,
-//       authorization: token ? `Bearer ${token}` : '',
-//     },
-//   };
-// });
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('id_token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
 
 // used by google maps api param
 const googleLibraries = ['geometry'];
 const httpLink = createHttpLink({uri: '/graphql'});
 const client = new ApolloClient({
-// link: authLink.concat(httpLink),
-  link: httpLink,
+  link: authLink.concat(httpLink),
+  // link: httpLink,
   cache: new InMemoryCache(),
 });
 
