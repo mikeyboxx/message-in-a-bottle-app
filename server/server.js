@@ -7,6 +7,7 @@ const { typeDefs, resolvers } = require('./schemas');
 const { authMiddleware } = require('./utils/auth');
 
 const seedDaemon = require('./utils/seedDaemon');
+const movementDaemon = require('./utils/movementDaemon');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -50,6 +51,7 @@ const startApolloServer = async (typeDefs, resolvers) => {
       console.log(`API server running on port ${PORT}!`);
       console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`)
       seedDaemon();
+      movementDaemon();
     });
   })
 };

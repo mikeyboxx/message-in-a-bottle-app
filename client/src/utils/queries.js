@@ -10,6 +10,7 @@ query NotesInBounds($swLat: Float!, $swLng: Float!, $neLat: Float!, $neLng: Floa
       noteOwner
       lat
       lng
+      bearing
       createdTs
     }
     distance

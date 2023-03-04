@@ -27,6 +27,10 @@ const noteSchema = new Schema(
       type: Number,
       required: true,
     },
+    bearing: {
+      type: Number,
+      // default: Math.floor(Math.random() * 360) + 1
+    }
   },
   {
     toJSON: {

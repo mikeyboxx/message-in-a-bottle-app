@@ -27,13 +27,13 @@ const noteIcon = {
 };
 
 // minimum zoom to retrieve data from database
-const MIN_ZOOM = 15;
+const MIN_ZOOM = 5;
 const DEFAULT_ZOOM = 18;
 
 export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
+  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
   
   const map = useRef(null);
   const zoomChanged = useRef(false);
@@ -48,7 +48,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
         neLat: bounds.getNorthEast().lat(), 
         neLng: bounds.getNorthEast().lng()
       }
-    })
+    });
   },[getNotesInBounds]);
 
   // initial map options (zoom, heading, center of the map)
@@ -115,12 +115,12 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
   // retrieve data from the database every 60 seconds, if zoom level is acceptable
   // after initial render, start monitoring the user's gps location
   useEffect(()=>{
-    // const timer = setInterval(()=>{
-    //   if (map.current.zoom > MIN_ZOOM) {
-    //     const newBounds = map.current.getBounds();
-    //     newBounds && getBoundsData(newBounds);
-    //   }
-    // },60000);
+    const timer = setInterval(async ()=>{
+      if (map.current.zoom > MIN_ZOOM) {
+        const newBounds = map.current.getBounds();
+        newBounds && getBoundsData(newBounds);
+      }
+    },5000);
     
     const navId = navigator.geolocation.watchPosition( 
       newPos => 
@@ -137,9 +137,9 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
     return () => {
       navigator.geolocation.clearWatch(navId);
-      // clearInterval(timer);
+      clearInterval(timer);
     }
-  },[]);
+  },[getBoundsData]);
 
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
@@ -161,6 +161,8 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       setNotesInBounds(arr);
     }
   },[position, data, notesInProximityHandler]);
+
+  // useEffect(() => {console.log(data)},[data])
 
 
   return (
