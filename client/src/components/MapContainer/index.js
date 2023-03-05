@@ -1,5 +1,6 @@
 import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
+import Alert from '@mui/material/Alert';
 import { useLazyQuery } from '@apollo/client';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
@@ -33,7 +34,7 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
+  const [getNotesInBounds, {data, error, loading}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
   
   const map = useRef(null);
   const zoomChanged = useRef(false);
@@ -118,7 +119,9 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     const timer = setInterval(async ()=>{
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
-        newBounds && getBoundsData(newBounds);
+        // console.log(loading);
+        // if (!loading)
+          newBounds && getBoundsData(newBounds);
       }
     },5000);
     
@@ -144,7 +147,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
-    if (data?.notesInBounds && position && map.current.zoom > MIN_ZOOM) {
+    if (!loading && data?.notesInBounds && position && map.current.zoom > MIN_ZOOM) {
       const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
@@ -160,14 +163,14 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       
       setNotesInBounds(arr);
     }
-  },[position, data, notesInProximityHandler]);
+  },[loading, position, data, notesInProximityHandler]);
 
-  useEffect(() => {console.log(data)},[data])
+  // useEffect(() => {console.log(loading, data)},[data, loading])
 
 
   return (
     <div style={{flex: '1 1 '}}>
-        {position &&  
+        {position && !error &&
           <GoogleMap    
             id={'googleMap'}
             mapContainerStyle={{height: '100%'}}
@@ -181,16 +184,22 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
               position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
               icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
             />
-            
-            {notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
-              <Marker
-                key={idx}
-                options={{optimized: true}}
-                position={{lat, lng}}
-                icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
-              />
-            )}
+            {!loading && 
+              notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
+                <Marker
+                  key={idx}
+                  options={{optimized: true}}
+                  position={{lat, lng}}
+                  icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
+                />
+              )}
           </GoogleMap>}
+
+          {error && 
+            <Alert variant="filled" severity="error">
+              Error loading Data!
+            </Alert>
+          }
     </div>
   )
 }
