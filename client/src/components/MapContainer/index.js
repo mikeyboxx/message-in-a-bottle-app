@@ -147,7 +147,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
-    if (!loading && data?.notesInBounds && position && map.current.zoom > MIN_ZOOM) {
+    if (data?.notesInBounds && position && map.current.zoom > MIN_ZOOM) {
       const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
@@ -163,7 +163,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       
       setNotesInBounds(arr);
     }
-  },[loading, position, data, notesInProximityHandler]);
+  },[position, data, notesInProximityHandler]);
 
   // useEffect(() => {console.log(loading, data)},[data, loading])
 
