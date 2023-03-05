@@ -38,7 +38,4 @@ db.once('open', async () => {
   });
 
   console.log('users seeded');
-
-  seedDaemon();
-  movementDaemon();
 });
