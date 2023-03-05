@@ -34,7 +34,7 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
   const [position, setPosition] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data, error, loading}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
+  const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
   
   const map = useRef(null);
   const zoomChanged = useRef(false);
@@ -119,9 +119,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     const timer = setInterval(async ()=>{
       if (map.current.zoom > MIN_ZOOM) {
         const newBounds = map.current.getBounds();
-        // console.log(loading);
-        // if (!loading)
-          newBounds && getBoundsData(newBounds);
+        newBounds && getBoundsData(newBounds);
       }
     },5000);
     
@@ -184,15 +182,14 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
               position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
               icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
             />
-            {!loading && 
-              notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
-                <Marker
-                  key={idx}
-                  options={{optimized: true}}
-                  position={{lat, lng}}
-                  icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
-                />
-              )}
+            {notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
+              <Marker
+                key={idx}
+                options={{optimized: true}}
+                position={{lat, lng}}
+                icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
+              />
+            )}
           </GoogleMap>}
 
           {error && 

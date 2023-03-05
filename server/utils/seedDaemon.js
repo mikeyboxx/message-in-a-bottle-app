@@ -33,7 +33,7 @@ module.exports = async () => {
 
   const timer = setInterval(async () => {
     ctr = ctr + (ms / 1000);
-    // console.log('seedDaemon', ctr);
+    console.log('seedDaemon', ctr);
 
     if (ctr > 86400) {
       console.log('seedDaemon finished');

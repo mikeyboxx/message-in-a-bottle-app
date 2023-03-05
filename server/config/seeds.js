@@ -1,13 +1,17 @@
 const db = require('./connection');
 const { Note, User } = require('../models');
+const seedDaemon = require('../utils/seedDaemon');
+const movementDaemon = require('../utils/movementDaemon');
 
 db.once('open', async () => {
   
   await Note.deleteMany();
 
-  console.log('notes seeded');
+  console.log('notes deleted');
   
   await User.deleteMany();
+
+  console.log('users deleted');
   
   await User.create({
     firstName: 'Pamela',
@@ -35,5 +39,6 @@ db.once('open', async () => {
 
   console.log('users seeded');
 
-  process.exit();
+  seedDaemon();
+  movementDaemon();
 });
