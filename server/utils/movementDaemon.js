@@ -47,7 +47,7 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
           }
       } catch (err) {
         console.log(err);
-        clearInterval(timer);    
+        return clearInterval(timer); 
       }
     }
   },ms);

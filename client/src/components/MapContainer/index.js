@@ -162,7 +162,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
     }
   },[position, data, notesInProximityHandler]);
 
-  // useEffect(() => {console.log(data)},[data])
+  useEffect(() => {console.log(data)},[data])
 
 
   return (

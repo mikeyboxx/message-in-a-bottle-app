@@ -59,7 +59,7 @@ module.exports = async () => {
             bearing: Math.floor(Math.random() * 360) + 1
           });
       } catch (err) {
-        clearInterval(timer);    
+        return clearInterval(timer);    
       }
     }
   },ms);
