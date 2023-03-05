@@ -1,4 +1,4 @@
-import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import Alert from '@mui/material/Alert';
 import { useLazyQuery } from '@apollo/client';
@@ -31,121 +31,74 @@ const noteIcon = {
 const MIN_ZOOM = 5;
 const DEFAULT_ZOOM = 18;
 
-export default function MapContainer({startingPosition, navActionHandler, navAction, notesInProximityHandler}) {
-  const [position, setPosition] = useState(null);
+export default function MapContainer({position, userAction, userActionHandler, notesInProximityHandler}) {
+  const [googleMap, setGoogleMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
   
-  const map = useRef(null);
-  const zoomChanged = useRef(false);
-  const dragEnd = useRef(false);
+  // get data from the database if zoom level is acceptable
+  const getBoundsData = useCallback(() => {
+    if (googleMap?.zoom > MIN_ZOOM) {
+      const newBounds = googleMap.getBounds();
+      newBounds && getNotesInBounds({
+        variables: {
+          swLat: newBounds.getSouthWest().lat(), 
+          swLng: newBounds.getSouthWest().lng(), 
+          neLat: newBounds.getNorthEast().lat(), 
+          neLng: newBounds.getNorthEast().lng()
+        }
+      });
+    }
+  },[googleMap, getNotesInBounds]);
   
-  // argument passed is a google map bounds object
-  const getBoundsData = useCallback(bounds => {
-    getNotesInBounds({
-      variables: {
-        swLat: bounds.getSouthWest().lat(), 
-        swLng: bounds.getSouthWest().lng(), 
-        neLat: bounds.getNorthEast().lat(), 
-        neLng: bounds.getNorthEast().lng()
-      }
-    });
-  },[getNotesInBounds]);
-
-  // initial map options (zoom, heading, center of the map)
-  const initialMapOptions = useMemo(() => ({
-    zoom: DEFAULT_ZOOM,
-    heading: startingPosition.coords.heading,
-    center: {lat: startingPosition.coords.latitude, lng: startingPosition.coords.longitude}
-  }),[startingPosition]);
-
-  // initialize google map and save in useRef
+  // initialize google map and save in state var
   const onLoad = useCallback(gMap => {
-    gMap.setOptions(initialMapOptions);
-    map.current = gMap;
-  },[initialMapOptions]);
+    gMap.setOptions({
+      zoom: DEFAULT_ZOOM,
+      heading: position?.coords.heading,
+      center: {lat: position?.coords.latitude, lng: position?.coords.longitude}
+    });
+    
+    setGoogleMap(gMap);
+  },[position]);
 
   // track google map events
-  const onDragEnd = useCallback(() => dragEnd.current = true,[]);
-  const onZoomChanged = useCallback(() => zoomChanged.current = true,[]);
+  const onDragEnd = useCallback(() => userActionHandler('dragged'), [userActionHandler]);
+  const onZoomChanged = useCallback(() => userActionHandler('zoomed'), [userActionHandler]);
+  const onBoundsChanged = useCallback(() => getBoundsData(), [getBoundsData]);
   
-  // check if specific google maps events were fired, in order to refresh data based on the new map bounds
-  const onIdle = useCallback(() => {
-    if (zoomChanged.current || dragEnd.current){
-      if (map.current.zoom > MIN_ZOOM) {
-        const newBounds = map.current.getBounds();
-        newBounds && getBoundsData(newBounds)
-      } 
-      else {
-        setNotesInBounds([]);
+// retrieve data from the database every 5 seconds, if zoom level is acceptable
+useEffect(()=>{
+  const timer = setInterval(async () => {
+    // console.log('tick');
+  const newBounds = googleMap.getBounds();
+    getNotesInBounds({
+      variables: {
+        swLat: newBounds.getSouthWest().lat(), 
+        swLng: newBounds.getSouthWest().lng(), 
+        neLat: newBounds.getNorthEast().lat(), 
+        neLng: newBounds.getNorthEast().lng()
       }
+  })}, 5000);
+  return () => clearInterval(timer);
+},[googleMap, getBoundsData, getNotesInBounds]);
 
-      // this will disable the pan and heading of the map
-      if (dragEnd.current || (zoomChanged.current && (map.current.zoom !== DEFAULT_ZOOM )))
-          navActionHandler(null);
 
-      zoomChanged.current = false;
-      dragEnd.current = false;
-    } 
-  },[navActionHandler, getBoundsData]);
-  
-
-  useEffect(()=>{
-    if (position &&  map.current){
-      const newBounds = map.current.getBounds();
-      if (newBounds) {
-        const isInBounds = 
-          position.coords.latitude > newBounds.getSouthWest().lat() && 
-          position.coords.longitude >  newBounds.getSouthWest().lng() && 
-          position.coords.latitude < newBounds.getNorthEast().lat() && 
-          position.coords.longitude <  newBounds.getNorthEast().lng();
-
-        if (map.current.zoom > MIN_ZOOM && isInBounds) {
-          getBoundsData(newBounds)
-        }
-      }   
-
-      if (navAction === 'location'){
-        map.current.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
-        position.coords.accuracy < 10 && map.current.setHeading(position.coords.heading);
-        map.current.setZoom(DEFAULT_ZOOM);
-      }
+// pan the map if gps position changes
+useEffect(()=>{
+  if (position &&  googleMap){
+    if (userAction === 'location'){
+      googleMap.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+      position.coords.accuracy < 10 && googleMap.setHeading(position.coords.heading);
+      googleMap.setZoom(DEFAULT_ZOOM);
     }
-  },[position, navAction, getBoundsData])
-
-  // retrieve data from the database every 60 seconds, if zoom level is acceptable
-  // after initial render, start monitoring the user's gps location
-  useEffect(()=>{
-    const timer = setInterval(async ()=>{
-      if (map.current.zoom > MIN_ZOOM) {
-        const newBounds = map.current.getBounds();
-        newBounds && getBoundsData(newBounds);
-      }
-    },5000);
-    
-    const navId = navigator.geolocation.watchPosition( 
-      newPos => 
-        setPosition(oldPos => 
-          (oldPos?.coords.latitude !== newPos.coords.latitude || 
-           oldPos?.coords.longitude !== newPos.coords.longitude) ? newPos : oldPos),
-      err => console.log(err),
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: Infinity
-      }
-    );
-
-    return () => {
-      navigator.geolocation.clearWatch(navId);
-      clearInterval(timer);
-    }
-  },[getBoundsData]);
+  }
+},[position, userAction, googleMap])
 
 
   // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
-    if (data?.notesInBounds && position && map.current.zoom > MIN_ZOOM) {
+    if (data?.notesInBounds && position && googleMap.zoom > MIN_ZOOM) {
       const arr = data.notesInBounds.map(({note}) => {
         const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
           {lat: position.coords.latitude, lng: position.coords.longitude},
@@ -158,12 +111,9 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
       });
 
       notesInProximityHandler(arr.filter(({inProximity}) => inProximity === true));
-      
       setNotesInBounds(arr);
     }
-  },[position, data, notesInProximityHandler]);
-
-  // useEffect(() => {console.log(loading, data)},[data, loading])
+  },[position, data, googleMap, notesInProximityHandler]);
 
 
   return (
@@ -174,7 +124,7 @@ export default function MapContainer({startingPosition, navActionHandler, navAct
             mapContainerStyle={{height: '100%'}}
             options={defaultMapOptions}
             onLoad={onLoad}
-            onIdle={onIdle}
+            onBoundsChanged={onBoundsChanged}
             onZoomChanged={onZoomChanged}
             onDragEnd={onDragEnd}
           >

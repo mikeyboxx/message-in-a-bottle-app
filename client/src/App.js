@@ -33,25 +33,31 @@ const client = new ApolloClient({
 
 function App() {
   // console.log('App');
-  const [startingPosition, setStartingPosition] = useState(null);
+  const [position, setPosition] = useState(null);
   const [gpsLoadError, setGpsLoadError] = useState(null);
   const {isLoaded, loadError} = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: googleLibraries
   });
-  const [navigationAction, setNavigationAction] = useState('location');
+  const [userAction, userActionHandler] = useState('location');
   const [notesInProximity, setNotesInProximity] = useState([]);
 
   const getGPSLocation = useCallback(() => {
-    navigator.geolocation.getCurrentPosition( 
-      pos => setStartingPosition(pos),
-      err => setGpsLoadError(err),
+    const navId = navigator.geolocation.watchPosition( 
+      newPos => 
+        setPosition(oldPos => 
+          (oldPos?.coords.latitude !== newPos.coords.latitude || 
+           oldPos?.coords.longitude !== newPos.coords.longitude) ? newPos : oldPos),
+      err => {console.log(err); setGpsLoadError(err);},
       {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 0
+        maximumAge: Infinity
       }
     );
+    return () => {
+      navigator.geolocation.clearWatch(navId);
+    }
   },[])
 
   useEffect(()=>{
@@ -61,7 +67,7 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-        {(isLoaded && startingPosition) && 
+        {(isLoaded && position) && 
           <Box 
             sx={{
               display: 'flex', 
@@ -77,12 +83,12 @@ function App() {
                 }px`, 
             }}>
 
-            <TopNav handler={setNavigationAction}/> 
+            <TopNav handler={userActionHandler}/> 
 
             <MapContainer 
-              startingPosition={startingPosition} 
-              navActionHandler={setNavigationAction} 
-              navAction={navigationAction}
+              position={position} 
+              userAction={userAction}
+              userActionHandler={userActionHandler} 
               notesInProximityHandler={setNotesInProximity}  
             />
             
@@ -102,7 +108,7 @@ function App() {
           </Alert>
         }
 
-        {(!isLoaded || !startingPosition) && 
+        {(!isLoaded || !position) && 
           <CircularProgress/>
         }
     </ApolloProvider>

@@ -113,18 +113,18 @@ export default function DrawerContainer({ notesInProximity }) {
 
         <StyledBox sx={{ flex: 1, overflow: 'auto'}}>
           <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
-              {notesInProximity
-                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
-                  const dt = new Date(createdTs);
-                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-                  return ( 
-                    <li key={idx}>
-                        {noteText}<br/><br/> 
-                        By: {noteAuthor} -- {dtString}<br/> 
-                        Distance: {distance.toFixed(1)} meters <hr/> 
-                    </li>)
-                })}
-            </ul>
+            {notesInProximity
+              .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
+                const dt = new Date(createdTs);
+                const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+                return ( 
+                  <li key={idx}>
+                      {noteText}<br/><br/> 
+                      By: {noteAuthor} -- {dtString}<br/> 
+                      Distance: {distance.toFixed(1)} meters <hr/> 
+                  </li>)
+            })}
+          </ul>
         </StyledBox>
       </SwipeableDrawer>
      </Root>
