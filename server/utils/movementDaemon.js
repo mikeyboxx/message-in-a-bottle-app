@@ -2,7 +2,6 @@ const db = require('../config/connection');
 const { Note } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry');
 
-// db.once('open', async () => {
   module.exports = () => {
   console.log('movementDaemon started');
   
