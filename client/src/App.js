@@ -4,11 +4,14 @@ import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apo
 import { setContext } from '@apollo/client/link/context';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
 import Box from '@mui/material/Box';
 
 import MapContainer from './components/MapContainer';
 import TopNav from './components/TopNav';
 import DrawerContainer from './components/DrawerContainer';
+import SignIn from './components/SignIn';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
@@ -39,8 +42,17 @@ function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: googleLibraries
   });
-  const [userAction, userActionHandler] = useState('location');
+  const [userAction, setUserAction] = useState('location');
   const [notesInProximity, setNotesInProximity] = useState([]);
+  const [openSignIn, setOpenSignIn] = useState(userAction === 'signIn');
+
+  // const handleClickOpen = () => {
+  //   setOpenSignIn(true);
+  // };
+
+  const handleClose = () => {
+    setOpenSignIn(false);
+  };
 
   const getGPSLocation = useCallback(() => {
     const navId = navigator.geolocation.watchPosition( 
@@ -64,6 +76,13 @@ function App() {
     getGPSLocation();
   },[getGPSLocation]);
 
+  useEffect(()=>{
+    if (userAction === 'signIn') {
+      setOpenSignIn(true);
+    }
+    setUserAction(null);
+  },[userAction]);
+
 
   return (
     <ApolloProvider client={client}>
@@ -83,18 +102,28 @@ function App() {
                 }px`, 
             }}>
 
-            <TopNav handler={userActionHandler}/> 
+            <TopNav handler={setUserAction}/> 
 
             <MapContainer 
               position={position} 
               userAction={userAction}
-              userActionHandler={userActionHandler} 
+              userActionHandler={setUserAction} 
               notesInProximityHandler={setNotesInProximity}  
             />
             
             {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
+
           </Box>
         }
+          {<Dialog 
+            open={openSignIn}
+            onClose={handleClose}
+            
+            >
+            {/* <Button >X</Button> */}
+            <SignIn/>
+          </Dialog>}
+
 
         {loadError && 
           <Alert variant="filled" severity="error">

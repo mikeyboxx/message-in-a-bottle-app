@@ -93,8 +93,8 @@ useEffect(()=>{
 
 // pan the map if gps position changes
 useEffect(()=>{
-  if (position &&  googleMap){
-    if (userAction === 'location'){
+  if (position && googleMap){
+    if (!['dragged', 'zoomed'].includes(userAction)){
       googleMap.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       position.coords.accuracy < 10 && googleMap.setHeading(position.coords.heading);
       googleMap.setZoom(DEFAULT_ZOOM);

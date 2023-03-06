@@ -44,8 +44,8 @@ export default function BottomNav({handler}) {
       />
       <BottomNavigationAction
         sx={actionStyle}
-        label="Login" 
-        value="login" 
+        label="Sign In" 
+        value="signIn" 
         icon={<LoginOutlinedIcon />} 
       />
     </BottomNavigation>
