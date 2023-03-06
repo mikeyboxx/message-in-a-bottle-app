@@ -35,6 +35,7 @@ export default function MapContainer({position, userAction, userActionHandler, n
   const [googleMap, setGoogleMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
+  const [timer, setTimer] = useState(null);
   
   // get data from the database if zoom level is acceptable
   const getBoundsData = useCallback(() => {
@@ -80,8 +81,14 @@ useEffect(()=>{
         neLng: newBounds.getNorthEast().lng()
       }
   })}, 5000);
+  setTimer(timer);
   return () => clearInterval(timer);
 },[googleMap, getBoundsData, getNotesInBounds]);
+
+useEffect(()=>{
+  clearInterval(timer);
+},[error, timer]);
+
 
 
 // pan the map if gps position changes
@@ -118,7 +125,7 @@ useEffect(()=>{
 
   return (
     <div style={{flex: '1 1 '}}>
-        {position && !error &&
+        {position && !error  &&
           <GoogleMap    
             id={'googleMap'}
             mapContainerStyle={{height: '100%'}}
@@ -144,7 +151,7 @@ useEffect(()=>{
 
           {error && 
             <Alert variant="filled" severity="error">
-              Error loading Data!
+              {error.stack}
             </Alert>
           }
     </div>

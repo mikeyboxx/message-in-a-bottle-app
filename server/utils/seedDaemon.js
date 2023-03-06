@@ -55,7 +55,7 @@ module.exports = async () => {
             noteAuthor: a,
             lat: position.lat,
             lng: position.lng,
-            bearing: Math.floor(Math.random() * 360) + 1
+            // bearing: Math.floor(Math.random() * 360) + 1
           });
       } catch (err) {
         return clearInterval(timer);    
