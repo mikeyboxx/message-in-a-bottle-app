@@ -12,6 +12,7 @@ import MapContainer from './components/MapContainer';
 import TopNav from './components/TopNav';
 import DrawerContainer from './components/DrawerContainer';
 import SignIn from './components/SignIn';
+import Auth from './utils/auth';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
@@ -46,13 +47,6 @@ function App() {
   const [notesInProximity, setNotesInProximity] = useState([]);
   const [openSignIn, setOpenSignIn] = useState(userAction === 'signIn');
 
-  // const handleClickOpen = () => {
-  //   setOpenSignIn(true);
-  // };
-
-  const handleClose = () => {
-    setOpenSignIn(false);
-  };
 
   const getGPSLocation = useCallback(() => {
     const navId = navigator.geolocation.watchPosition( 
@@ -80,7 +74,16 @@ function App() {
     if (userAction === 'signIn') {
       setOpenSignIn(true);
     }
-    setUserAction(null);
+
+    if (userAction === 'signOut') {
+      Auth.logout();
+    }
+
+    if (userAction === 'loggedIn') {
+      setOpenSignIn(false);
+    }
+
+    // setUserAction(null);
   },[userAction]);
 
 
@@ -102,7 +105,7 @@ function App() {
                 }px`, 
             }}>
 
-            <TopNav handler={setUserAction}/> 
+            <TopNav userActionHandler={setUserAction}/> 
 
             <MapContainer 
               position={position} 
@@ -117,11 +120,14 @@ function App() {
         }
           {<Dialog 
             open={openSignIn}
-            onClose={handleClose}
+            onClose={()=>{
+              setOpenSignIn(false);
+              setUserAction('cancelledSignIn')
+            }}
             
             >
             {/* <Button >X</Button> */}
-            <SignIn/>
+            <SignIn userActionHandler={setUserAction} />
           </Dialog>}
 
 

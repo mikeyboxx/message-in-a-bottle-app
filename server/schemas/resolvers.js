@@ -57,13 +57,8 @@ const resolvers = {
       throw new AuthenticationError('Not logged in');
     },
     
-    login: async (parent, { userName, password }, context) => {
-      if (context.user) {
-        throw new AuthenticationError('Already logged in');
-      }
-
+    login: async (parent, { userName, password }) => {
       const user = await User.findOne({ userName });
-      
 
       if (!user) {
         throw new AuthenticationError('Incorrect credentials');
@@ -72,7 +67,7 @@ const resolvers = {
       const correctPw = await user.isCorrectPassword(password);
 
       if (!correctPw) {
-        throw new AuthenticationError('Incorrect credentials');
+        throw new AuthenticationError('Password is incorrect');
       }
 
       const token = signToken(user);

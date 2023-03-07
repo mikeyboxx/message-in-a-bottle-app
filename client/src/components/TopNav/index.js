@@ -5,18 +5,19 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import Auth from '../../utils/auth';
 
 const actionStyle = {
   color: 'purple'
 };
 
-export default function BottomNav({handler}) {
+export default function BottomNav({userActionHandler}) {
   const [value, setValue] = React.useState('location');
 
   const handleChange = React.useCallback((event, newValue) => {
     setValue(newValue);
-    handler(newValue);
-  },[handler]);
+    userActionHandler(newValue);
+  },[userActionHandler]);
 
   return (
     <BottomNavigation 
@@ -42,12 +43,20 @@ export default function BottomNav({handler}) {
         value="favorites"
         icon={<FavoriteIcon />}
       />
-      <BottomNavigationAction
-        sx={actionStyle}
-        label="Sign In" 
-        value="signIn" 
-        icon={<LoginOutlinedIcon />} 
-      />
+
+      {!Auth.loggedIn() ? 
+        <BottomNavigationAction
+          sx={actionStyle}
+          label="Sign In" 
+          value="signIn" 
+          icon={<LoginOutlinedIcon />} 
+        /> :
+        <BottomNavigationAction
+          sx={actionStyle}
+          label="Sign Out" 
+          value="signOut" 
+          icon={<LogoutOutlinedIcon />} 
+        />}
     </BottomNavigation>
   );
 }
