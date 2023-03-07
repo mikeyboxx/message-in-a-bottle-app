@@ -65,7 +65,7 @@ export default function MapContainer({position, userAction, userActionHandler, n
 
   // track google map events
   const onDragEnd = useCallback(() => userActionHandler('dragged'), [userActionHandler]);
-  const onZoomChanged = useCallback(() => userActionHandler('zoomed'), [userActionHandler]);
+  // const onZoomChanged = useCallback(() => userActionHandler('zoomed'), [userActionHandler]);
   const onBoundsChanged = useCallback(() => getBoundsData(), [getBoundsData]);
   
 // retrieve data from the database every 5 seconds, if zoom level is acceptable
@@ -133,7 +133,7 @@ useEffect(()=>{
             options={defaultMapOptions}
             onLoad={onLoad}
             onBoundsChanged={onBoundsChanged}
-            onZoomChanged={onZoomChanged}
+            // onZoomChanged={onZoomChanged}
             onDragEnd={onDragEnd}
           >
             <Marker

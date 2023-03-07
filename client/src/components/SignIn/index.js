@@ -1,57 +1,59 @@
-import { useState, useEffect, useCallback } from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
+import { useState, useCallback } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../utils/mutations';
 import Auth from '../../utils/auth';
 
 
+export default function SignIn({userActionHandler, userAction}) {
+  console.log(userAction);
+  const [login] = useMutation(LOGIN);
+  const [loginError, setLoginError] = useState(null);
 
-
-const theme = createTheme();
-
-export default function SignIn({userActionHandler}) {
-  const [login, { error }] = useMutation(LOGIN);
-
-  const handleSubmit = async event => {
+  const handleSubmit = useCallback(async event => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
 
+    const data = new FormData(event.currentTarget);
+    
     try {
-      const mutationResponse = await login({
+      setLoginError(null);
+      
+      const response = await login({
         variables: { 
           userName: data.get('userName'), 
           password: data.get('password') 
-        },
-      });
-      const response = mutationResponse.data.login;
-      Auth.login(response.token);
-      userActionHandler('loggedIn');
-    } catch (e) {
-      console.log(e);
-    }
+      }});
 
-    // console.log({
-    //   userName: data.get('userName'),
-    //   password: data.get('password'),
-    // });
-  };
+      Auth.login(response.data.login.token);
+
+      // userActionHandler('signedIn');
+      userActionHandler('location');
+    } catch (e) {
+      setLoginError(e);
+    }
+  },[login, userActionHandler]);
+
+  const handleClose = useCallback(async event => {
+    userActionHandler('location');
+  },[userActionHandler]);
 
 
   return (
-    <ThemeProvider theme={theme}>
+    <Dialog 
+      open={userAction === 'signIn'}
+      onClose={handleClose}
+    >
       <Container component="main" maxWidth="xs" >
-        <CssBaseline />
         <Box
           sx={{
             paddingBottom: 2,
@@ -64,10 +66,16 @@ export default function SignIn({userActionHandler}) {
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
+
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Typography component="span" sx={{color: 'red'}}>
+              {loginError ? '*' + loginError?.message : ""}
+            </Typography>
+
             <TextField
               margin="normal"
               required
@@ -77,7 +85,6 @@ export default function SignIn({userActionHandler}) {
               name="userName"
               autoComplete="userName"
               autoFocus
-              // value=" "
             />
             <TextField
               margin="normal"
@@ -88,7 +95,6 @@ export default function SignIn({userActionHandler}) {
               type="password"
               id="password"
               autoComplete="current-password"
-              // value=" "
             />
             <Button
               type="submit"
@@ -104,7 +110,7 @@ export default function SignIn({userActionHandler}) {
                   Forgot password?
                 </Link>
               </Grid>
-              <Grid item>
+              <Grid item >
                 <Link href="#"   variant="body2">
                   Sign Up
                 </Link>
@@ -113,6 +119,6 @@ export default function SignIn({userActionHandler}) {
           </Box>
         </Box>
       </Container>
-    </ThemeProvider>
+    </Dialog>
   );
 }

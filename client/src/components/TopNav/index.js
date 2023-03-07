@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useCallback, useState} from 'react';
 import {BottomNavigation, BottomNavigationAction} from '@mui/material/';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -11,12 +11,17 @@ const actionStyle = {
   color: 'purple'
 };
 
-export default function BottomNav({userActionHandler}) {
-  const [value, setValue] = React.useState('location');
+export default function BottomNav({userAction, userActionHandler}) {
+  const [value, setValue] = useState(userAction);
 
-  const handleChange = React.useCallback((event, newValue) => {
-    setValue(newValue);
+  const handleChange = useCallback((event, newValue) => {
     userActionHandler(newValue);
+
+    // if Sign Out is selected logout user
+    newValue === 'signOut' && Auth.logout();
+    
+    // do not select the icon
+    !['signIn', 'signOut'].includes(newValue) && setValue(newValue);
   },[userActionHandler]);
 
   return (

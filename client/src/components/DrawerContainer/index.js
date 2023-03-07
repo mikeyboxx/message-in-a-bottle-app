@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import { grey } from '@mui/material/colors';
 import {Box, Typography} from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
@@ -37,7 +36,6 @@ export default function DrawerContainer({ notesInProximity }) {
 
   return (
     <Root onClick={toggleDrawer(!open)}>
-      <CssBaseline />
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {

@@ -1,18 +1,17 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect, useCallback, useMemo} from 'react';
 import {useJsApiLoader} from '@react-google-maps/api';
 import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import MapContainer from './components/MapContainer';
 import TopNav from './components/TopNav';
 import DrawerContainer from './components/DrawerContainer';
 import SignIn from './components/SignIn';
-import Auth from './utils/auth';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
@@ -31,7 +30,6 @@ const googleLibraries = ['geometry'];
 const httpLink = createHttpLink({uri: '/graphql'});
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  // link: httpLink,
   cache: new InMemoryCache(),
 });
 
@@ -45,8 +43,20 @@ function App() {
   });
   const [userAction, setUserAction] = useState('location');
   const [notesInProximity, setNotesInProximity] = useState([]);
-  const [openSignIn, setOpenSignIn] = useState(userAction === 'signIn');
 
+  const boxStyle = useMemo(()=>({
+    display: 'flex', 
+    flexDirection: 'column', 
+    height:
+      // this fixes google chrome mobile issue with page height being > screen height
+      `${
+        (/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
+          ? window.screen.height >= window.innerHeight 
+            ? window.innerHeight 
+            : window.screen.height - (window.innerHeight - window.screen.height) 
+          : Math.min(window.screen.height, window.innerHeight))
+      }px`, 
+  }),[]);
 
   const getGPSLocation = useCallback(() => {
     const navId = navigator.geolocation.watchPosition( 
@@ -70,82 +80,41 @@ function App() {
     getGPSLocation();
   },[getGPSLocation]);
 
-  useEffect(()=>{
-    if (userAction === 'signIn') {
-      setOpenSignIn(true);
-    }
-
-    if (userAction === 'signOut') {
-      Auth.logout();
-    }
-
-    if (userAction === 'loggedIn') {
-      setOpenSignIn(false);
-    }
-
-    // setUserAction(null);
-  },[userAction]);
 
 
   return (
     <ApolloProvider client={client}>
-        {(isLoaded && position) && 
-          <Box 
-            sx={{
-              display: 'flex', 
-              flexDirection: 'column', 
-              height:
-               // this fixes google chrome mobile issue with page height being > screen height
-                `${
-                  (/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
-                    ? window.screen.height >= window.innerHeight 
-                      ? window.innerHeight 
-                      : window.screen.height - (window.innerHeight - window.screen.height) 
-                    : Math.min(window.screen.height, window.innerHeight))
-                }px`, 
-            }}>
+      <CssBaseline />
+      <SignIn userAction={userAction} userActionHandler={setUserAction} />
 
-            <TopNav userActionHandler={setUserAction}/> 
+      {(isLoaded && position) && 
+        <Box sx={boxStyle}>
+          <TopNav userAction={userAction} userActionHandler={setUserAction}/> 
+          <MapContainer userAction={userAction} userActionHandler={setUserAction}
+            position={position} 
+            notesInProximityHandler={setNotesInProximity}  
+          />
+          {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
+        </Box>
+      }
 
-            <MapContainer 
-              position={position} 
-              userAction={userAction}
-              userActionHandler={setUserAction} 
-              notesInProximityHandler={setNotesInProximity}  
-            />
-            
-            {notesInProximity.length > 0 && <DrawerContainer notesInProximity={notesInProximity}/>}
+      {loadError && 
+        <Alert variant="filled" severity="error">
+          Error loading Google Maps! <br/>
+          {loadError.message}
+        </Alert>
+      }
 
-          </Box>
-        }
-          {<Dialog 
-            open={openSignIn}
-            onClose={()=>{
-              setOpenSignIn(false);
-              setUserAction('cancelledSignIn')
-            }}
-            
-            >
-            {/* <Button >X</Button> */}
-            <SignIn userActionHandler={setUserAction} />
-          </Dialog>}
+      {gpsLoadError && 
+        <Alert variant="filled" severity="error">
+          GPS error! <br/>
+          {gpsLoadError.message}
+        </Alert>
+      }
 
-
-        {loadError && 
-          <Alert variant="filled" severity="error">
-            Error loading Google Maps!
-          </Alert>
-        }
-
-        {gpsLoadError && 
-          <Alert variant="filled" severity="error">
-            {gpsLoadError}
-          </Alert>
-        }
-
-        {(!isLoaded || !position) && 
-          <CircularProgress/>
-        }
+      {(!isLoaded || !position) && 
+        <CircularProgress/>
+      }
     </ApolloProvider>
   );
 }
