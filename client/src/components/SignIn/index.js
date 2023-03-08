@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { useMutation } from '@apollo/client';
+
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -6,17 +8,15 @@ import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
-
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { useMutation } from '@apollo/client';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+
 import { LOGIN } from '../../utils/mutations';
 import Auth from '../../utils/auth';
 
 
 export default function SignIn({userActionHandler, userAction}) {
-  console.log(userAction);
   const [login] = useMutation(LOGIN);
   const [loginError, setLoginError] = useState(null);
 
@@ -36,7 +36,6 @@ export default function SignIn({userActionHandler, userAction}) {
 
       Auth.login(response.data.login.token);
 
-      // userActionHandler('signedIn');
       userActionHandler('location');
     } catch (e) {
       setLoginError(e);

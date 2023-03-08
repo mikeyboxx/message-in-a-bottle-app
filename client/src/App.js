@@ -12,6 +12,7 @@ import MapContainer from './components/MapContainer';
 import TopNav from './components/TopNav';
 import DrawerContainer from './components/DrawerContainer';
 import SignIn from './components/SignIn';
+// import SignUp from './components/SignUp';
 
 // import {getLatLonBounds} from './utils/trigonometry';
 
@@ -49,13 +50,11 @@ function App() {
     flexDirection: 'column', 
     height:
       // this fixes google chrome mobile issue with page height being > screen height
-      `${
-        (/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
+      `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
           ? window.screen.height >= window.innerHeight 
             ? window.innerHeight 
             : window.screen.height - (window.innerHeight - window.screen.height) 
-          : Math.min(window.screen.height, window.innerHeight))
-      }px`, 
+          : Math.min(window.screen.height, window.innerHeight))}px`, 
   }),[]);
 
   const getGPSLocation = useCallback(() => {

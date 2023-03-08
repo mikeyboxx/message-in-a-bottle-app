@@ -28,13 +28,13 @@ const noteIcon = {
 };
 
 // minimum zoom to retrieve data from database
-const MIN_ZOOM = 5;
+const MIN_ZOOM = 4;
 const DEFAULT_ZOOM = 18;
 
 export default function MapContainer({position, userAction, userActionHandler, notesInProximityHandler}) {
   const [googleMap, setGoogleMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'no-cache'});
+  const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
   const [timer, setTimer] = useState(null);
   
   // get data from the database if zoom level is acceptable
@@ -120,7 +120,9 @@ useEffect(()=>{
 
       notesInProximityHandler(arr.filter(({inProximity}) => inProximity === true));
       setNotesInBounds(arr);
-    }
+    } else
+    setNotesInBounds([]);
+
   },[position, data, googleMap, notesInProximityHandler]);
 
 

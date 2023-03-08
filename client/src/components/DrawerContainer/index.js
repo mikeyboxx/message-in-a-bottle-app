@@ -39,7 +39,7 @@ export default function DrawerContainer({ notesInProximity }) {
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {
-            maxHeight: `calc(50% - ${drawerBleeding}px)`,
+            height: `calc(50% - ${drawerBleeding}px)`,
             overflow: 'visible',
             padding: 15,
             display: 'flex'
