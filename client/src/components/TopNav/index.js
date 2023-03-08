@@ -1,22 +1,28 @@
-import * as React from 'react';
+import {useCallback, useState} from 'react';
 import {BottomNavigation, BottomNavigationAction} from '@mui/material/';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import Auth from '../../utils/auth';
 
 const actionStyle = {
   color: 'purple'
 };
 
-export default function BottomNav({handler}) {
-  const [value, setValue] = React.useState('location');
+export default function BottomNav({userAction, userActionHandler}) {
+  const [value, setValue] = useState(userAction);
 
-  const handleChange = React.useCallback((event, newValue) => {
-    setValue(newValue);
-    handler(newValue);
-  },[handler]);
+  const handleChange = useCallback((event, newValue) => {
+    userActionHandler(newValue);
+
+    // if Sign Out is selected logout user
+    newValue === 'signOut' && Auth.logout();
+    
+    // do not select the icon
+    !['signIn', 'signOut'].includes(newValue) && setValue(newValue);
+  },[userActionHandler]);
 
   return (
     <BottomNavigation 
@@ -42,12 +48,20 @@ export default function BottomNav({handler}) {
         value="favorites"
         icon={<FavoriteIcon />}
       />
-      <BottomNavigationAction
-        sx={actionStyle}
-        label="Login" 
-        value="login" 
-        icon={<LoginOutlinedIcon />} 
-      />
+
+      {!Auth.loggedIn() ? 
+        <BottomNavigationAction
+          sx={actionStyle}
+          label="Sign In" 
+          value="signIn" 
+          icon={<LoginOutlinedIcon />} 
+        /> :
+        <BottomNavigationAction
+          sx={actionStyle}
+          label="Sign Out" 
+          value="signOut" 
+          icon={<LogoutOutlinedIcon />} 
+        />}
     </BottomNavigation>
   );
 }

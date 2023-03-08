@@ -3,10 +3,9 @@ const { Note } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry');
 const getRandomQuote = require('./getRandomQuote');
 
-// db.once('open', async () => {
 module.exports = async () => {
   console.log('seedDaemon started');
-  // await Note.deleteMany();
+
   const distanceInMeters = 8046; // 5 miles
 
   const userTargetArr = [
@@ -56,10 +55,10 @@ module.exports = async () => {
             noteAuthor: a,
             lat: position.lat,
             lng: position.lng,
-            bearing: Math.floor(Math.random() * 360) + 1
+            // bearing: Math.floor(Math.random() * 360) + 1
           });
       } catch (err) {
-        clearInterval(timer);    
+        return clearInterval(timer);    
       }
     }
   },ms);

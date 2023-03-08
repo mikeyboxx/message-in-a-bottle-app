@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import { grey } from '@mui/material/colors';
 import {Box, Typography} from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
@@ -37,11 +36,10 @@ export default function DrawerContainer({ notesInProximity }) {
 
   return (
     <Root onClick={toggleDrawer(!open)}>
-      <CssBaseline />
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {
-            maxHeight: `calc(50% - ${drawerBleeding}px)`,
+            height: `calc(50% - ${drawerBleeding}px)`,
             overflow: 'visible',
             padding: 15,
             display: 'flex'
@@ -113,18 +111,18 @@ export default function DrawerContainer({ notesInProximity }) {
 
         <StyledBox sx={{ flex: 1, overflow: 'auto'}}>
           <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
-              {notesInProximity
-                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
-                  const dt = new Date(createdTs);
-                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-                  return ( 
-                    <li key={idx}>
-                        {noteText}<br/><br/> 
-                        By: {noteAuthor} -- {dtString}<br/> 
-                        Distance: {distance.toFixed(1)} meters <hr/> 
-                    </li>)
-                })}
-            </ul>
+            {notesInProximity
+              .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
+                const dt = new Date(createdTs);
+                const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+                return ( 
+                  <li key={idx}>
+                      {noteText}<br/><br/> 
+                      By: {noteAuthor} -- {dtString}<br/> 
+                      Distance: {distance.toFixed(1)} meters <hr/> 
+                  </li>)
+            })}
+          </ul>
         </StyledBox>
       </SwipeableDrawer>
      </Root>
