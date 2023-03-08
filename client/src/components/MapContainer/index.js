@@ -34,7 +34,7 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer({position, userAction, userActionHandler, notesInProximityHandler}) {
   const [googleMap, setGoogleMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS);
+  const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
   const [timer, setTimer] = useState(null);
   
   // get data from the database if zoom level is acceptable
@@ -71,7 +71,7 @@ export default function MapContainer({position, userAction, userActionHandler, n
 // retrieve data from the database every 5 seconds, if zoom level is acceptable
 useEffect(()=>{
   const timer = setInterval(async () => {
-    // console.log('tick');
+    console.log('tick');
   const newBounds = googleMap.getBounds();
     getNotesInBounds({
       variables: {
@@ -86,7 +86,8 @@ useEffect(()=>{
 },[googleMap, getBoundsData, getNotesInBounds]);
 
 useEffect(()=>{
-  clearInterval(timer);
+  if (error)
+    clearInterval(timer);
 },[error, timer]);
 
 
