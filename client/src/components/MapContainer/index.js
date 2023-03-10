@@ -155,7 +155,7 @@ export default function MapContainer() {
         {position && isLoaded && !error && !loadError &&
           <GoogleMap    
             id={'googleMap'}
-            mapContainerStyle={{height: '100vh'}}
+            mapContainerStyle={{height: '100%'}}
             options={defaultMapOptions}
             onLoad={onLoad}
             onBoundsChanged={onBoundsChanged}
