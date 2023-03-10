@@ -3,8 +3,8 @@ import { setContext } from '@apollo/client/link/context';
 
 import { StateProvider } from './utils/GlobalState';
 import TrackGps from './components/TrackGps';
-import MapContainer from './components/MapContainer';
 import TopNav from './components/TopNav';
+import MapContainer from './components/MapContainer';
 
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem('id_token');
@@ -30,20 +30,8 @@ function App() {
     <ApolloProvider client={client}>
       <StateProvider>
         <TrackGps />
-        <div style={{
-          display: 'flex', 
-          flexDirection: 'column', 
-          height:
-            // this fixes google chrome mobile issue with page height being > screen height
-            `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
-                ? window.screen.height >= window.innerHeight 
-                  ? window.innerHeight 
-                  : window.screen.height - (window.innerHeight - window.screen.height) 
-                : Math.min(window.screen.height, window.innerHeight))}px`, 
-        }}>
         <TopNav />
         <MapContainer />
-        </div>
       </StateProvider>
     </ApolloProvider>
   )

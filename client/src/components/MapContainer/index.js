@@ -12,7 +12,6 @@ import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION, UPDATE_NOTES_IN_PROXIMITY } from '../../utils/actions';
 import DrawerContainer from '../../components/DrawerContainer';
 
-
 const googleLibraries = ['geometry'];
 
 // google maps options
@@ -41,6 +40,7 @@ const noteIcon = {
 // minimum zoom to retrieve data from database
 const MIN_ZOOM = 4;
 const DEFAULT_ZOOM = 18;
+const PROXIMITY_THRESHOLD = 20;
 
 export default function MapContainer() {
   const [{position, userAction, notesInProximity}, dispatch] = useStateContext();
@@ -107,9 +107,6 @@ export default function MapContainer() {
     }
   },[googleMap, getBoundsData]);
 
-  
-  
-
 
   // pan the map if gps state.position changes
   useEffect(()=>{
@@ -131,7 +128,7 @@ export default function MapContainer() {
         return {
           note,
           distance,
-          inProximity: distance < 20
+          inProximity: distance < PROXIMITY_THRESHOLD
         }
       });
 
@@ -151,45 +148,51 @@ export default function MapContainer() {
   }, [error, loadError, timer]);
 
   return (
-    <div style={{flex: '1 1 '}}>
-        {position && isLoaded && !error && !loadError &&
-          <GoogleMap    
-            id={'googleMap'}
-            mapContainerStyle={{height: '100%'}}
-            options={defaultMapOptions}
-            onLoad={onLoad}
-            onBoundsChanged={onBoundsChanged}
-            onZoomChanged={onZoomChanged}
-            onDragEnd={onDragEnd}
-          >
+    <>
+      {position && isLoaded && !error && !loadError &&
+        <GoogleMap    
+          id={'googleMap'}
+          mapContainerStyle={{height: 
+            // this fixes google chrome mobile issue with page height being > screen height
+              `${(/mobile/.test(navigator.userAgent.toLowerCase()) && /chrome/.test(navigator.userAgent.toLowerCase()) 
+                  ? window.screen.height >= window.innerHeight 
+                    ? window.innerHeight 
+                    : window.screen.height - (window.innerHeight - window.screen.height) 
+                  : Math.min(window.screen.height, window.innerHeight)) - 56}px`, }}
+          options={defaultMapOptions}
+          onLoad={onLoad}
+          onBoundsChanged={onBoundsChanged}
+          onZoomChanged={onZoomChanged}
+          onDragEnd={onDragEnd}
+        >
+          <Marker
+            position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
+            icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
+          />
+          {notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
             <Marker
-              position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
-              icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
+              key={idx}
+              options={{optimized: true}}
+              position={{lat, lng}}
+              icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
             />
-            {notesInBounds?.map(({note: {lat, lng}, inProximity}, idx) => 
-              <Marker
-                key={idx}
-                options={{optimized: true}}
-                position={{lat, lng}}
-                icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
-              />
-            )}
-            {notesInProximity.length > 0 && <DrawerContainer />}
-          </GoogleMap>}
+          )}
+          {notesInProximity.length > 0 && <DrawerContainer />}
+        </GoogleMap>}
 
-        {error && 
-          <Alert variant="filled" severity="error">
-            {error.message}
-          </Alert>}
+      {error && 
+        <Alert variant="filled" severity="error">
+          {error.message}
+        </Alert>}
 
-        {loadError && 
-          <Alert variant="filled" severity="error">
-            Error loading Google Maps! <br/>
-            {loadError.message}
-          </Alert>}
+      {loadError && 
+        <Alert variant="filled" severity="error">
+          Error loading Google Maps! <br/>
+          {loadError.message}
+        </Alert>}
 
-        {(!isLoaded || !position) && 
-          <CircularProgress/>}
-    </div>
+      {(!isLoaded || !position) && 
+        <CircularProgress/>}
+    </>
   )
 }

@@ -2,7 +2,6 @@ import {useEffect, useCallback} from 'react';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_GPS_POSITION, UPDATE_ERRORS } from '../../utils/actions';
 
-
 function TrackGps() {
   const [, dispatch] = useStateContext();
 
