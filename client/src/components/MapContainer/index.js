@@ -1,8 +1,19 @@
 import {useState, useCallback, useEffect} from 'react';
-import {GoogleMap, Marker} from '@react-google-maps/api';
-import Alert from '@mui/material/Alert';
 import { useLazyQuery } from '@apollo/client';
+
+import {GoogleMap, Marker} from '@react-google-maps/api';
+import {useJsApiLoader} from '@react-google-maps/api';
+
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
+import { useStateContext } from '../../utils/GlobalState';
+import { UPDATE_USER_ACTION, UPDATE_NOTES_IN_PROXIMITY } from '../../utils/actions';
+import DrawerContainer from '../../components/DrawerContainer';
+
+
+const googleLibraries = ['geometry'];
 
 // google maps options
 const defaultMapOptions = { 
@@ -31,7 +42,12 @@ const noteIcon = {
 const MIN_ZOOM = 4;
 const DEFAULT_ZOOM = 18;
 
-export default function MapContainer({position, userAction, userActionHandler, notesInProximityHandler}) {
+export default function MapContainer() {
+  const [{position, userAction, notesInProximity}, dispatch] = useStateContext();
+  const {isLoaded, loadError} = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    libraries: googleLibraries
+  },[]);
   const [googleMap, setGoogleMap] = useState(null);
   const [notesInBounds, setNotesInBounds] = useState(null);
   const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
@@ -64,48 +80,48 @@ export default function MapContainer({position, userAction, userActionHandler, n
   },[position]);
 
   // track google map events
-  const onDragEnd = useCallback(() => userActionHandler('dragged'), [userActionHandler]);
-  // const onZoomChanged = useCallback(() => userActionHandler('zoomed'), [userActionHandler]);
-  const onBoundsChanged = useCallback(() => getBoundsData(), [getBoundsData]);
+  const onDragEnd = useCallback(() => {
+    dispatch({
+      type: UPDATE_USER_ACTION,
+      userAction: 'dragged',
+    });
+  }, [dispatch]);
+
+  const onZoomChanged = useCallback(() => {
+    dispatch({
+      type: UPDATE_USER_ACTION,
+      userAction: 'zoomed',
+    });
+  }, [dispatch]);
+
+  const onBoundsChanged = useCallback(() => {
+    ['dragged', 'zoomed'].includes(userAction) && getBoundsData(); 
+  }, [getBoundsData, userAction]);
   
-// retrieve data from the database every 5 seconds, if zoom level is acceptable
-useEffect(()=>{
-  const timer = setInterval(async () => {
-    console.log('tick');
-  const newBounds = googleMap.getBounds();
-    getNotesInBounds({
-      variables: {
-        swLat: newBounds.getSouthWest().lat(), 
-        swLng: newBounds.getSouthWest().lng(), 
-        neLat: newBounds.getNorthEast().lat(), 
-        neLng: newBounds.getNorthEast().lng()
-      }
-  })}, 5000);
-  setTimer(timer);
-  return () => clearInterval(timer);
-},[googleMap, getBoundsData, getNotesInBounds]);
+  // retrieve data from the database every 5 seconds, if zoom level is acceptable
+  useEffect(()=>{
+    if (googleMap){
+      const timer = setInterval(async () => getBoundsData(), 5000);
+      setTimer(timer);
+      return () => clearInterval(timer);
+    }
+  },[googleMap, getBoundsData]);
 
-useEffect(()=>{
-  if (error)
-    clearInterval(timer);
-},[error, timer]);
+  
+  
 
 
-
-// pan the map if gps position changes
-useEffect(()=>{
-  if (position && googleMap){
-    // if (!['dragged', 'zoomed'].includes(userAction)){
-    if (userAction === 'location'){
+  // pan the map if gps state.position changes
+  useEffect(()=>{
+    if (position && googleMap && userAction === 'center-map' ){
       googleMap.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       position.coords.accuracy < 10 && googleMap.setHeading(position.coords.heading);
       googleMap.setZoom(DEFAULT_ZOOM);
     }
-  }
-},[position, userAction, googleMap])
+  },[position,  googleMap, userAction])
 
 
-  // each time there is new data from the database or the gps position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
+  // each time there is new data from the database or the gps state.position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
   useEffect(() => {
     if (data?.notesInBounds && position && googleMap.zoom > MIN_ZOOM) {
       const arr = data.notesInBounds.map(({note}) => {
@@ -119,24 +135,31 @@ useEffect(()=>{
         }
       });
 
-      notesInProximityHandler(arr.filter(({inProximity}) => inProximity === true));
+      dispatch({
+        type: UPDATE_NOTES_IN_PROXIMITY,
+        notesInProximity: arr.filter(note => note.inProximity),
+      });
+
       setNotesInBounds(arr);
     } else
     setNotesInBounds([]);
 
-  },[position, data, googleMap, notesInProximityHandler]);
+  },[position, data, googleMap, dispatch]);
 
+  useEffect(()=>{
+    (error || loadError) && clearInterval(timer);
+  }, [error, loadError, timer]);
 
   return (
     <div style={{flex: '1 1 '}}>
-        {position && !error  &&
+        {position && isLoaded && !error && !loadError &&
           <GoogleMap    
             id={'googleMap'}
-            mapContainerStyle={{height: '100%'}}
+            mapContainerStyle={{height: '100vh'}}
             options={defaultMapOptions}
             onLoad={onLoad}
             onBoundsChanged={onBoundsChanged}
-            // onZoomChanged={onZoomChanged}
+            onZoomChanged={onZoomChanged}
             onDragEnd={onDragEnd}
           >
             <Marker
@@ -151,13 +174,22 @@ useEffect(()=>{
                 icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
               />
             )}
+            {notesInProximity.length > 0 && <DrawerContainer />}
           </GoogleMap>}
 
-          {error && 
-            <Alert variant="filled" severity="error">
-              {error.stack}
-            </Alert>
-          }
+        {error && 
+          <Alert variant="filled" severity="error">
+            {error.message}
+          </Alert>}
+
+        {loadError && 
+          <Alert variant="filled" severity="error">
+            Error loading Google Maps! <br/>
+            {loadError.message}
+          </Alert>}
+
+        {(!isLoaded || !position) && 
+          <CircularProgress/>}
     </div>
   )
 }

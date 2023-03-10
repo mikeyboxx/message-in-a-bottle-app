@@ -14,9 +14,12 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import { LOGIN } from '../../utils/mutations';
 import Auth from '../../utils/auth';
+import { useStateContext } from '../../utils/GlobalState';
+import { UPDATE_USER_ACTION } from '../../utils/actions';
 
 
-export default function SignIn({userActionHandler, userAction}) {
+export default function SignIn() {
+  const [{userAction, prevUserAction}, dispatch] = useStateContext();
   const [login] = useMutation(LOGIN);
   const [loginError, setLoginError] = useState(null);
 
@@ -36,15 +39,32 @@ export default function SignIn({userActionHandler, userAction}) {
 
       Auth.login(response.data.login.token);
 
-      userActionHandler('location');
+      dispatch({
+        type: UPDATE_USER_ACTION,
+        userAction: prevUserAction
+      });
+
     } catch (e) {
       setLoginError(e);
     }
-  },[login, userActionHandler]);
+  },[login, dispatch, prevUserAction]);
 
   const handleClose = useCallback(async event => {
-    userActionHandler('location');
-  },[userActionHandler]);
+    event.preventDefault();
+    dispatch({
+      type: UPDATE_USER_ACTION,
+      userAction: prevUserAction
+    });
+  },[dispatch, prevUserAction]);
+
+  const handleSignUpClick = useCallback(async event => {
+    event.preventDefault();
+    dispatch({
+      type: UPDATE_USER_ACTION,
+      userAction: 'signUp',
+      prevUserAction 
+    });
+  },[dispatch, prevUserAction]);
 
 
   return (
@@ -110,7 +130,7 @@ export default function SignIn({userActionHandler, userAction}) {
                 </Link>
               </Grid>
               <Grid item >
-                <Link href="#"   variant="body2">
+                <Link href="#"   variant="body2" onClick={handleSignUpClick}>
                   Sign Up
                 </Link>
               </Grid>
