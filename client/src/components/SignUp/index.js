@@ -1,40 +1,27 @@
-import {useCallback} from "react";
+import {useCallback, useState} from "react";
+import { useMutation } from '@apollo/client';
+
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-// import { makeStyles } from "@mui/styles";
 import Container from "@mui/material/Container";
 import Dialog from '@mui/material/Dialog';
+
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
-
-
-
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
+import { ADD_USER } from '../../utils/mutations';
+import Auth from '../../utils/auth';
 
 export default function SignUp() {
   const [{userAction, prevUserAction}, dispatch] = useStateContext();
+  const [loginError, setLoginError] = useState(null);
+  const [addUser] = useMutation(ADD_USER);
 
   const handleClose = useCallback(async event => {
     dispatch({
@@ -52,6 +39,35 @@ export default function SignUp() {
     });
   },[dispatch, prevUserAction]);
 
+  const handleSubmit = useCallback(async event => {
+    event.preventDefault();
+
+    const data = new FormData(event.currentTarget);
+    
+    try {
+      setLoginError(null);
+      
+      const response = await addUser({
+        variables: { 
+          firstName: data.get('firstName'), 
+          lastName: data.get('lastName'), 
+          email: data.get('email'), 
+          userName: data.get('userName'), 
+          password: data.get('password') 
+      }});
+
+      Auth.login(response.data.addUser.token);
+
+      dispatch({
+        type: UPDATE_USER_ACTION,
+        userAction: prevUserAction
+      });
+
+    } catch (e) {
+      setLoginError(e);
+    }
+  },[addUser, dispatch, prevUserAction]);
+
 
   return (
     <Dialog 
@@ -60,14 +76,26 @@ export default function SignUp() {
     >
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <div >
-          <Avatar >
+        <Box
+          sx={{
+            paddingBottom: 2,
+            paddingTop: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+          >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
+          
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <form  noValidate>
+          <Typography component="span" sx={{color: 'red'}}>
+              {loginError ? '*' + loginError?.message : ""}
+            </Typography>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -103,7 +131,18 @@ export default function SignUp() {
                   autoComplete="email"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="userName"
+                  label="User Name"
+                  id="userName"
+                  autoComplete="userName"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   variant="outlined"
                   required
@@ -115,14 +154,9 @@ export default function SignUp() {
                   autoComplete="current-password"
                 />
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
             </Grid>
             <Button
+              sx={{marginTop:2}}
               type="submit"
               fullWidth
               variant="contained"
@@ -131,16 +165,13 @@ export default function SignUp() {
               Sign Up
             </Button>
             <Grid container justify="flex-end">
-              <Grid item>
+              <Grid item sx={{marginTop:2}}>
                 <Link href="#" variant="body2" onClick={handleSignInClick}>
-                  Already have an account? Sign in
+                  Already have an account? 
                 </Link>
               </Grid>
             </Grid>
-          </form>
-        </div>
-        <Box mt={5}>
-          <Copyright />
+          </Box>
         </Box>
       </Container>
     </Dialog>
