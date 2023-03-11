@@ -5,6 +5,7 @@ import { StateProvider } from './utils/GlobalState';
 import TrackGps from './components/TrackGps';
 import TopNav from './components/TopNav';
 import MapContainer from './components/MapContainer';
+import DrawerContainer from './components/DrawerContainer';
 
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem('id_token');
@@ -24,14 +25,13 @@ const client = new ApolloClient({
 
 
 function App() {
-  console.log('App');
-
   return (
     <ApolloProvider client={client}>
       <StateProvider>
         <TrackGps />
         <TopNav />
         <MapContainer />
+        <DrawerContainer />
       </StateProvider>
     </ApolloProvider>
   )

@@ -6,7 +6,6 @@ function TrackGps() {
   const [, dispatch] = useStateContext();
 
   const getGPSLocation = useCallback(() => {
-    console.log('getGPSLocation');
     const navId = navigator.geolocation.watchPosition( 
       newPos => {
         dispatch({

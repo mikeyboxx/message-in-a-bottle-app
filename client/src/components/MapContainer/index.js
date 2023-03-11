@@ -10,7 +10,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION, UPDATE_NOTES_IN_PROXIMITY } from '../../utils/actions';
-import DrawerContainer from '../../components/DrawerContainer';
 
 const googleLibraries = ['geometry'];
 
@@ -177,7 +176,6 @@ export default function MapContainer() {
               icon={{...noteIcon, fillColor: inProximity  ? "red" : "black"}}  // temporary - changes color of birdie 
             />
           )}
-          {notesInProximity.length > 0 && <DrawerContainer />}
         </GoogleMap>}
 
       {error && 
