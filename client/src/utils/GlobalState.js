@@ -10,15 +10,7 @@ const StateProvider = ({ value = {}, ...props }) => {
     prevUserAction: null,
     position: null,
     notesInProximity: [],
-    // navId: null,
     errors: [],
-    notes: [],
-
-    // products: [],
-    // cart: [],
-    // cartOpen: false,
-    // categories: [],
-    // currentCategory: '',
   });
 
   return <Provider value={[state, dispatch]} {...props} />;

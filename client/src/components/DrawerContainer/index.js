@@ -38,7 +38,7 @@ export default function DrawerContainer() {
 
   return (
     <>
-      {notesInProximity.length && 
+      {notesInProximity?.length > 0 && 
       <Root onClick={toggleDrawer(!open)}>
         <Global
           styles={{
