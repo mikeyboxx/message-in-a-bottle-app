@@ -1,13 +1,19 @@
 import { useReducer } from 'react';
+import {getDistanceFromLatLonInMeters} from './trigonometry';
 import {
   UPDATE_GPS_POSITION,
   UPDATE_ERRORS,
   UPDATE_USER_ACTION,
-  UPDATE_NOTES_IN_PROXIMITY
+  UPDATE_NOTES_IN_BOUNDS,
+  UPDATE_MAP_BOUNDS,
+  UPDATE_CENTER_MAP
 } from './actions';
+
+const PROXIMITY_THRESHOLD = 20;
 
 // The reducer is a function that accepts the current state and an action. It returns a new state based on that action.
 export const reducer = (state, action) => {
+  // console.log(state, action);
   switch (action.type) {
     // Returns a copy of state with an update products array. We use the action.products property and spread it's contents into the new array.
     case UPDATE_GPS_POSITION:
@@ -29,13 +35,34 @@ export const reducer = (state, action) => {
         prevUserAction: action.prevUserAction || state.userAction
       };
 
-    case UPDATE_NOTES_IN_PROXIMITY:
+    case UPDATE_NOTES_IN_BOUNDS: 
+      const arr = action.notesInBounds.map(({note}) => {
+        const distance =  getDistanceFromLatLonInMeters(
+          state.position.coords.latitude, state.position.coords.longitude, note.lat, note.lng);
+        return {
+          note,
+          distance,
+          inProximity: distance < PROXIMITY_THRESHOLD
+        }
+      });
+
       return {
         ...state,
-        notesInProximity: action.notesInProximity,
+        notesInBounds: arr,
       };
 
-    
+    case UPDATE_MAP_BOUNDS:
+      return {
+        ...state,
+        centerMap: action.centerMap !== null ? action.centerMap : state.centerMap,
+        mapBounds: action.mapBounds,
+      };
+
+    case UPDATE_CENTER_MAP:
+      return {
+        ...state,
+        centerMap: action.centerMap,
+      };
 
     // Return the state as is in the event that the `action.type` passed to our reducer was not accounted for by the developers
     // This saves us from a crash.

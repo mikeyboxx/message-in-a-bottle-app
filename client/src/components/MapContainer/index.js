@@ -1,17 +1,10 @@
-import {useState, useCallback, useEffect} from 'react';
-import { useLazyQuery } from '@apollo/client';
-
+import {useState, useCallback, useEffect, useRef} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import {useJsApiLoader} from '@react-google-maps/api';
-
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-
-import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_USER_ACTION, UPDATE_NOTES_IN_PROXIMITY } from '../../utils/actions';
-
-const googleLibraries = ['geometry'];
+import { UPDATE_MAP_BOUNDS } from '../../utils/actions';
 
 // google maps options
 const defaultMapOptions = { 
@@ -39,33 +32,13 @@ const noteIcon = {
 // minimum zoom to retrieve data from database
 const MIN_ZOOM = 4;
 const DEFAULT_ZOOM = 18;
-const PROXIMITY_THRESHOLD = 20;
 
 export default function MapContainer() {
-  const [{position, userAction, notesInProximity}, dispatch] = useStateContext();
-  const {isLoaded, loadError} = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries: googleLibraries
-  },[]);
+  // console.log('MapContainer');
+  const [{position, centerMap, notesInBounds}, dispatch] = useStateContext();
+  const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }, []);
   const [googleMap, setGoogleMap] = useState(null);
-  const [notesInBounds, setNotesInBounds] = useState(null);
-  const [getNotesInBounds, {data, error}] = useLazyQuery(QUERY_NOTES_IN_BOUNDS,{fetchPolicy: 'network-only'});
-  const [timer, setTimer] = useState(null);
-  
-  // get data from the database if zoom level is acceptable
-  const getBoundsData = useCallback(() => {
-    if (googleMap?.zoom > MIN_ZOOM) {
-      const newBounds = googleMap.getBounds();
-      newBounds && getNotesInBounds({
-        variables: {
-          swLat: newBounds.getSouthWest().lat(), 
-          swLng: newBounds.getSouthWest().lng(), 
-          neLat: newBounds.getNorthEast().lat(), 
-          neLng: newBounds.getNorthEast().lng()
-        }
-      });
-    }
-  },[googleMap, getNotesInBounds]);
+  const isDragged = useRef(false);
   
   // initialize google map and save in state var
   const onLoad = useCallback(gMap => {
@@ -79,76 +52,34 @@ export default function MapContainer() {
   },[position]);
 
   // track google map events
-  const onDragEnd = useCallback(() => {
-    dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'dragged',
-    });
-  }, [dispatch]);
+  const onDragEnd = useCallback(() => isDragged.current = true, []);
 
-  const onZoomChanged = useCallback(() => {
-    dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'zoomed',
-    });
-  }, [dispatch]);
+  const onIdle = useCallback(() => {
+      googleMap.getZoom() > MIN_ZOOM && 
+        dispatch({
+          type: UPDATE_MAP_BOUNDS,
+          mapBounds: googleMap.getBounds(),
+          centerMap: googleMap.getZoom() !== DEFAULT_ZOOM || isDragged.current ? false : null
+        });
 
-  const onBoundsChanged = useCallback(() => {
-    ['dragged', 'zoomed'].includes(userAction) && getBoundsData(); 
-  }, [getBoundsData, userAction]);
-  
-  // retrieve data from the database every 5 seconds, if zoom level is acceptable
-  useEffect(()=>{
-    if (googleMap){
-      const timer = setInterval(async () => getBoundsData(), 5000);
-      setTimer(timer);
-      return () => clearInterval(timer);
-    }
-  },[googleMap, getBoundsData]);
-
+      isDragged.current = false;
+  }, [googleMap, dispatch]);
 
   // pan the map if gps state.position changes
   useEffect(()=>{
-    if (position && googleMap && userAction === 'center-map' ){
+    if (position && googleMap && centerMap ){
       googleMap.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       position.coords.accuracy < 10 && googleMap.setHeading(position.coords.heading);
+    };
+    
+    centerMap && googleMap && googleMap.getZoom() !== DEFAULT_ZOOM && 
       googleMap.setZoom(DEFAULT_ZOOM);
-    }
-  },[position,  googleMap, userAction])
+  },[position, googleMap, centerMap]);
 
-
-  // each time there is new data from the database or the gps state.position has changed, calculate the distance and whether the note is in proximity of the user, and set notesInBounds state variable, causing a re-render 
-  useEffect(() => {
-    if (data?.notesInBounds && position && googleMap.zoom > MIN_ZOOM) {
-      const arr = data.notesInBounds.map(({note}) => {
-        const distance =  window.google.maps.geometry.spherical.computeDistanceBetween(
-          {lat: position.coords.latitude, lng: position.coords.longitude},
-          {lat: note.lat, lng: note.lng});
-        return {
-          note,
-          distance,
-          inProximity: distance < PROXIMITY_THRESHOLD
-        }
-      });
-
-      dispatch({
-        type: UPDATE_NOTES_IN_PROXIMITY,
-        notesInProximity: arr.filter(note => note.inProximity),
-      });
-
-      setNotesInBounds(arr);
-    } else
-    setNotesInBounds([]);
-
-  },[position, data, googleMap, dispatch]);
-
-  useEffect(()=>{
-    (error || loadError) && clearInterval(timer);
-  }, [error, loadError, timer]);
 
   return (
     <>
-      {position && isLoaded && !error && !loadError &&
+      {position && isLoaded && !loadError &&
         <GoogleMap    
           id={'googleMap'}
           mapContainerStyle={{height: 
@@ -160,8 +91,7 @@ export default function MapContainer() {
                   : Math.min(window.screen.height, window.innerHeight)) - 56}px`, }}
           options={defaultMapOptions}
           onLoad={onLoad}
-          onBoundsChanged={onBoundsChanged}
-          onZoomChanged={onZoomChanged}
+          onIdle={onIdle}
           onDragEnd={onDragEnd}
         >
           <Marker
@@ -177,11 +107,6 @@ export default function MapContainer() {
             />
           )}
         </GoogleMap>}
-
-      {error && 
-        <Alert variant="filled" severity="error">
-          {error.message}
-        </Alert>}
 
       {loadError && 
         <Alert variant="filled" severity="error">

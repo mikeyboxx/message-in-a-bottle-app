@@ -10,7 +10,7 @@ import SignIn from '../../components/SignIn';
 import SignUp from '../../components/SignUp';
 import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_USER_ACTION } from '../../utils/actions';
+import { UPDATE_USER_ACTION, UPDATE_CENTER_MAP } from '../../utils/actions';
 
 const actionStyle = {
   color: 'purple'
@@ -21,11 +21,17 @@ export default function TopNav() {
   const [value, setValue] = useState(userAction);
 
   const handleChange = useCallback((event, newValue) => {
-    dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: newValue,
-    });
-    // if Sign Out is selected logout user
+    if (newValue === 'centerMap')
+      dispatch({
+        type: UPDATE_CENTER_MAP,
+        centerMap: true,
+      });
+    else
+      dispatch({
+        type: UPDATE_USER_ACTION,
+        userAction: newValue,
+      });
+
     newValue === 'signOut' && Auth.logout();
     
     // do not select the icon
@@ -42,7 +48,7 @@ export default function TopNav() {
         <BottomNavigationAction
           sx={actionStyle}
           label="Location"
-          value="center-map"
+          value="centerMap"
           icon={<LocationOnIcon />}
         />
         <BottomNavigationAction

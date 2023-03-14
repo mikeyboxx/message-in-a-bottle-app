@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 
 import { StateProvider } from './utils/GlobalState';
 import TrackGps from './components/TrackGps';
+import NotesInBounds from './components/NotesInBounds';
 import TopNav from './components/TopNav';
 import MapContainer from './components/MapContainer';
 import DrawerContainer from './components/DrawerContainer';
@@ -29,6 +30,7 @@ function App() {
     <ApolloProvider client={client}>
       <StateProvider>
         <TrackGps />
+        <NotesInBounds />
         <TopNav />
         <MapContainer />
         <DrawerContainer />
