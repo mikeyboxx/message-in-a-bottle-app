@@ -1,10 +1,9 @@
 import {useState, useCallback, useEffect, useRef} from 'react';
 import {GoogleMap, Marker} from '@react-google-maps/api';
 import {useJsApiLoader} from '@react-google-maps/api';
-import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_MAP_BOUNDS } from '../../utils/actions';
+import { UPDATE_MAP_BOUNDS, UPDATE_ERRORS } from '../../utils/actions';
 
 // google maps options
 const defaultMapOptions = { 
@@ -35,7 +34,7 @@ const DEFAULT_ZOOM = 18;
 
 export default function MapContainer() {
   // console.log('MapContainer');
-  const [{position, centerMap, notesInBounds}, dispatch] = useStateContext();
+  const [{position, centerMap, notesInBounds, errors}, dispatch] = useStateContext();
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }, []);
   const [googleMap, setGoogleMap] = useState(null);
   const isDragged = useRef(false);
@@ -43,6 +42,7 @@ export default function MapContainer() {
   // initialize google map and save in state var
   const onLoad = useCallback(gMap => {
     gMap.setOptions({
+      keyboardShortcuts: false,
       zoom: DEFAULT_ZOOM,
       heading: position?.coords.heading,
       center: {lat: position?.coords.latitude, lng: position?.coords.longitude}
@@ -76,6 +76,13 @@ export default function MapContainer() {
       googleMap.setZoom(DEFAULT_ZOOM);
   },[position, googleMap, centerMap]);
 
+  useEffect(() => {
+    loadError && dispatch({
+      type: UPDATE_ERRORS,
+      error: loadError
+    });
+  },[loadError, dispatch]);
+
 
   return (
     <>
@@ -108,14 +115,9 @@ export default function MapContainer() {
           )}
         </GoogleMap>}
 
-      {loadError && 
-        <Alert variant="filled" severity="error">
-          Error loading Google Maps! <br/>
-          {loadError.message}
-        </Alert>}
-
-      {(!isLoaded || !position) && 
-        <CircularProgress/>}
+      {(!isLoaded || !position) && errors.length === 0 &&
+        <CircularProgress/>
+        }
     </>
   )
 }

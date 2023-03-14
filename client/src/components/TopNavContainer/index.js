@@ -6,8 +6,8 @@ import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
-import SignIn from '../../components/SignIn';
-import SignUp from '../../components/SignUp';
+import SignIn from '../SignIn';
+import SignUp from '../SignUp';
 import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION, UPDATE_CENTER_MAP } from '../../utils/actions';
@@ -16,7 +16,7 @@ const actionStyle = {
   color: 'purple'
 };
 
-export default function TopNav() {
+export default function TopNavContainer() {
   const [{userAction}, dispatch] = useStateContext();
   const [value, setValue] = useState(userAction);
 

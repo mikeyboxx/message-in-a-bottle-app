@@ -17,7 +17,6 @@ import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
 
-
 export default function SignIn() {
   const [{userAction, prevUserAction}, dispatch] = useStateContext();
   const [login] = useMutation(LOGIN);
@@ -103,7 +102,6 @@ export default function SignIn() {
               label="User Name"
               name="userName"
               autoComplete="userName"
-              autoFocus
             />
             <TextField
               margin="normal"

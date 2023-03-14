@@ -2,9 +2,10 @@ import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apo
 import { setContext } from '@apollo/client/link/context';
 
 import { StateProvider } from './utils/GlobalState';
-import TrackGps from './components/TrackGps';
-import NotesInBounds from './components/NotesInBounds';
-import TopNav from './components/TopNav';
+import GpsProvider from './components/GpsProvider';
+import NotesInBoundsProvider from './components/NotesInBoundsProvider';
+import ErrorContainer from './components/ErrorContainer';
+import TopNavContainer from './components/TopNavContainer';
 import MapContainer from './components/MapContainer';
 import DrawerContainer from './components/DrawerContainer';
 
@@ -29,11 +30,15 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <StateProvider>
-        <TrackGps />
-        <NotesInBounds />
-        <TopNav />
+
+        <GpsProvider />
+        <NotesInBoundsProvider />
+
+        <TopNavContainer />
+        <ErrorContainer />
         <MapContainer />
         <DrawerContainer />
+
       </StateProvider>
     </ApolloProvider>
   )
