@@ -40,7 +40,7 @@ export default function MapContainer() {
   const [{userAction, prevUserAction, notesInBounds}] = useStateContext();
   const [googleMap, setGoogleMap] = useState(null);
   const [mapBounds, setMapBounds] = useState(null);
-  const [panMap, setPanMap] = useState(null);
+  const [panMap, setPanMap] = useState(true);
   
   // this fixes google chrome mobile issue with page height being > screen height
   const mapStyle = useMemo(() => ({

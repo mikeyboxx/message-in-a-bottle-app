@@ -18,7 +18,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         userAction: action.userAction,
-        prevUserAction: action.prevUserAction || state.userAction
+        prevUserAction: state.userAction === 'location' ? Math.floor(Math.random() * 1000).toString() : state.userAction
       };
 
     case UPDATE_NOTES_IN_BOUNDS: 
