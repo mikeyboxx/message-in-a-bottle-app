@@ -1,23 +1,28 @@
-import {useEffect, useCallback} from 'react';
+import { useEffect, useCallback } from 'react';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_GPS_POSITION, UPDATE_ERRORS } from '../../utils/actions';
 
 function TrackGps() {
+  console.log('TrackGps')
   const [, dispatch] = useStateContext();
 
   const getGPSLocation = useCallback(() => {
-    const navId = navigator.geolocation.watchPosition( 
+    console.log('getGPSLocation')
+    const id = navigator.geolocation.watchPosition( 
       newPos => {
         dispatch({
           type: UPDATE_GPS_POSITION,
           position: newPos,
-        })
+          navId: id
+        });
       },
-      err => 
+      err => {
+        navigator.geolocation.clearWatch(id);
         dispatch({
           type: UPDATE_ERRORS,
-          error: err,
-        }),
+          error: {name: 'getGPSLocation', message: err.message}
+        })
+      },
       {
         enableHighAccuracy: true,
         timeout: 5000,
@@ -25,7 +30,7 @@ function TrackGps() {
       }
     );
 
-    return () => navigator.geolocation.clearWatch(navId)
+    return () => navigator.geolocation.clearWatch(id)
   },[dispatch])
 
   useEffect(()=>{

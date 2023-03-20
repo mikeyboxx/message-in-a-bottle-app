@@ -45,36 +45,27 @@ export const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
 
 
 export const getLatLonBounds = (currLat, currLng, distanceInMeters = 100) =>{
-  const bounds = {
-    NE: {
-      lat: null,
-      lng: null
-    },
-    SW: {
-      lat: null,
-      lng: null
-    },
-  };
+  const bounds = {};
 
   // north
   let {x, y} = circleXY(distanceInMeters, 0);
   let {lat, lng } = getLatLonGivenDistanceAndBearing(currLat, currLng, x, y );
-  bounds.NE.lat = lat;
+  bounds.neLat = lat;
 
   // east
   ({x, y} = circleXY(distanceInMeters, 90));
   ({lat, lng } = getLatLonGivenDistanceAndBearing(currLat, currLng, x, y ));
-  bounds.NE.lng = lng;
+  bounds.neLng = lng;
 
   // south
   ({x, y} = circleXY(distanceInMeters, 180));
   ({lat, lng } = getLatLonGivenDistanceAndBearing(currLat, currLng, x, y ));
-  bounds.SW.lat = lat;
+  bounds.swLat = lat;
 
   // west
   ({x, y} = circleXY(distanceInMeters, 270));
   ({lat, lng } = getLatLonGivenDistanceAndBearing(currLat, currLng, x, y ));
-  bounds.SW.lng = lng;
+  bounds.swLng = lng;
 
  return bounds;
 }

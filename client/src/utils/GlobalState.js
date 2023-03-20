@@ -6,11 +6,10 @@ const { Provider } = StateContext;
 
 const StateProvider = ({ value = {}, ...props }) => {
   const [state, dispatch] = useStateReducer({
-    userAction: 'center-map',
+    userAction: 'centerMap',
     prevUserAction: null,
     position: null,
-    notesInProximity: [],
-    errors: [],
+    notesInBounds: []
   });
 
   return <Provider value={[state, dispatch]} {...props} />;

@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
@@ -30,11 +30,12 @@ const Puller = styled(Box)(({ theme }) => ({
 }));
 
 export default function DrawerContainer() {
-  const [{notesInProximity}, ] = useStateContext();
+  const [{notesInBounds}, ] = useStateContext();
   const [open, setOpen] = useState(false);
-  const toggleDrawer = useCallback((newOpen) => () => {
-    setOpen(newOpen);
-  },[]);
+  const [notesInProximity, setNotesInProximity] = useState([]);
+  const toggleDrawer = useCallback(newOpen => () => setOpen(newOpen), []);
+
+  useEffect(() => setNotesInProximity(notesInBounds.filter(note => note.inProximity)), [notesInBounds])
 
   return (
     <>
