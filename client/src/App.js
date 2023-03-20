@@ -26,27 +26,17 @@ const client = new ApolloClient({
 
 
 function App() {
-  console.log('App');
-  // const {position,  error: gpsError} = useGps();
-  // console.log(position, gpsError);
-  
-  // const bounds = position ? getLatLonBounds(position.coords.latitude, position.coords.longitude, 1000) : {neLat: null, neLng: null, swLat: null, swLng: null};
-  // const {loading, data, error: apolloError} = useNotesInBounds(bounds);
-  // console.log(loading, data, apolloError);
-  
+  // console.log('App');
   
   return (
     <ApolloProvider client={client}>
       <StateProvider>
-          <TopNavContainer />
-          <MapContainer /> 
-           
-          {/* Modals */}
-          <SignIn />
-          <SignUp />
-
-
-        {/* <DrawerContainer /> */}
+        <TopNavContainer />
+        <MapContainer /> 
+          
+        {/* Modals */}
+        <SignIn />
+        <SignUp />
 
       </StateProvider>
     </ApolloProvider>

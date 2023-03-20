@@ -7,8 +7,6 @@ const resolvers = {
     notes: async () => Note.find(),
 
     notesInBounds: async (parent, {swLat, swLng, neLat, neLng, lat, lng}) => {
-      // console.log('notesInBounds');
-      // console.log(lat, lng, swLat, swLng, neLat, neLng);
       const data = await Note.find({
         $and: [
           {lat: {$gt: swLat }},
@@ -26,8 +24,6 @@ const resolvers = {
           inProximity: distance && (distance < 10)
         } 
       });
-
-      // console.log(notes.length);
 
       return notes;
     },
