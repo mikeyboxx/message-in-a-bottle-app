@@ -2,6 +2,8 @@ const { AuthenticationError } = require('apollo-server-express');
 const { Note, User } = require('../models');
 const { signToken } = require('../utils/auth');
 
+const PROXIMITY_THRESHOLD = 50;
+
 const resolvers = {
   Query: {
     notes: async () => Note.find(),
@@ -21,7 +23,7 @@ const resolvers = {
         return {
           note,
           distance,
-          inProximity: distance && (distance < 10)
+          inProximity: distance && (distance < PROXIMITY_THRESHOLD)
         } 
       });
 

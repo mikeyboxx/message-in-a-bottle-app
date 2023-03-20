@@ -17,15 +17,15 @@ const noteIcon = {
 const MAX_NOTES = 200;
 
 function NoteMarkers({mapBounds: {swLat, swLng, neLat, neLng}}) {
-  console.log('NoteMarkers');
-  const [, dispatch] = useStateContext();
+  // console.log('NoteMarkers');
+  const [{position: {coords: {latitude: lat, longitude: lng}}}, dispatch] = useStateContext();
 
 
   const {data, error, loading} = useQuery(
     QUERY_NOTES_IN_BOUNDS, 
     {
       fetchPolicy: 'network-only',
-      variables: {swLat, swLng, neLat, neLng}
+      variables: {swLat, swLng, neLat, neLng, lat, lng}
     }
   );
 

@@ -4,6 +4,7 @@ import { StateProvider } from './utils/GlobalState';
 
 import TopNavContainer from './components/TopNavContainer';
 import MapContainer from './components/MapContainer';
+import DrawerContainer from './components/DrawerContainer';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 
@@ -24,15 +25,14 @@ const client = new ApolloClient({
 });
 
 
-
 function App() {
   // console.log('App');
-  
   return (
     <ApolloProvider client={client}>
       <StateProvider>
-        <TopNavContainer />
-        <MapContainer /> 
+          <TopNavContainer />
+          <MapContainer />
+          <DrawerContainer />
           
         {/* Modals */}
         <SignIn />

@@ -7,7 +7,6 @@ import Alert from '@mui/material/Alert';
 import { useStateContext } from '../../utils/GlobalState';
 import useGps from '../../hooks/useGps'
 import NoteMarkers from '../../components/NoteMarkers'
-import DrawerContainer from '../../components/DrawerContainer';
 
 
 // google maps options
@@ -35,10 +34,10 @@ const alertStyle ={
 const DEFAULT_ZOOM = 18;
 
 export default function MapContainer() {
-  console.log('MapContainer');
+  // console.log('MapContainer');
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY });
   const {position, gpsError} = useGps();
-  const [{userAction, prevUserAction}] = useStateContext();
+  const [{userAction, prevUserAction, notesInBounds}] = useStateContext();
   const [googleMap, setGoogleMap] = useState(null);
   const [mapBounds, setMapBounds] = useState(null);
   const [panMap, setPanMap] = useState(null);
@@ -50,8 +49,8 @@ export default function MapContainer() {
         ? window.screen.height >= window.innerHeight 
           ? window.innerHeight 
           : window.screen.height - (window.innerHeight - window.screen.height) 
-        : Math.min(window.screen.height, window.innerHeight)) - 56}px`
-  }), [])
+        : Math.min(window.screen.height, window.innerHeight)) - (56 + (notesInBounds.filter(note => note.inProximity).length > 0 ? 58 : 0))}px`
+  }), [notesInBounds])
 
   // set the initial map options after api map object is loaded
   const onLoad = useCallback(gMap => {
@@ -127,8 +126,6 @@ export default function MapContainer() {
 
           {mapBounds && 
             <NoteMarkers mapBounds={mapBounds}/>}
-
-          <DrawerContainer />
         </GoogleMap>}
 
       {(!isLoaded || !position) && 

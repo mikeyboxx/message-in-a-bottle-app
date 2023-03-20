@@ -8,7 +8,7 @@ const useGps = () => {
   const [gpsError, setGpsError] = useState(null);
   
   const getGPSLocation = useCallback(() => {
-    console.log('getGPSLocation');
+    // console.log('getGPSLocation');
     const id = navigator.geolocation.watchPosition( 
       newPos => {
         setPosition(newPos);
@@ -18,12 +18,15 @@ const useGps = () => {
         });
       },
       gpsError => {
-        setGpsError({name: 'getGPSLocation', message: gpsError.message});
-        navigator.geolocation.clearWatch(id);
+        if (gpsError.code > 2) {
+          console.log(gpsError);
+          setGpsError({name: 'getGPSLocation', message: gpsError.message});
+          navigator.geolocation.clearWatch(id);
+        }
         
       }, {
         enableHighAccuracy: true,
-        timeout: 5000,
+        timeout: 60000,
         maximumAge: Infinity
       }
     );

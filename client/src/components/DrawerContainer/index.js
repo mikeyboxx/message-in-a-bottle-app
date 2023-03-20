@@ -35,7 +35,9 @@ export default function DrawerContainer() {
   const [notesInProximity, setNotesInProximity] = useState([]);
   const toggleDrawer = useCallback(newOpen => () => setOpen(newOpen), []);
 
-  useEffect(() => setNotesInProximity(notesInBounds.filter(note => note.inProximity)), [notesInBounds])
+  useEffect(() => 
+    setNotesInProximity(notesInBounds.filter(note => note.inProximity))
+  , [notesInBounds])
 
   return (
     <>
@@ -90,7 +92,7 @@ export default function DrawerContainer() {
                   mt: .5,
                 }}
               >
-                {notesInProximity.length}
+                
               </Typography>
 
               <Typography variant="h5" 
@@ -105,12 +107,17 @@ export default function DrawerContainer() {
 
               <Typography variant="h6" 
                 sx={{ 
-                  color: 'purple',
-                  ml: 3,
+                  color: 'red',
+                  ml: 5,
                 }}
               >
-                Pickup Notes 
+                Pickup <span style={{
+                  marginLeft: 5,
+                  marginRight: 5,
+                  
+                }}>{notesInProximity.length}</span> Notes 
               </Typography> 
+
             </div>
           </StyledBox>
 
