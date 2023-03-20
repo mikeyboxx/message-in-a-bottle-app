@@ -19,25 +19,24 @@ import { ADD_USER } from '../../utils/mutations';
 import Auth from '../../utils/auth';
 
 export default function SignUp() {
-  const [{userAction, prevUserAction}, dispatch] = useStateContext();
+  const [{userAction}, dispatch] = useStateContext();
   const [loginError, setLoginError] = useState(null);
   const [addUser] = useMutation(ADD_USER);
 
   const handleClose = useCallback(async event => {
     dispatch({
       type: UPDATE_USER_ACTION,
-      userAction: prevUserAction
+      userAction: 'location'
     });
-  },[dispatch, prevUserAction]);
+  },[dispatch]);
 
   const handleSignInClick = useCallback(async event => {
     event.preventDefault();
     dispatch({
       type: UPDATE_USER_ACTION,
       userAction: 'signIn',
-      prevUserAction 
     });
-  },[dispatch, prevUserAction]);
+  },[dispatch]);
 
   const handleSubmit = useCallback(async event => {
     event.preventDefault();
@@ -60,13 +59,13 @@ export default function SignUp() {
 
       dispatch({
         type: UPDATE_USER_ACTION,
-        userAction: prevUserAction
+        userAction: 'location'
       });
 
     } catch (e) {
       setLoginError(e);
     }
-  },[addUser, dispatch, prevUserAction]);
+  },[addUser, dispatch]);
 
 
   return (

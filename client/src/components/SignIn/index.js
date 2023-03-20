@@ -19,7 +19,7 @@ import { UPDATE_USER_ACTION } from '../../utils/actions';
 
 export default function SignIn() {
   // console.log('SignIn');
-  const [{userAction, prevUserAction}, dispatch] = useStateContext();
+  const [{userAction}, dispatch] = useStateContext();
   const [login] = useMutation(LOGIN);
   const [loginError, setLoginError] = useState(null);
 
@@ -41,30 +41,32 @@ export default function SignIn() {
 
       dispatch({
         type: UPDATE_USER_ACTION,
-        userAction: prevUserAction
+        userAction: 'location'
+        // userAction: prevUserAction
       });
 
     } catch (e) {
       setLoginError(e);
     }
-  },[login, dispatch, prevUserAction]);
+  },[login, dispatch]);
 
   const handleClose = useCallback(async event => {
     event.preventDefault();
     dispatch({
       type: UPDATE_USER_ACTION,
-      userAction: prevUserAction
+      userAction: 'location'
+      // userAction: prevUserAction
     });
-  },[dispatch, prevUserAction]);
+  },[dispatch]);
 
   const handleSignUpClick = useCallback(async event => {
     event.preventDefault();
     dispatch({
       type: UPDATE_USER_ACTION,
       userAction: 'signUp',
-      prevUserAction 
+      // prevUserAction 
     });
-  },[dispatch, prevUserAction]);
+  },[dispatch]);
 
 
   return (
