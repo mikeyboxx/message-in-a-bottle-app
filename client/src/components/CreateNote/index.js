@@ -40,15 +40,13 @@ export default function CreateNote() {
     try {
       setCreateError(null);
       
-      const note = await addNote({
+      await addNote({
         variables: {
           noteText: data.get('noteText'),
           lat: position.coords.latitude,
           lng: position.coords.longitude,
           bearing: null
       }});
-
-      console.log(note);
 
       dispatch({
         type: UPDATE_USER_ACTION,
@@ -92,12 +90,11 @@ export default function CreateNote() {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  sx={{height: 300, width: 400}}
+                  sx={{height: 300, width: 400, }}
                   name="noteText"
                   variant="outlined"
                   multiline
-                  // maxRows={40}
-                  minRows={10}
+                  rows={11}
                   required
                   fullWidth
                   id="noteText"

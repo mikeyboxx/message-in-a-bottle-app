@@ -75,7 +75,6 @@ const resolvers = {
     },
 
     addNote: async (parent, args, context) => {
-      console.log(context.user);
       if (context.user) {
         const note = await Note.create({
           ...args,
