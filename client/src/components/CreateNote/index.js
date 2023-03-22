@@ -62,7 +62,7 @@ export default function CreateNote() {
   return (
     <Dialog 
       open={userAction === 'create'}
-      onClose={handleClose}
+      onClose={handleClose} 
     >
       <Container component="main" maxWidth="xs">
         <Box
@@ -87,21 +87,16 @@ export default function CreateNote() {
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
                 <TextField
-                  sx={{height: 300, width: 400, }}
-                  name="noteText"
                   variant="outlined"
                   multiline
                   rows={11}
                   required
                   fullWidth
                   id="noteText"
+                  name="noteText"
                   label="Note Text"
                 />
-              </Grid>
-            </Grid>
 
             <Button
               sx={{marginTop:2}}

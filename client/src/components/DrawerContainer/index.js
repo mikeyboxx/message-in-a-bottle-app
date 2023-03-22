@@ -2,7 +2,7 @@ import {useState, useCallback, useEffect} from 'react';
 import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
-import {Box, Typography} from '@mui/material';
+import {Box, Typography, Card} from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import {Journals} from 'react-bootstrap-icons';
 
@@ -46,7 +46,7 @@ export default function DrawerContainer() {
         <Global
           styles={{
             '.MuiDrawer-root > .MuiPaper-root': {
-              height: `calc(50% - ${drawerBleeding}px)`,
+              height: `calc(80% - ${drawerBleeding}px)`,
               overflow: 'visible',
               padding: 15,
               display: 'flex'
@@ -121,20 +121,43 @@ export default function DrawerContainer() {
             </div>
           </StyledBox>
 
-          <StyledBox sx={{ flex: 1, overflow: 'auto'}}>
-            <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
+          <StyledBox sx={{  overflow: 'auto', mb: 2}}>
+              {notesInProximity
+                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
+                  const dt = new Date(createdTs);
+                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+                  return ( 
+                      <Card key={idx} sx={{p: 2, m:2, elevation: 15}} raised>
+                        <pre style={{ whiteSpace: 'pre-wrap'}}>
+                          <Typography color="text.secondary">
+                            {noteText}
+                          </Typography>
+                        </pre>
+
+                          <Typography sx={{ml: 2, mt: 1}} variant="body2">
+                            By: {noteAuthor} -- {dtString}
+                          </Typography>
+
+                          <Typography sx={{ml: 2}} variant="body2">
+                            Distance: {distance.toFixed(1)} meters  
+                          </Typography> 
+                      </Card>
+                    )
+              })}
+              
+            {/* <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
               {notesInProximity
                 .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
                   const dt = new Date(createdTs);
                   const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
                   return ( 
                     <li key={idx}>
-                        {noteText}<br/><br/> 
+                        <pre>{noteText}</pre><br/><br/> 
                         By: {noteAuthor} -- {dtString}<br/> 
                         Distance: {distance.toFixed(1)} meters <hr/> 
                     </li>)
               })}
-            </ul>
+            </ul> */}
           </StyledBox>
         </SwipeableDrawer>
       </Root>}
