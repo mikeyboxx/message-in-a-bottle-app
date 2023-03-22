@@ -81,7 +81,7 @@ export default function MapContainer() {
     });
 
     // do not pan map if map is zoomed
-    if (googleMap.getZoom !== DEFAULT_ZOOM){
+    if (googleMap.getZoom() !== DEFAULT_ZOOM){
       setPanMap(false);
     }
   },[googleMap]);
