@@ -10,6 +10,8 @@ const typeDefs = gql`
     password: String
     createdTs: String
     updatedTs: String
+    createdNotes: [Note]
+    ownedNotes: [Note]
   }
 
   type Auth {
@@ -53,8 +55,9 @@ const typeDefs = gql`
     addUser(firstName: String!, lastName: String!, email: String!, userName: String!, password: String!): Auth
     updateUser(firstName: String, lastName: String, email: String, password: String): User
     login(userName: String!, password: String!): Auth
+    
+    addNote(noteText: String!, lat: Float!, lng: Float!, bearing: Int): Note
   }
-
 `;
 
 module.exports = typeDefs;

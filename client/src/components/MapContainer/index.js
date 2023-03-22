@@ -90,7 +90,6 @@ export default function MapContainer() {
   // pan the map if gps position changes and panMap === true
   useEffect(() => {
     if (position && googleMap && panMap){
-      console.log('panMap');
       googleMap.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
       position.coords.accuracy < 10 && googleMap.setHeading(position.coords.heading);
     }
@@ -125,8 +124,7 @@ export default function MapContainer() {
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
 
-          {mapBounds && 
-            <NoteMarkers mapBounds={mapBounds}/>}
+          {mapBounds && <NoteMarkers mapBounds={mapBounds}/>}
         </GoogleMap>}
 
       {(!isLoaded || !position) && 

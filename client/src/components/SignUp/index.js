@@ -1,6 +1,14 @@
 import {useCallback, useState} from "react";
 import { useMutation } from '@apollo/client';
 
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -22,6 +30,11 @@ export default function SignUp() {
   const [{userAction}, dispatch] = useStateContext();
   const [loginError, setLoginError] = useState(null);
   const [addUser] = useMutation(ADD_USER);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword( show => !show);
+  const handleMouseDownPassword = (event) => event.preventDefault();
+
 
   const handleClose = useCallback(async event => {
     dispatch({
@@ -141,16 +154,32 @@ export default function SignUp() {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                />
+                
+                <FormControl>
+                  <InputLabel variant="outlined" sx={{background: 'white', pr:1, pl: 1}}>Password *</InputLabel>
+                  <OutlinedInput
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    fullWidth
+                    notched
+                    autoComplete="current-password"
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+              </FormControl>
+
               </Grid>
             </Grid>
             <Button

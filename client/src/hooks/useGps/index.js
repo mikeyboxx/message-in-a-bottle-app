@@ -11,7 +11,6 @@ const useGps = () => {
     // console.log('getGPSLocation');
     navigator.geolocation.watchPosition( 
       newPos => {
-        console.log(newPos);
         setGpsError(null);
         setPosition(newPos);
         dispatch({

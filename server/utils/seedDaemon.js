@@ -1,12 +1,12 @@
 // const db = require('../config/connection');
-const { Note } = require('../models');
+const { Note, User } = require('../models');
 const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry');
 const getRandomQuote = require('./getRandomQuote');
 
 module.exports = async () => {
   console.log('seedDaemon started');
 
-  const distanceInMeters = 546; // 5 miles
+  const distanceInMeters = 1000; // 5 miles
 
   const userTargetArr = [
     {
@@ -27,16 +27,18 @@ module.exports = async () => {
     // },
   ];
   
-  const ms = 10000;
+  const ms = 5000;
   let ctr = 0;
 
   const timer = setInterval(async () => {
     ctr = ctr + (ms / 1000);
     // console.log('seedDaemon', ctr);
 
-    if (ctr > 86400) {
+    // if (ctr > 86400) {
+    if (ctr > 3600) {
       console.log('seedDaemon finished');
       clearInterval(timer); 
+      process.exit(0);
       return null;
     }
 
@@ -50,15 +52,46 @@ module.exports = async () => {
           let position = getLatLonGivenDistanceAndBearing(lat, lng, x, y );
           let {q, a} = await getRandomQuote();
 
-          await Note.create({
+          const names = a.split(' ');
+          const firstName =  names[0];
+          const lastName = names.length === 1 ? '' : names.length >= 3 ? names[2] : names[1];
+          const userName = firstName + lastName.slice(0,1).toUpperCase() + lastName.slice(1);
+          const email = firstName + '.' +  (lastName || '1') + '@' + 'testmail.com';
+
+          let user = await User.findOne({ userName });
+
+          if (!user) {
+            user = await User.create({
+              firstName,
+              lastName,
+              email,
+              userName,
+              password: 'password12345'
+            });
+            // console.log('created user ', user);
+          }
+
+          const note = await Note.create({
             noteText: q,
-            noteAuthor: a,
+            noteAuthor: userName,
             lat: position.lat,
             lng: position.lng,
             // bearing: Math.floor(Math.random() * 360) + 1
           });
+
+          // console.log('created note ', note);
+
+          const result = await User.findOneAndUpdate(
+            { _id: user._id },
+            { $addToSet: { createdNotes: note._id } },
+            { new: true }
+          );
+
+          // console.log('updated user ', result.id);
+
       } catch (err) {
-        return clearInterval(timer);    
+        console.log(err);
+        process.exit(1);
       }
     }
   },ms);

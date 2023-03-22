@@ -14,7 +14,8 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
 
     if (ctr > 86400) {
       console.log('movementDaemon finished');
-      clearInterval(timer); 
+      clearInterval(timer);
+      process.exit(0); 
       return null;
     }
 

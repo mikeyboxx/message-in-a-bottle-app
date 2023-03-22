@@ -6,18 +6,17 @@ const userSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: true,
       trim: true
     },
     lastName: {
       type: String,
-      required: true,
       trim: true
     },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
+      match: [/.+@.+\..+/, 'Must match an email address!'],
     },
     userName: {
       type: String,
@@ -28,8 +27,20 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 5    
-    }
+      minlength: 6    
+    },
+    createdNotes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Note',
+      },
+    ],
+    ownedNotes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Note',
+      },
+    ],
   },{
     toJSON: {
       virtuals: true,

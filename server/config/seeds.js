@@ -38,4 +38,6 @@ db.once('open', async () => {
   });
 
   console.log('users seeded');
+
+  process.exit(0);
 });

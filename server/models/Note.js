@@ -59,10 +59,8 @@ noteSchema.methods.getDistance = function (lat, lng) {
   return distance;
 }
 
-  const note = mongoose.model('note', noteSchema);
+  const Note = mongoose.model('Note', noteSchema);
 
-
-
-module.exports = note;
+module.exports = Note;
 
 

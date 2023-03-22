@@ -30,7 +30,7 @@ const resolvers = {
       return notes;
     },
 
-    users: async () => User.find(),
+    users: async () => User.find().populate(['createdNotes', 'ownedNotes']),
   },
 
   Mutation: {
@@ -74,7 +74,25 @@ const resolvers = {
       return { token, user };
     },
 
-    
+    addNote: async (parent, { noteText, lat, lng, bearing }, context) => {
+      if (context.user) {
+        const note = await Note.create({
+          noteText,
+          noteAuthor: context.user.username,
+          lat,
+          lng,
+          bearing
+        });
+
+        await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { createdNotes: note._id, ownedNotes: note._id } },
+        );
+
+        return note;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
   }
 };
 
