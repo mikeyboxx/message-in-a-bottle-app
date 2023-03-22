@@ -74,14 +74,12 @@ const resolvers = {
       return { token, user };
     },
 
-    addNote: async (parent, { noteText, lat, lng, bearing }, context) => {
+    addNote: async (parent, args, context) => {
+      console.log(context.user);
       if (context.user) {
         const note = await Note.create({
-          noteText,
-          noteAuthor: context.user.username,
-          lat,
-          lng,
-          bearing
+          ...args,
+          noteAuthor: context.user.userName,
         });
 
         await User.findOneAndUpdate(

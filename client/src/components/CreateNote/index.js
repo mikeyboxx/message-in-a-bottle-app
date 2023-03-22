@@ -1,55 +1,36 @@
 import {useCallback, useState} from "react";
 import { useMutation } from '@apollo/client';
 
-import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Dialog from '@mui/material/Dialog';
+import {Journals} from 'react-bootstrap-icons';
+
 
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
-import { ADD_USER } from '../../utils/mutations';
-import Auth from '../../utils/auth';
+import { ADD_NOTE } from '../../utils/mutations';
 
 export default function CreateNote() {
-  const [{userAction}, dispatch] = useStateContext();
-  const [loginError, setLoginError] = useState(null);
-  const [addUser] = useMutation(ADD_USER);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword( show => !show);
-  const handleMouseDownPassword = (event) => event.preventDefault();
-
+  // const [{userAction, position: {coords: {latitude: lat, longitude: lng}}}, dispatch] = useStateContext();
+  const [{userAction, position}, dispatch] = useStateContext();
+  const [createError, setCreateError] = useState(null);
+  const [addNote] = useMutation(ADD_NOTE);
 
   const handleClose = useCallback(async event => {
+    setCreateError(null);
     dispatch({
       type: UPDATE_USER_ACTION,
       userAction: 'location'
     });
   },[dispatch]);
 
-  const handleSignInClick = useCallback(async event => {
-    event.preventDefault();
-    dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'signIn',
-    });
-  },[dispatch]);
 
   const handleSubmit = useCallback(async event => {
     event.preventDefault();
@@ -57,18 +38,17 @@ export default function CreateNote() {
     const data = new FormData(event.currentTarget);
     
     try {
-      setLoginError(null);
+      setCreateError(null);
       
-      const response = await addUser({
-        variables: { 
-          firstName: data.get('firstName'), 
-          lastName: data.get('lastName'), 
-          email: data.get('email'), 
-          userName: data.get('userName'), 
-          password: data.get('password') 
+      const note = await addNote({
+        variables: {
+          noteText: data.get('noteText'),
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          bearing: null
       }});
 
-      Auth.login(response.data.addUser.token);
+      console.log(note);
 
       dispatch({
         type: UPDATE_USER_ACTION,
@@ -76,18 +56,17 @@ export default function CreateNote() {
       });
 
     } catch (e) {
-      setLoginError(e);
+      setCreateError(e);
     }
-  },[addUser, dispatch]);
+  },[position, addNote, dispatch]);
 
 
   return (
     <Dialog 
-      open={userAction === 'signUp'}
+      open={userAction === 'create'}
       onClose={handleClose}
     >
       <Container component="main" maxWidth="xs">
-        <CssBaseline />
         <Box
           sx={{
             paddingBottom: 2,
@@ -98,90 +77,35 @@ export default function CreateNote() {
           }}
           >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
+            <Journals />
           </Avatar>
           
           <Typography component="h1" variant="h5">
-            Sign up
+            Create Note
           </Typography>
+
           <Typography component="span" sx={{color: 'red'}}>
-              {loginError ? '*' + loginError?.message : ""}
-            </Typography>
+              {createError ? '*' + createError?.message : ""}
+          </Typography>
+
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  autoComplete="fname"
-                  name="firstName"
+                  sx={{height: 300, width: 400}}
+                  name="noteText"
                   variant="outlined"
+                  multiline
+                  // maxRows={40}
+                  minRows={10}
                   required
                   fullWidth
-                  id="firstName"
-                  label="First Name"
+                  id="noteText"
+                  label="Note Text"
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="lname"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="userName"
-                  label="User Name"
-                  id="userName"
-                  autoComplete="userName"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                
-                <FormControl>
-                  <InputLabel variant="outlined" sx={{background: 'white', pr:1, pl: 1}}>Password *</InputLabel>
-                  <OutlinedInput
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    notched
-                    autoComplete="current-password"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-              </FormControl>
-
               </Grid>
             </Grid>
+
             <Button
               sx={{marginTop:2}}
               type="submit"
@@ -189,16 +113,10 @@ export default function CreateNote() {
               variant="contained"
               color="primary"
             >
-              Sign Up
+              Create Note
             </Button>
-            <Grid container justify="flex-end">
-              <Grid item sx={{marginTop:2}}>
-                <Link href="#" variant="body2" onClick={handleSignInClick}>
-                  Already have an account? 
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
+
         </Box>
       </Container>
     </Dialog>

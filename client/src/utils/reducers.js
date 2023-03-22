@@ -6,7 +6,7 @@ import {
   UPDATE_NOTES_IN_BOUNDS,
 } from './actions';
 
-const PROXIMITY_THRESHOLD = 50;
+const PROXIMITY_THRESHOLD = 20;
 
 export const reducer = (state, action) => {
   switch (action.type) {

@@ -6,20 +6,20 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
+// import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Dialog from '@mui/material/Dialog';
+
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
@@ -34,7 +34,6 @@ export default function SignUp() {
 
   const handleClickShowPassword = () => setShowPassword( show => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();
-
 
   const handleClose = useCallback(async event => {
     dispatch({
@@ -87,7 +86,8 @@ export default function SignUp() {
       onClose={handleClose}
     >
       <Container component="main" maxWidth="xs">
-        <CssBaseline />
+        {/* <CssBaseline /> */}
+
         <Box
           sx={{
             paddingBottom: 2,
@@ -104,9 +104,11 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
+
           <Typography component="span" sx={{color: 'red'}}>
               {loginError ? '*' + loginError?.message : ""}
-            </Typography>
+          </Typography>
+
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -120,6 +122,7 @@ export default function SignUp() {
                   label="First Name"
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   variant="outlined"
@@ -131,6 +134,7 @@ export default function SignUp() {
                   autoComplete="lname"
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
@@ -142,6 +146,7 @@ export default function SignUp() {
                   autoComplete="email"
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   variant="outlined"
@@ -153,8 +158,8 @@ export default function SignUp() {
                   autoComplete="userName"
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
-                
                 <FormControl>
                   <InputLabel variant="outlined" sx={{background: 'white', pr:1, pl: 1}}>Password *</InputLabel>
                   <OutlinedInput
@@ -178,10 +183,10 @@ export default function SignUp() {
                       </InputAdornment>
                     }
                   />
-              </FormControl>
-
+                </FormControl>
               </Grid>
             </Grid>
+
             <Button
               sx={{marginTop:2}}
               type="submit"
@@ -191,6 +196,7 @@ export default function SignUp() {
             >
               Sign Up
             </Button>
+
             <Grid container justify="flex-end">
               <Grid item sx={{marginTop:2}}>
                 <Link href="#" variant="body2" onClick={handleSignInClick}>
@@ -198,6 +204,7 @@ export default function SignUp() {
                 </Link>
               </Grid>
             </Grid>
+
           </Box>
         </Box>
       </Container>

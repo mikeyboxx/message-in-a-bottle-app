@@ -7,6 +7,7 @@ import MapContainer from './components/MapContainer';
 import DrawerContainer from './components/DrawerContainer';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import CreateNote from './components/CreateNote';
 
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem('id_token');
@@ -37,6 +38,7 @@ function App() {
         {/* Modals */}
         <SignIn />
         <SignUp />
+        <CreateNote />
 
       </StateProvider>
     </ApolloProvider>
