@@ -9,7 +9,6 @@ const noteIcon = {
 };
 
 export const NoteMarker = React.memo(({note: {note: {lat, lng}, inProximity}}) => {
-  // console.log('NoteMarker');
   return (
     <>
       <Marker

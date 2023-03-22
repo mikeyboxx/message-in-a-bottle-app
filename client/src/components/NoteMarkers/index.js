@@ -7,13 +7,11 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 import { UPDATE_NOTES_IN_BOUNDS } from '../../utils/actions';
 import { NoteMarker } from '../../components/NoteMarker';
 
-
 const MAX_NOTES = 200;
 
 const NoteMarkers = ({mapBounds: {swLat, swLng, neLat, neLng}}) => {
-  // console.log('NoteMarkers');
   const [{notesInBounds}, dispatch] = useStateContext();
-
+  
   const {data, error, loading} = useQuery(
     QUERY_NOTES_IN_BOUNDS, 
     {

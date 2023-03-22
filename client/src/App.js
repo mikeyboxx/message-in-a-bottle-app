@@ -27,19 +27,17 @@ const client = new ApolloClient({
 
 
 function App() {
-  // console.log('App');
   return (
     <ApolloProvider client={client}>
       <StateProvider>
-          <TopNavContainer />
-          <MapContainer />
-          <DrawerContainer />
+        <TopNavContainer />
+        <MapContainer />
+        <DrawerContainer />
           
         {/* Modals */}
         <SignIn />
         <SignUp />
         <CreateNote />
-
       </StateProvider>
     </ApolloProvider>
   )

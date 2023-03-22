@@ -34,7 +34,6 @@ const alertStyle ={
 const DEFAULT_ZOOM = 18;
 
 export default function MapContainer() {
-  // console.log('MapContainer');
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY });
   const {position, gpsError} = useGps();
   const [{userAction, prevUserAction, notesInBounds}] = useStateContext();

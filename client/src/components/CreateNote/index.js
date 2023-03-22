@@ -5,7 +5,6 @@ import { useMutation } from '@apollo/client';
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -18,7 +17,6 @@ import { UPDATE_USER_ACTION } from '../../utils/actions';
 import { ADD_NOTE } from '../../utils/mutations';
 
 export default function CreateNote() {
-  // const [{userAction, position: {coords: {latitude: lat, longitude: lng}}}, dispatch] = useStateContext();
   const [{userAction, position}, dispatch] = useStateContext();
   const [createError, setCreateError] = useState(null);
   const [addNote] = useMutation(ADD_NOTE);

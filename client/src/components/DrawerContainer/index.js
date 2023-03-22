@@ -46,7 +46,7 @@ export default function DrawerContainer() {
         <Global
           styles={{
             '.MuiDrawer-root > .MuiPaper-root': {
-              height: `calc(80% - ${drawerBleeding}px)`,
+              maxHeight: `calc(80% - ${drawerBleeding}px)`,
               overflow: 'visible',
               padding: 15,
               display: 'flex'
@@ -144,20 +144,6 @@ export default function DrawerContainer() {
                       </Card>
                     )
               })}
-              
-            {/* <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
-              {notesInProximity
-                .map(({note: {noteText, noteAuthor, createdTs}, distance}, idx) => { 
-                  const dt = new Date(createdTs);
-                  const dtString = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-                  return ( 
-                    <li key={idx}>
-                        <pre>{noteText}</pre><br/><br/> 
-                        By: {noteAuthor} -- {dtString}<br/> 
-                        Distance: {distance.toFixed(1)} meters <hr/> 
-                    </li>)
-              })}
-            </ul> */}
           </StyledBox>
         </SwipeableDrawer>
       </Root>}

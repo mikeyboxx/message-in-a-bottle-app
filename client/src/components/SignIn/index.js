@@ -18,10 +18,13 @@ import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
 
 export default function SignIn() {
-  // console.log('SignIn');
+  console.log('SignIn');
   const [{userAction}, dispatch] = useStateContext();
   const [login] = useMutation(LOGIN);
   const [loginError, setLoginError] = useState(null);
+
+  console.log('userAction: ', userAction)
+  console.log('loginError: ', loginError)
 
   const handleSubmit = useCallback(async event => {
     event.preventDefault();
@@ -132,7 +135,7 @@ export default function SignIn() {
               </Grid>
             </Grid>
           </Box>
-          
+
         </Box>
       </Container>
     </Dialog>
