@@ -6,7 +6,7 @@ const getRandomQuote = require('./getRandomQuote');
 module.exports = async () => {
   console.log('seedDaemon started');
 
-  const distanceInMeters = 1000; // 5 miles
+  const distanceInMeters = 8046; // 5 miles
 
   const userTargetArr = [
     {
@@ -21,10 +21,10 @@ module.exports = async () => {
     //   lat: 34.1430296,
     //   lng: -118.0996981
     // },
-    // {
-    //   lat: 33.616935,
-    //   lng: -78.999047
-    // },
+    {
+      lat: 33.616935,
+      lng: -78.999047
+    },
   ];
   
   const ms = 5000;
