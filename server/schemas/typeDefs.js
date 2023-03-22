@@ -52,11 +52,28 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    addUser(firstName: String!, lastName: String!, email: String!, userName: String!, password: String!): Auth
-    updateUser(firstName: String, lastName: String, email: String, password: String): User
-    login(userName: String!, password: String!): Auth
+    addUser(
+      firstName: String!, 
+      lastName: String!, 
+      email: String!, 
+      userName: String!, 
+      password: String!): Auth
+
+    updateUser(
+      firstName: String, 
+      lastName: String, 
+      email: String, 
+      password: String): User
+
+    login(
+      userName: String!, 
+      password: String!): Auth
     
-    addNote(noteText: String!, lat: Float!, lng: Float!, bearing: Int): Note
+    addNote(
+      noteText: String!, 
+      lat: Float!, 
+      lng: Float!, 
+      bearing: Int): Note
   }
 `;
 
