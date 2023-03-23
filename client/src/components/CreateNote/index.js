@@ -18,6 +18,7 @@ import {Journals} from 'react-bootstrap-icons';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
 import { ADD_NOTE } from '../../utils/mutations';
+import Auth from '../../utils/auth';
 
 export default function CreateNote() {
   const [{userAction, position}, dispatch] = useStateContext();
@@ -86,7 +87,8 @@ export default function CreateNote() {
           </Typography>
 
           <Typography component="span" sx={{color: 'red'}}>
-              {createError ? '*' + createError?.message : ""}
+              {/* {createError ? '*' + createError?.message : ""} */}
+              {!Auth.loggedIn() ? '* You need to sign in first!' : ""}
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -111,6 +113,7 @@ export default function CreateNote() {
               fullWidth
               variant="contained"
               color="primary"
+              disabled={!Auth.loggedIn() ? true : false}
             >
               Create Note
             </Button>

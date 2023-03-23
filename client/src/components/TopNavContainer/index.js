@@ -5,6 +5,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+
 import { useStateContext } from '../../utils/GlobalState';
 import Auth from '../../utils/auth';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
