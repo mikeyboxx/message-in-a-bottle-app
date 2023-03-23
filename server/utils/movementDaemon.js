@@ -10,9 +10,9 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
 
   const timer = setInterval(async () => {
     ctr = ctr + (ms / 1000);
-    // console.log('movementDaemon', ctr);
 
-    if (ctr > 86400) {
+    // if (ctr > 86400) {
+    if (ctr > 3600) {
       console.log('movementDaemon finished');
       clearInterval(timer);
       process.exit(0); 

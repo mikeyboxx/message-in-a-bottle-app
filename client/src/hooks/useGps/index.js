@@ -8,7 +8,6 @@ const useGps = () => {
   const [gpsError, setGpsError] = useState(null);
   
   const getGPSLocation = useCallback(() => {
-    // console.log('getGPSLocation');
     navigator.geolocation.watchPosition( 
       newPos => {
         setGpsError(null);

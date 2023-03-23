@@ -9,6 +9,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Dialog from '@mui/material/Dialog';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
 import {Journals} from 'react-bootstrap-icons';
 
 
@@ -38,12 +41,14 @@ export default function CreateNote() {
     try {
       setCreateError(null);
       
+      const bearing = data.get('bearing') === 'on' ? Math.floor(Math.random() * 360) + 1 : null; 
+
       await addNote({
         variables: {
           noteText: data.get('noteText'),
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-          bearing: null
+          bearing
       }});
 
       dispatch({
@@ -95,6 +100,10 @@ export default function CreateNote() {
                   name="noteText"
                   label="Note Text"
                 />
+
+            <FormControlLabel 
+              control={<Checkbox size="small" name="bearing"/>} 
+              label="Make the Note Fly" />
 
             <Button
               sx={{marginTop:2}}
