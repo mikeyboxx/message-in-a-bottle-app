@@ -28,7 +28,7 @@ export default function TopNavContainer() {
     newValue === 'signOut' && Auth.logout();
     
     // do not highlight the selected icon
-    !['signIn', 'signOut'].includes(newValue) && setValue(newValue);
+    !['signIn', 'signOut', 'create'].includes(newValue) && setValue(newValue);
   },[dispatch]);
 
   return (
