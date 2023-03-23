@@ -27,15 +27,10 @@ import { ADD_USER } from '../../utils/mutations';
 import Auth from '../../utils/auth';
 
 export default function SignUp() {
-  console.log('SignUp');
   const [{userAction}, dispatch] = useStateContext();
   const [loginError, setLoginError] = useState(null);
   const [addUser] = useMutation(ADD_USER);
   const [showPassword, setShowPassword] = useState(false);
-
-  console.log('userAction: ', userAction)
-  console.log('loginError: ', loginError)
-  console.log('showPassword: ', showPassword)
 
   const handleClickShowPassword = () => setShowPassword( show => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();

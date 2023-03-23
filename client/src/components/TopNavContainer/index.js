@@ -14,13 +14,8 @@ const actionStyle = {
 };
 
 export default function TopNavContainer() {
-  console.log('TopNavContainer');
-
   const [{userAction}, dispatch] = useStateContext();
   const [value, setValue] = useState(userAction);
-
-  console.log('userAction: ', userAction)
-  console.log('value: ', value)
 
   const handleChange = useCallback((event, newValue) => {
     event.preventDefault();
