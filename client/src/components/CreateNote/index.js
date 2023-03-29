@@ -87,8 +87,7 @@ export default function CreateNote() {
           </Typography>
 
           <Typography component="span" sx={{color: 'red'}}>
-              {/* {createError ? '*' + createError?.message : ""} */}
-              {!Auth.loggedIn() ? '* You need to sign in first!' : ""}
+              {!Auth.loggedIn() ? '* You need to sign in first!' : createError ? '*' + createError?.message : ""}
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
