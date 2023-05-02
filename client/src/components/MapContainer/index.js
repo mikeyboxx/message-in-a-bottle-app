@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { useJsApiLoader } from '@react-google-maps/api';
-import { GoogleMap, Marker } from '@react-google-maps/api';
+ import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api';
+
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 
@@ -86,10 +86,12 @@ export default function MapContainer() {
   },[googleMap]);
 
 
-  // pan the map if gps position changes and panMap === true
   useEffect(() => {
+    // pan the map if gps position changes and panMap === true
     if (position && googleMap && panMap){
       googleMap.panTo({lat: position.coords.latitude, lng: position.coords.longitude});
+
+      // change heading only if GPS accuracy is more precise
       position.coords.accuracy < 10 && googleMap.setHeading(position.coords.heading);
     }
     

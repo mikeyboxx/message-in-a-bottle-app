@@ -6,6 +6,8 @@ import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
+// import {Journals} from 'react-bootstrap-icons';
+
 import { useStateContext } from '../../utils/GlobalState';
 import Auth from '../../utils/auth';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
@@ -56,6 +58,7 @@ export default function TopNavContainer() {
           label="Favorites"
           value="favorites"
           icon={<FavoriteIcon />}
+          // icon={<Journals size={22} style={{fontWeight: 'bold', marginBottom: 3}}/>}
         />
 
         {!Auth.loggedIn() ? 
