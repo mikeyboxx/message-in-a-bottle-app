@@ -3,23 +3,20 @@ import {useState, useCallback, useEffect} from 'react';
 import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
+
 import {Box, Typography, Card} from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-// import IconButton from '@mui/material/IconButton';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import BottomNavigation from '@mui/material/BottomNavigation';
 
-import Visibility from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-
 import {Journals} from 'react-bootstrap-icons';
 
 import { useStateContext } from '../../utils/GlobalState';
 
 const actionStyle = {
-  // color: 'purple',
-  // fontSize: 'small',
+  color: 'purple',
   alignItems: 'start',
   padding: 0,
   margin: 0
@@ -148,25 +145,29 @@ export default function DrawerContainer() {
                       <Card key={idx} sx={{p: 2, m:2, elevation: 15}} raised>
 
                           <Typography color="text.secondary">
-                            Created by {noteAuthor}
+                            {noteText}
+                          </Typography>
+
+                          <br/>
+
+                          <Typography color="text.secondary">
+                            Created by: {noteAuthor}
                           </Typography>
 
                           <Typography color="text.secondary">
-                            On {dtString}
+                            On: {dtString}
+                          </Typography>
+
+                          <Typography color="text.secondary">
+                            Distance: {distance.toFixed(2)} meters
                           </Typography>
 
                           <BottomNavigation 
                             value={value} 
-                            onChange={()=>{}}
+                            onChange={(event, newValue)=>{console.log(newValue); setValue(newValue);}}
                             showLabels={true}
                             sx={{}}
                           >
-                            <BottomNavigationAction
-                              sx={actionStyle}
-                              label="Examine"
-                              value="examine"
-                              icon={<Visibility fontSize="small"/>}
-                            />
                             <BottomNavigationAction
                               sx={actionStyle}
                               label="Save"
@@ -179,16 +180,8 @@ export default function DrawerContainer() {
                               value="destroy"
                               icon={<DeleteForeverIcon fontSize="small"/>}
                             />
-
-                            
                           </BottomNavigation>
-                          {/* <IconButton
-                            aria-label="examine note"
-                            onClick={()=>{}}
-                            edge="end"
-                          >
-                            <Visibility />
-                        </IconButton> */}
+                         
                       </Card>
                     )
               })}
