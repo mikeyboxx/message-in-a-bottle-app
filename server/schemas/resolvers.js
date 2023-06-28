@@ -83,7 +83,7 @@ const resolvers = {
 
         await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { createdNotes: note._id, ownedNotes: note._id } },
+          { $addToSet: { createdNotes: note._id } },
         );
 
         return note;
