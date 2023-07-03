@@ -74,6 +74,9 @@ const typeDefs = gql`
       lat: Float!, 
       lng: Float!, 
       bearing: Int): Note
+
+    updateNoteOwner(
+      id: ID): Note 
   }
 `;
 

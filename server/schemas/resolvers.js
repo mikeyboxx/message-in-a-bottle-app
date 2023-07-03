@@ -15,6 +15,8 @@ const resolvers = {
           {lng: {$gt: swLng }},
           {lat: {$lt: neLat }},
           {lng: {$lt: neLng }},
+          {noteOwner: {$exists: false}}
+          // {noteOwner: {$eq: null}}
         ]
       });
       
@@ -55,7 +57,26 @@ const resolvers = {
 
       throw new AuthenticationError('Not logged in');
     },
-    
+
+    updateNoteOwner: async (parent, args, context) => {
+      if (context.user) {
+
+        const note = await Note.findByIdAndUpdate(
+          { _id: args.id },
+          { noteOwner: context.user.userName},
+        );
+
+        await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { ownedNotes: args.id } },
+        );
+
+        return note;
+
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+
     login: async (parent, { userName, password }) => {
       const user = await User.findOne({ userName });
 
