@@ -76,7 +76,7 @@ const typeDefs = gql`
       bearing: Int): Note
 
     updateNoteOwner(
-      id: ID): Note 
+      id: ID!): Note 
   }
 `;
 

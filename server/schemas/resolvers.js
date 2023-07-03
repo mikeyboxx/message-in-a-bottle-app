@@ -32,7 +32,7 @@ const resolvers = {
       return notes;
     },
 
-    users: async () => User.find().populate(['createdNotes', 'ownedNotes']),
+    users: async () => await User.find().populate(['createdNotes', 'ownedNotes']),
   },
 
   Mutation: {
