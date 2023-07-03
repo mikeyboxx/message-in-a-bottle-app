@@ -6,7 +6,7 @@ const PROXIMITY_THRESHOLD = 50;
 
 const resolvers = {
   Query: {
-    notes: async () => Note.find(),
+    notes: async () => await Note.find(),
 
     notesInBounds: async (parent, {swLat, swLng, neLat, neLng, lat, lng}) => {
       const data = await Note.find({
@@ -15,6 +15,10 @@ const resolvers = {
           {lng: {$gt: swLng }},
           {lat: {$lt: neLat }},
           {lng: {$lt: neLng }},
+          {$or: [
+            {noteOwner: {$exists: false}},
+            {noteOwner: null}
+          ]} 
         ]
       });
       
@@ -30,7 +34,7 @@ const resolvers = {
       return notes;
     },
 
-    users: async () => User.find().populate(['createdNotes', 'ownedNotes']),
+    users: async () => await User.find().populate(['createdNotes', 'ownedNotes']),
   },
 
   Mutation: {
@@ -46,7 +50,11 @@ const resolvers = {
     updateUser: async (parent, args, context) => {
       try {
         if (context.user) {
-          const user = await User.findByIdAndUpdate(context.user._id, args, { new: true });
+          const user = await User.findByIdAndUpdate(
+            context.user._id, 
+            args, 
+            { new: true });
+            
           return user;
         }
       } catch (err) {
@@ -55,9 +63,52 @@ const resolvers = {
 
       throw new AuthenticationError('Not logged in');
     },
-    
+
+    pickupNote: async (parent, args, context) => {
+      if (context.user) {
+
+        const note = await Note.findByIdAndUpdate(
+          { _id: args.id },
+          { noteOwner: context.user.userName },
+          { new: true }
+        );
+
+        await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { ownedNotes: args.id } },
+        );
+
+        return note;
+
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+
+    dropNote: async (parent, args, context) => {
+      if (context.user) {
+
+        const note = await Note.findByIdAndUpdate(
+          { _id: args.id },
+          { noteOwner: null,
+            lat: args.lat,
+            lng: args.lng 
+          },
+          { new: true }
+        );
+
+        await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $pull: { ownedNotes: args.id } },
+        );
+
+        return note;
+
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+
     login: async (parent, { userName, password }) => {
-      const user = await User.findOne({ userName });
+      const user = await User.findOne({ userName }).populate(['createdNotes', 'ownedNotes']);
 
       if (!user) {
         throw new AuthenticationError('Incorrect credentials');
@@ -83,7 +134,7 @@ const resolvers = {
 
         await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { createdNotes: note._id, ownedNotes: note._id } },
+          { $addToSet: { createdNotes: note._id } },
         );
 
         return note;

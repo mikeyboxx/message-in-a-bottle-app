@@ -74,6 +74,14 @@ const typeDefs = gql`
       lat: Float!, 
       lng: Float!, 
       bearing: Int): Note
+
+    pickupNote(
+      id: ID!): Note 
+
+    dropNote(
+      id: ID!,
+      lat: Float!
+      lng: Float!): Note 
   }
 `;
 
