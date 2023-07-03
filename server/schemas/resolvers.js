@@ -6,7 +6,7 @@ const PROXIMITY_THRESHOLD = 50;
 
 const resolvers = {
   Query: {
-    notes: async () => Note.find(),
+    notes: async () => await Note.find(),
 
     notesInBounds: async (parent, {swLat, swLng, neLat, neLng, lat, lng}) => {
       const data = await Note.find({
@@ -16,7 +16,6 @@ const resolvers = {
           {lat: {$lt: neLat }},
           {lng: {$lt: neLng }},
           {noteOwner: {$exists: false}}
-          // {noteOwner: {$eq: null}}
         ]
       });
       
@@ -48,7 +47,11 @@ const resolvers = {
     updateUser: async (parent, args, context) => {
       try {
         if (context.user) {
-          const user = await User.findByIdAndUpdate(context.user._id, args, { new: true });
+          const user = await User.findByIdAndUpdate(
+            context.user._id, 
+            args, 
+            { new: true });
+            
           return user;
         }
       } catch (err) {
@@ -64,6 +67,7 @@ const resolvers = {
         const note = await Note.findByIdAndUpdate(
           { _id: args.id },
           { noteOwner: context.user.userName},
+          { new: true }
         );
 
         await User.findOneAndUpdate(
@@ -78,7 +82,7 @@ const resolvers = {
     },
 
     login: async (parent, { userName, password }) => {
-      const user = await User.findOne({ userName });
+      const user = await User.findOne({ userName }).populate(['createdNotes', 'ownedNotes']);
 
       if (!user) {
         throw new AuthenticationError('Incorrect credentials');
