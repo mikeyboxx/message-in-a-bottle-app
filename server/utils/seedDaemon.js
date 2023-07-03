@@ -4,15 +4,15 @@ const { circleXY, getLatLonGivenDistanceAndBearing } = require('./trigonometry')
 const getRandomQuote = require('./getRandomQuote');
 
 module.exports = async () => {
-  console.log('seedDaemon started');
+  console.log('seedDaemon started on: ', new Date.toLocaleString());
 
   const distanceInMeters = 8046; // 5 miles
 
   const userTargetArr = [
-    // {
-    //   lat: 40.5736681,
-    //   lng: -74.0055502
-    // },
+    {
+      lat: 40.5736681,
+      lng: -74.0055502
+    },
     {
       lat: 40.639240,
       lng: -74.001620
@@ -36,7 +36,7 @@ module.exports = async () => {
 
     // if (ctr > 86400) {
     if (ctr > 3600) {
-      console.log('seedDaemon finished');
+      console.log('seedDaemon finished on: ', new Date.toLocaleString());
       clearInterval(timer); 
       process.exit(0);
       return null;
