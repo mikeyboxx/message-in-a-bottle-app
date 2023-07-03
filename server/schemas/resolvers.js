@@ -69,7 +69,7 @@ const resolvers = {
 
         const note = await Note.findByIdAndUpdate(
           { _id: args.id },
-          { noteOwner: context.user.userName},
+          { noteOwner: context.user.userName },
           { new: true }
         );
 
@@ -89,7 +89,10 @@ const resolvers = {
 
         const note = await Note.findByIdAndUpdate(
           { _id: args.id },
-          { noteOwner: null},
+          { noteOwner: null,
+            lat: args.lat,
+            lng: args.lng 
+          },
           { new: true }
         );
 

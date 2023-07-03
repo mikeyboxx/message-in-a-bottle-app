@@ -79,7 +79,9 @@ const typeDefs = gql`
       id: ID!): Note 
 
     dropNote(
-      id: ID!): Note 
+      id: ID!,
+      lat: Float!
+      lng: Float!): Note 
   }
 `;
 
