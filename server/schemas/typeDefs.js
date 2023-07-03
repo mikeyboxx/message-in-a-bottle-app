@@ -75,7 +75,10 @@ const typeDefs = gql`
       lng: Float!, 
       bearing: Int): Note
 
-    updateNoteOwner(
+    addNoteOwner(
+      id: ID!): Note 
+
+    deleteNoteOwner(
       id: ID!): Note 
   }
 `;
