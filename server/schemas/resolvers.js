@@ -19,7 +19,6 @@ const resolvers = {
             {noteOwner: {$exists: false}},
             {noteOwner: null}
           ]} 
-          // {noteOwner: {$exists: false}}
         ]
       });
       
@@ -65,7 +64,7 @@ const resolvers = {
       throw new AuthenticationError('Not logged in');
     },
 
-    addNoteOwner: async (parent, args, context) => {
+    pickupNote: async (parent, args, context) => {
       if (context.user) {
 
         const note = await Note.findByIdAndUpdate(
@@ -85,7 +84,7 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    deleteNoteOwner: async (parent, args, context) => {
+    dropNote: async (parent, args, context) => {
       if (context.user) {
 
         const note = await Note.findByIdAndUpdate(
