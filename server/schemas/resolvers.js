@@ -34,6 +34,17 @@ const resolvers = {
       return notes;
     },
 
+    ownedNotes: async (parent, {}, context) => {
+      if (context.user) {
+        const notes = await Note.find({
+          noteOwner: context.user.userName
+        });
+        
+
+        return notes;
+      }
+    },
+
     users: async () => await User.find().populate(['createdNotes', 'ownedNotes']),
   },
 
