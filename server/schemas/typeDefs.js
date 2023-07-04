@@ -49,7 +49,11 @@ const typeDefs = gql`
       neLng: Float!): [NoteInBounds]
 
     users: [User]
+
+    ownedNotes: [Note] 
   }
+
+  
 
   type Mutation {
     addUser(
