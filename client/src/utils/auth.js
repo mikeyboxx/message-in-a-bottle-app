@@ -15,7 +15,6 @@ const AuthService = {
   isTokenExpired(token) {
     try {
       const decoded = decode(token);
-      console.log(decoded.exp, Date.now() / 1000);
       if (decoded.exp < Date.now() / 1000) {
         this.logout();
         return true;
