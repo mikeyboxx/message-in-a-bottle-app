@@ -7,7 +7,7 @@ import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 import { UPDATE_NOTES_IN_BOUNDS } from '../../utils/actions';
 import { NoteMarker } from '../../components/NoteMarker';
 
-const MAX_NOTES = 200;
+const MAX_NOTES = 150;
 
 const NoteMarkers = ({mapBounds: {swLat, swLng, neLat, neLng}}) => {
   const [{notesInBounds}, dispatch] = useStateContext();
@@ -40,7 +40,7 @@ const NoteMarkers = ({mapBounds: {swLat, swLng, neLat, neLng}}) => {
 
       {notesInBounds.length > MAX_NOTES && 
         <Alert variant="filled" severity="error" sx={{position: 'absolute', top: 0}}>
-            There are over 200 notes in map bounds. Please zoom in for better results...
+            {`There are over ${MAX_NOTES} notes in map bounds. Please zoom in for better results...`}
         </Alert>}
 
       {error && 
