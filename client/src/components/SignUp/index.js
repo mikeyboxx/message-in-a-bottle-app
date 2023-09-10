@@ -8,7 +8,6 @@ import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-// import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
@@ -21,10 +20,10 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
+import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
 import { ADD_USER } from '../../utils/mutations';
-import Auth from '../../utils/auth';
 
 export default function SignUp() {
   const [{userAction}, dispatch] = useStateContext();
@@ -81,133 +80,134 @@ export default function SignUp() {
 
 
   return (
-    <Dialog 
-      open={userAction === 'signUp'}
-      onClose={handleClose}
-    >
-      <Container component="main" maxWidth="xs">
-        {/* <CssBaseline /> */}
+    <>
+     {userAction === 'signUp' &&
+      <Dialog 
+        open={true}
+        onClose={handleClose}
+      >
+        <Container component="main" maxWidth="xs">
+          <Box
+            sx={{
+              paddingBottom: 2,
+              paddingTop: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+            >
+            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+              <LockOutlinedIcon />
+            </Avatar>
+            
+            <Typography component="h1" variant="h5">
+              Sign up
+            </Typography>
 
-        <Box
-          sx={{
-            paddingBottom: 2,
-            paddingTop: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-          >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
+            <Typography component="span" sx={{color: 'red'}}>
+                {loginError ? '*' + loginError?.message : ""}
+            </Typography>
 
-          <Typography component="span" sx={{color: 'red'}}>
-              {loginError ? '*' + loginError?.message : ""}
-          </Typography>
-
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="fname"
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="lname"
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="userName"
-                  label="User Name"
-                  id="userName"
-                  autoComplete="userName"
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <FormControl>
-                  <InputLabel variant="outlined" sx={{background: 'white', pr:1, pl: 1}}>Password *</InputLabel>
-                  <OutlinedInput
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    autoComplete="fname"
+                    name="firstName"
+                    variant="outlined"
                     required
                     fullWidth
-                    notched
-                    autoComplete="current-password"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
+                    id="firstName"
+                    label="First Name"
                   />
-                </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="lname"
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="userName"
+                    label="User Name"
+                    id="userName"
+                    autoComplete="userName"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <FormControl>
+                    <InputLabel variant="outlined" sx={{background: 'white', pr:1, pl: 1}}>Password *</InputLabel>
+                    <OutlinedInput
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      fullWidth
+                      notched
+                      autoComplete="current-password"
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                    />
+                  </FormControl>
+                </Grid>
               </Grid>
-            </Grid>
 
-            <Button
-              sx={{marginTop:2}}
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-            >
-              Sign Up
-            </Button>
+              <Button
+                sx={{marginTop:2}}
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                Sign Up
+              </Button>
 
-            <Grid container justify="flex-end">
-              <Grid item sx={{marginTop:2}}>
-                <Link href="#" variant="body2" onClick={handleSignInClick}>
-                  Already have an account? 
-                </Link>
+              <Grid container justify="flex-end">
+                <Grid item sx={{marginTop:2}}>
+                  <Link href="#" variant="body2" onClick={handleSignInClick}>
+                    Already have an account? 
+                  </Link>
+                </Grid>
               </Grid>
-            </Grid>
 
+            </Box>
           </Box>
-        </Box>
-      </Container>
-    </Dialog>
+        </Container>
+      </Dialog>}
+    </>
   );
 }

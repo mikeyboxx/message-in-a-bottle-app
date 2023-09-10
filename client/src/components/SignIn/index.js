@@ -12,10 +12,10 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-import { LOGIN } from '../../utils/mutations';
 import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
 import { UPDATE_USER_ACTION } from '../../utils/actions';
+import { LOGIN } from '../../utils/mutations';
 
 export default function SignIn() {
   const [{userAction}, dispatch] = useStateContext();
@@ -66,74 +66,77 @@ export default function SignIn() {
 
 
   return (
-    <Dialog 
-      open={userAction === 'signIn'}
-      onClose={handleClose}
-    >
-      <Container component="main" maxWidth="xs" >
-        <Box
-          sx={{
-            paddingBottom: 2,
-            paddingTop: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
+    <>
+     {userAction === 'signIn' &&
+      <Dialog 
+        open={true}
+        onClose={handleClose}
+      >
+        <Container component="main" maxWidth="xs" >
+          <Box
+            sx={{
+              paddingBottom: 2,
+              paddingTop: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+              <LockOutlinedIcon />
+            </Avatar>
 
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <Typography component="span" sx={{color: 'red'}}>
-              {loginError ? '*' + loginError?.message : ""}
+            <Typography component="h1" variant="h5">
+              Sign in
             </Typography>
 
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="userName"
-              label="User Name"
-              name="userName"
-              autoComplete="userName"
-            />
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              <Typography component="span" sx={{color: 'red'}}>
+                {loginError ? '*' + loginError?.message : ""}
+              </Typography>
 
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="userName"
+                label="User Name"
+                name="userName"
+                autoComplete="userName"
+              />
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+              />
 
-            <Grid container>
-              <Grid item >
-                <Link href="#"   variant="body2" onClick={handleSignUpClick}>
-                  Don't have an account? 
-                </Link>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign In
+              </Button>
+
+              <Grid container>
+                <Grid item >
+                  <Link href="#"   variant="body2" onClick={handleSignUpClick}>
+                    Don't have an account? 
+                  </Link>
+                </Grid>
               </Grid>
-            </Grid>
-          </Box>
+            </Box>
 
-        </Box>
-      </Container>
-    </Dialog>
+          </Box>
+        </Container>
+      </Dialog>}
+    </>
   );
 }
