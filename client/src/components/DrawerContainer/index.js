@@ -1,17 +1,17 @@
-import {useState, useCallback, useEffect} from 'react';
+import { useState, useCallback } from 'react';
 
 import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 
-import {Box, Typography, Card} from '@mui/material';
+import { Box, Typography, Card } from '@mui/material';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import BottomNavigation from '@mui/material/BottomNavigation';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import {Journals} from 'react-bootstrap-icons';
+import { Journals } from 'react-bootstrap-icons';
 
 import { useStateContext } from '../../utils/GlobalState';
 
@@ -44,15 +44,11 @@ const Puller = styled(Box)(({ theme }) => ({
 }));
 
 export default function DrawerContainer() {
-  const [{notesInBounds}, ] = useStateContext();
+  const [{ notesInProximity }] = useStateContext();
   const [open, setOpen] = useState(false);
-  const [notesInProximity, setNotesInProximity] = useState([]);
   const toggleDrawer = useCallback(newOpen => () => setOpen(newOpen), []);
   const [value, setValue] = useState(null);
 
-  useEffect(() => 
-    setNotesInProximity(notesInBounds.filter(note => note.inProximity))
-  , [notesInBounds])
 
   return (
     <>

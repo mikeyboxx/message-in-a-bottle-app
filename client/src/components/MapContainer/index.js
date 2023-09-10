@@ -36,7 +36,7 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer() {
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY });
   const {position, gpsError} = useGps();
-  const [{userAction, prevUserAction, notesInBounds}] = useStateContext();
+  const [{userAction, prevUserAction, notesInProximity}] = useStateContext();
   const [googleMap, setGoogleMap] = useState(null);
   const [mapBounds, setMapBounds] = useState(null);
   const [panMap, setPanMap] = useState(true);
@@ -48,8 +48,8 @@ export default function MapContainer() {
         ? window.screen.height >= window.innerHeight 
           ? window.innerHeight 
           : window.screen.height - (window.innerHeight - window.screen.height) 
-        : Math.min(window.screen.height, window.innerHeight)) - (56 + (notesInBounds.filter(note => note.inProximity).length > 0 ? 58 : 0))}px`
-  }), [notesInBounds])
+        : Math.min(window.screen.height, window.innerHeight)) - (56 + (notesInProximity.length > 0 ? 58 : 0))}px`
+  }), [notesInProximity])
 
   // set the initial map options after api map object is loaded
   const onLoad = useCallback(gMap => {

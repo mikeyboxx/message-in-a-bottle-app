@@ -37,6 +37,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         notesInBounds: arr,
+        notesInProximity: arr.filter(note => note.inProximity)
       };
       
     default:
