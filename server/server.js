@@ -49,7 +49,12 @@ const startApolloServer = async (typeDefs, resolvers) => {
   }
   
   db.once('open', () => {
-    movementDaemon();
+    movementDaemon(
+      {
+        timeIntervalMilliSecs: 5000, // time interval to update database with new lat/lng for notes that fly
+        distanceInMeters: 15     // distance in meters that is used to calculate new lat/lng, using note bearing, simulating flying speed
+      }
+    );
     app.listen(PORT, '0.0.0.0', () => {  
       console.log(`API server running on port ${PORT}!`);
       console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`)
