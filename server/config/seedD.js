@@ -5,13 +5,13 @@ db.once('open', async () => {
   seedDaemon({
     distanceInMeters: 546,
     userTargetArr: [
-      {
-        lat: 40.5736681,
-        lng: -74.0055502
+      { // h
+        lat: 40.573546,
+        lng: -74.005546
       },
-      {
-        lat: 40.639240,
-        lng: -74.001620
+      { // oceana
+        lat: 40.576804,
+        lng: -73.956923
       }
     ], 
     timeIntervalMilliSecs: 10000,  
