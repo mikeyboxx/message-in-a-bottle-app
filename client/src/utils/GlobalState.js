@@ -10,7 +10,8 @@ const StateProvider = ({ value = {}, ...props }) => {
     prevUserAction: null,
     position: null,
     notesInBounds: [],
-    notesInProximity: []
+    notesInProximity: [],
+    mapBounds: null
   });
 
   return <Provider value={[state, dispatch]} {...props} />;
