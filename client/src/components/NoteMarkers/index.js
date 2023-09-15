@@ -9,15 +9,15 @@ import { NoteMarker } from '../../components/NoteMarker';
 
 const MAX_NOTES = 150;
 
-const NoteMarkers = ({mapBounds: {swLat, swLng, neLat, neLng}}) => {
-  const [{notesInBounds}, dispatch] = useStateContext();
+const NoteMarkers = () => {
+  const [{ mapBounds }, dispatch] = useStateContext();
   
   const {data, error, loading} = useQuery(
     QUERY_NOTES_IN_BOUNDS, 
     {
       fetchPolicy: 'network-only',
       pollInterval: 5000,
-      variables: {swLat, swLng, neLat, neLng}
+      variables: {...mapBounds}
     }
   );
 
@@ -31,14 +31,14 @@ const NoteMarkers = ({mapBounds: {swLat, swLng, neLat, neLng}}) => {
 
   return (
     <>
-      {notesInBounds?.length <= MAX_NOTES && 
-        notesInBounds?.map((note, idx) => 
+      {data?.notesInBounds.length <= MAX_NOTES && 
+        data?.notesInBounds.map((note, idx) => 
           <NoteMarker key={idx} note={note} />)}
 
       {loading && 
         <CircularProgress/>}
 
-      {notesInBounds.length > MAX_NOTES && 
+      {data?.notesInBounds.length > MAX_NOTES && 
         <Alert variant="filled" severity="error" sx={{position: 'absolute', top: 0}}>
             {`There are over ${MAX_NOTES} notes in map bounds. Please zoom in for better results...`}
         </Alert>}

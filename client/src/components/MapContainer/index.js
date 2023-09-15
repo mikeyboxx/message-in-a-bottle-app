@@ -7,6 +7,7 @@ import Alert from '@mui/material/Alert';
 import { useStateContext } from '../../utils/GlobalState';
 import useGps from '../../hooks/useGps'
 import NoteMarkers from '../../components/NoteMarkers'
+import { UPDATE_GOOGLE_MAP_BOUNDS } from '../../utils/actions';
 
 
 // google maps options
@@ -36,9 +37,8 @@ const DEFAULT_ZOOM = 18;
 export default function MapContainer() {
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY });
   const {position, gpsError} = useGps();
-  const [{userAction, prevUserAction, notesInProximity}] = useStateContext();
+  const [{userAction, prevUserAction, notesInProximity}, dispatch] = useStateContext();
   const [googleMap, setGoogleMap] = useState(null);
-  const [mapBounds, setMapBounds] = useState(null);
   const [panMap, setPanMap] = useState(true);
   
   // this fixes google chrome mobile issue with page height being > screen height
@@ -72,18 +72,21 @@ export default function MapContainer() {
   const onIdle = useCallback(() => {
     const bounds = googleMap.getBounds();
 
-    setMapBounds({
-      swLat: bounds.getSouthWest().lat(), 
-      swLng: bounds.getSouthWest().lng(), 
-      neLat: bounds.getNorthEast().lat(), 
-      neLng: bounds.getNorthEast().lng()
+    dispatch({
+      type: UPDATE_GOOGLE_MAP_BOUNDS,
+      mapBounds: {
+        swLat: bounds.getSouthWest().lat(), 
+        swLng: bounds.getSouthWest().lng(), 
+        neLat: bounds.getNorthEast().lat(), 
+        neLng: bounds.getNorthEast().lng()
+      }
     });
 
     // do not pan map if map is zoomed
     if (googleMap.getZoom() !== DEFAULT_ZOOM){
       setPanMap(false);
     }
-  },[googleMap]);
+  },[googleMap, dispatch]);
 
 
   useEffect(() => {
@@ -125,7 +128,7 @@ export default function MapContainer() {
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
 
-          {mapBounds && <NoteMarkers mapBounds={mapBounds}/>}
+          <NoteMarkers />
         </GoogleMap>}
 
       {(!isLoaded || !position) && 

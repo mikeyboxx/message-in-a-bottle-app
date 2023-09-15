@@ -4,6 +4,7 @@ import {
   UPDATE_GPS_POSITION,
   UPDATE_USER_ACTION,
   UPDATE_NOTES_IN_BOUNDS,
+  UPDATE_GOOGLE_MAP_BOUNDS
 } from './actions';
 
 const PROXIMITY_THRESHOLD = 20;
@@ -39,6 +40,12 @@ export const reducer = (state, action) => {
         notesInBounds: arr,
         notesInProximity: arr.filter(note => note.inProximity)
       };
+
+    case UPDATE_GOOGLE_MAP_BOUNDS:
+      return {
+        ...state,
+        mapBounds: action.mapBounds,
+      }  
       
     default:
       return state;
