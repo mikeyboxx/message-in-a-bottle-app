@@ -6,11 +6,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 
 import { useStateContext } from '../../utils/GlobalState';
-import useGps from '../../hooks/useGps'
-import { NoteMarker } from '../../components/NoteMarker';
 import { UPDATE_NOTES_IN_BOUNDS, UPDATE_MENU_ACTION } from '../../utils/actions';
 import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
-
+import { NoteMarker } from '../../components/NoteMarker';
 
 // google maps options
 const defaultMapOptions = { 
@@ -39,8 +37,7 @@ const MAX_NOTES = 150;
 
 export default function MapContainer() {
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY });
-  const {position, gpsError} = useGps();
-  const [{menuAction, notesInProximity}, dispatch] = useStateContext();
+  const [{menuAction, position, notesInBounds, notesInProximity}, dispatch] = useStateContext();
   const [googleMap, setGoogleMap] = useState(null);
   const [panMap, setPanMap] = useState(true);
   const [mapBounds, setMapBounds] = useState(null);
@@ -61,6 +58,7 @@ export default function MapContainer() {
         ? window.screen.height >= window.innerHeight 
           ? window.innerHeight 
           : window.screen.height - (window.innerHeight - window.screen.height) 
+        // : Math.min(window.screen.height, window.innerHeight))}px`
         : Math.min(window.screen.height, window.innerHeight)) - (56 + (notesInProximity.length > 0 ? 58 : 0))}px`
   }), [notesInProximity])
 
@@ -113,7 +111,6 @@ export default function MapContainer() {
     }
   },[position, googleMap, panMap]);
 
-
   // pan map only if previous action was not a modal
   useEffect(() => {
     if (menuAction === 'location'){
@@ -130,14 +127,13 @@ export default function MapContainer() {
     dispatch({
       type: UPDATE_NOTES_IN_BOUNDS,
       notesInBounds: data.notesInBounds,
-      position 
     });
   },[position, data, dispatch]);
 
 
   return (
     <>
-      {position && isLoaded && !loadError && !gpsError &&
+      {position && isLoaded && !loadError &&
         <GoogleMap    
           mapContainerStyle={mapStyle}
           options={defaultMapOptions}
@@ -153,14 +149,12 @@ export default function MapContainer() {
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
 
-          { data?.notesInBounds.length <= MAX_NOTES &&
-            data?.notesInBounds.map((note, idx) => 
-              <NoteMarker key={idx} note={note} />) }
-
-          { data?.notesInBounds.length > MAX_NOTES &&
-            <Alert variant="filled" severity="error" sx={alertStyle}>
-              {`There are over ${MAX_NOTES} notes in map bounds. Please zoom in for better results...`}
-            </Alert> }
+          { notesInBounds.length <= MAX_NOTES 
+            ? notesInBounds.map((note, idx) => 
+              <NoteMarker key={idx} note={note} />) 
+            : <Alert variant="filled" severity="error" sx={alertStyle}>
+                {`There are over ${MAX_NOTES} notes in map bounds. Please zoom in for better results...`}
+              </Alert> }
 
           
           {(!isLoaded || !position || loading) && 
@@ -170,11 +164,6 @@ export default function MapContainer() {
             <Alert variant="filled" severity="error" sx={alertStyle}>
               {error.name}: {error.message}
             </Alert>}
-
-          {gpsError && 
-            <Alert variant="filled" severity="error" sx={alertStyle}>
-                {gpsError.name}: {gpsError.message}
-            </Alert>} 
 
           {loadError && 
           <Alert variant="filled" severity="error" sx={alertStyle}>

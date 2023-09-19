@@ -1,8 +1,10 @@
 import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink,} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+
 import { StateProvider } from './utils/GlobalState';
 import Auth from './utils/auth';
 
+import GPSProvider from './components/GPSProvider';
 import TopNavContainer from './components/TopNavContainer';
 import MapContainer from './components/MapContainer';
 import DrawerContainer from './components/DrawerContainer';
@@ -28,11 +30,11 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-
 function App() {
   return (
     <ApolloProvider client={client}>
       <StateProvider>
+        <GPSProvider />
         <TopNavContainer />
         <MapContainer />
         <DrawerContainer />

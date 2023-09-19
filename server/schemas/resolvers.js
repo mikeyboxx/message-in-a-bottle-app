@@ -75,7 +75,7 @@ const resolvers = {
       throw new AuthenticationError('Not logged in');
     },
 
-    pickupNote: async (parent, args, context) => {
+    saveNote: async (parent, args, context) => {
       if (context.user) {
 
         const note = await Note.findByIdAndUpdate(
