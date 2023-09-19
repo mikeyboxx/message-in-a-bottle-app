@@ -25,7 +25,7 @@ const useGps = () => {
           console.log(gpsError);
           setGpsError({name: 'getGPSLocation', message: gpsError.message});
       }, {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false,
         timeout: 60000,
         maximumAge: Infinity
       }
