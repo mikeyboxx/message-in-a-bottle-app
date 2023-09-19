@@ -79,7 +79,7 @@ const typeDefs = gql`
       lng: Float!, 
       bearing: Int): Note
 
-    pickupNote(
+    saveNote(
       id: ID!): Note 
 
     dropNote(

@@ -1,6 +1,7 @@
 import { useReducer } from 'react';
 import {getDistanceFromLatLonInMeters} from './trigonometry';
 import {
+  UPDATE_GPS_POSITION,
   UPDATE_MENU_ACTION,
   UPDATE_NOTES_IN_BOUNDS,
 } from './actions';
@@ -9,6 +10,12 @@ const PROXIMITY_THRESHOLD = 20;
 
 export const reducer = (state, action) => {
   switch (action.type) {
+    case UPDATE_GPS_POSITION:
+      return {
+        ...state,
+        position: action.position,
+      }
+
     case UPDATE_MENU_ACTION:
       return {
         ...state,
@@ -19,8 +26,8 @@ export const reducer = (state, action) => {
       const arr = action.notesInBounds.map(({note}) => {
         const distance =  
           getDistanceFromLatLonInMeters(
-            action.position.coords.latitude, 
-            action.position.coords.longitude, 
+            state.position.coords.latitude, 
+            state.position.coords.longitude, 
             note.lat, 
             note.lng);
 

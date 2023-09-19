@@ -33,7 +33,7 @@ export default function TopNavContainer() {
     newValue === 'signOut' && Auth.logout();
     
     // highlight the selected icon
-    ['location'].includes(newValue) && setValue(newValue);
+    ['location', 'favorites'].includes(newValue) && setValue(newValue);
   },[dispatch]);
 
   return (
@@ -60,7 +60,7 @@ export default function TopNavContainer() {
           label="Favorites"
           value="favorites"
           icon={<Badge 
-                  badgeContent={4} 
+                  // badgeContent={4} 
                   // color="secondary"
                   >
                     <FavoriteIcon />
