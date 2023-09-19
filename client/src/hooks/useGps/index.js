@@ -15,8 +15,10 @@ const useGps = () => {
           coords: {
             accuracy, 
             heading,
-            latitude: Math.round(latitude * 1000000) / 1000000,   // rounds it in order to make GPS less sensitive
-            longitude: Math.round(longitude * 1000000) / 1000000,  
+            latitude,
+            longitude,
+            // latitude: Math.round(latitude * 1000000) / 1000000,   // rounds it in order to make GPS less sensitive
+            // longitude: Math.round(longitude * 1000000) / 1000000,  
             speed 
           }
         });

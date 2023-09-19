@@ -48,7 +48,7 @@ export default function MapContainer() {
   const {data, error, loading} = useQuery(
     QUERY_NOTES_IN_BOUNDS, 
     {
-      fetchPolicy: 'network-only',
+      // fetchPolicy: 'network-only',
       pollInterval: 3000,
       variables: {...mapBounds}
     }
