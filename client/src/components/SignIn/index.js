@@ -14,11 +14,11 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_USER_ACTION } from '../../utils/actions';
+import { UPDATE_MENU_ACTION } from '../../utils/actions';
 import { LOGIN } from '../../utils/mutations';
 
 export default function SignIn() {
-  const [{userAction}, dispatch] = useStateContext();
+  const [{menuAction}, dispatch] = useStateContext();
   const [login] = useMutation(LOGIN);
   const [loginError, setLoginError] = useState(null);
 
@@ -39,8 +39,8 @@ export default function SignIn() {
       Auth.login(response.data.login.token);
 
       dispatch({
-        type: UPDATE_USER_ACTION,
-        userAction: 'location'
+        type: UPDATE_MENU_ACTION,
+        menuAction: 'location'
       });
 
     } catch (e) {
@@ -51,23 +51,23 @@ export default function SignIn() {
   const handleClose = useCallback(async event => {
     event.preventDefault();
     dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'location'
+      type: UPDATE_MENU_ACTION,
+      menuAction: 'location'
     });
   },[dispatch]);
 
   const handleSignUpClick = useCallback(async event => {
     event.preventDefault();
     dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'signUp',
+      type: UPDATE_MENU_ACTION,
+      menuAction: 'signUp',
     });
   },[dispatch]);
 
 
   return (
     <>
-     {userAction === 'signIn' &&
+     {menuAction === 'signIn' &&
       <Dialog 
         open={true}
         onClose={handleClose}

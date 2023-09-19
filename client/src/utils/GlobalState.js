@@ -6,9 +6,8 @@ const { Provider } = StateContext;
 
 const StateProvider = ({ value = {}, ...props }) => {
   const [state, dispatch] = useStateReducer({
-    userAction: 'location',
-    prevUserAction: null,
-    position: null,
+    menuAction: 'location',
+    // prevmenuAction: null,
     notesInBounds: [],
     notesInProximity: [],
     mapBounds: null

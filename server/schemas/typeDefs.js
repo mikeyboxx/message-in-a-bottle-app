@@ -43,10 +43,10 @@ const typeDefs = gql`
     notesInBounds(
       lat: Float,
       lng: Float,
-      swLat: Float!, 
-      swLng: Float!, 
-      neLat: Float!, 
-      neLng: Float!): [NoteInBounds]
+      swLat: Float, 
+      swLng: Float, 
+      neLat: Float, 
+      neLng: Float): [NoteInBounds]
 
     users: [User]
 

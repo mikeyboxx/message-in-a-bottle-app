@@ -22,11 +22,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_USER_ACTION } from '../../utils/actions';
+import { UPDATE_MENU_ACTION } from '../../utils/actions';
 import { ADD_USER } from '../../utils/mutations';
 
 export default function SignUp() {
-  const [{userAction}, dispatch] = useStateContext();
+  const [{menuAction}, dispatch] = useStateContext();
   const [loginError, setLoginError] = useState(null);
   const [addUser] = useMutation(ADD_USER);
   const [showPassword, setShowPassword] = useState(false);
@@ -36,16 +36,16 @@ export default function SignUp() {
 
   const handleClose = useCallback(async event => {
     dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'location'
+      type: UPDATE_MENU_ACTION,
+      menuAction: 'location'
     });
   },[dispatch]);
 
   const handleSignInClick = useCallback(async event => {
     event.preventDefault();
     dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'signIn',
+      type: UPDATE_MENU_ACTION,
+      menuAction: 'signIn',
     });
   },[dispatch]);
 
@@ -69,8 +69,8 @@ export default function SignUp() {
       Auth.login(response.data.addUser.token);
 
       dispatch({
-        type: UPDATE_USER_ACTION,
-        userAction: 'location'
+        type: UPDATE_MENU_ACTION,
+        menuAction: 'location'
       });
 
     } catch (e) {
@@ -81,7 +81,7 @@ export default function SignUp() {
 
   return (
     <>
-     {userAction === 'signUp' &&
+     {menuAction === 'signUp' &&
       <Dialog 
         open={true}
         onClose={handleClose}

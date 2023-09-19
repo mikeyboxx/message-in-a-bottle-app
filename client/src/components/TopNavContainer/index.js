@@ -12,28 +12,28 @@ import Badge from '@mui/material/Badge';
 
 import { useStateContext } from '../../utils/GlobalState';
 import Auth from '../../utils/auth';
-import { UPDATE_USER_ACTION } from '../../utils/actions';
+import { UPDATE_MENU_ACTION } from '../../utils/actions';
 
 const actionStyle = {
   color: 'purple'
 };
 
 export default function TopNavContainer() {
-  const [{userAction}, dispatch] = useStateContext();
-  const [value, setValue] = useState(userAction);
+  const [{menuAction}, dispatch] = useStateContext();
+  const [value, setValue] = useState(menuAction);
 
   const handleChange = useCallback((event, newValue) => {
     event.preventDefault();
     
     dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: newValue,
+      type: UPDATE_MENU_ACTION,
+      menuAction: newValue,
     });
 
     newValue === 'signOut' && Auth.logout();
     
-    // do not highlight the selected icon
-    !['signIn', 'signOut', 'create'].includes(newValue) && setValue(newValue);
+    // highlight the selected icon
+    ['location'].includes(newValue) && setValue(newValue);
   },[dispatch]);
 
   return (
