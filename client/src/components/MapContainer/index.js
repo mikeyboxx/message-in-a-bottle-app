@@ -147,8 +147,8 @@ export default function MapContainer() {
         >
           <Marker
             position={{
-              lat: Math.round(position.coords.latitude * 1000000) / 1000000, 
-              lng: Math.round(position.coords.longitude * 1000000) / 1000000
+              lat: position.coords.latitude, 
+              lng: position.coords.longitude
             }} 
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />

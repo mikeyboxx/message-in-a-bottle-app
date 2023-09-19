@@ -27,7 +27,7 @@ export default function CreateNote() {
     setCreateError(null);
     dispatch({
       type: UPDATE_MENU_ACTION,
-      menuAction: 'location'
+      menuAction: null
     });
   },[dispatch]);
 

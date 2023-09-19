@@ -52,7 +52,7 @@ export default function SignIn() {
     event.preventDefault();
     dispatch({
       type: UPDATE_MENU_ACTION,
-      menuAction: 'location'
+      menuAction: null
     });
   },[dispatch]);
 

@@ -37,7 +37,7 @@ export default function SignUp() {
   const handleClose = useCallback(async event => {
     dispatch({
       type: UPDATE_MENU_ACTION,
-      menuAction: 'location'
+      menuAction: null
     });
   },[dispatch]);
 
