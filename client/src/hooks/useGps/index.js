@@ -1,20 +1,24 @@
 import { useEffect, useCallback, useState } from 'react';
-import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_GPS_POSITION } from '../../utils/actions';
 
 const useGps = () => {
-  const [, dispatch] = useStateContext();
   const [position, setPosition] = useState(null);
   const [gpsError, setGpsError] = useState(null);
   
   const getGPSLocation = useCallback(() => {
     navigator.geolocation.watchPosition( 
       newPos => {
+        const {coords: { accuracy, heading, latitude, longitude, speed }} = newPos;
+
         setGpsError(null);
-        setPosition(newPos);
-        dispatch({
-          type: UPDATE_GPS_POSITION,
-          position: newPos
+
+        setPosition({
+          coords: {
+            accuracy, 
+            heading,
+            latitude: Math.round(latitude * 1000000) / 1000000,   // rounds it in order to make GPS less sensitive
+            longitude: Math.round(longitude * 1000000) / 1000000,  
+            speed 
+          }
         });
       },
       gpsError => {
@@ -26,13 +30,13 @@ const useGps = () => {
         maximumAge: Infinity
       }
     );
-  },[dispatch])
+  },[])
   
   useEffect(()=>{
     getGPSLocation();
   },[getGPSLocation]);
-  
-  return {position, gpsError};
+
+  return { position, gpsError };
 }
 
 export default useGps;

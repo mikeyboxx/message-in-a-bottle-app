@@ -15,19 +15,19 @@ import {Journals} from 'react-bootstrap-icons';
 
 import Auth from '../../utils/auth';
 import { useStateContext } from '../../utils/GlobalState';
-import { UPDATE_USER_ACTION } from '../../utils/actions';
+import { UPDATE_MENU_ACTION } from '../../utils/actions';
 import { ADD_NOTE } from '../../utils/mutations';
 
 export default function CreateNote() {
-  const [{userAction, position}, dispatch] = useStateContext();
+  const [{menuAction, position}, dispatch] = useStateContext();
   const [createError, setCreateError] = useState(null);
   const [addNote] = useMutation(ADD_NOTE);
 
   const handleClose = useCallback(async event => {
     setCreateError(null);
     dispatch({
-      type: UPDATE_USER_ACTION,
-      userAction: 'location'
+      type: UPDATE_MENU_ACTION,
+      menuAction: 'location'
     });
   },[dispatch]);
 
@@ -51,8 +51,8 @@ export default function CreateNote() {
       }});
 
       dispatch({
-        type: UPDATE_USER_ACTION,
-        userAction: 'location'
+        type: UPDATE_MENU_ACTION,
+        menuAction: 'location'
       });
 
     } catch (e) {
@@ -63,7 +63,7 @@ export default function CreateNote() {
 
   return (
     <>
-     {userAction === 'create' &&
+     {menuAction === 'create' &&
       <Dialog 
         open={true}
         onClose={handleClose} 

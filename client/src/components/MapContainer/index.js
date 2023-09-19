@@ -1,13 +1,15 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
- import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api';
+import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api';
+import { useQuery } from '@apollo/client';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 
 import { useStateContext } from '../../utils/GlobalState';
 import useGps from '../../hooks/useGps'
-import NoteMarkers from '../../components/NoteMarkers'
-import { UPDATE_GOOGLE_MAP_BOUNDS } from '../../utils/actions';
+import { NoteMarker } from '../../components/NoteMarker';
+import { UPDATE_NOTES_IN_BOUNDS, UPDATE_MENU_ACTION } from '../../utils/actions';
+import { QUERY_NOTES_IN_BOUNDS } from '../../utils/queries';
 
 
 // google maps options
@@ -33,13 +35,24 @@ const alertStyle ={
 }
 
 const DEFAULT_ZOOM = 18;
+const MAX_NOTES = 150;
 
 export default function MapContainer() {
   const {isLoaded, loadError} = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY });
   const {position, gpsError} = useGps();
-  const [{userAction, prevUserAction, notesInProximity}, dispatch] = useStateContext();
+  const [{menuAction, notesInProximity}, dispatch] = useStateContext();
   const [googleMap, setGoogleMap] = useState(null);
   const [panMap, setPanMap] = useState(true);
+  const [mapBounds, setMapBounds] = useState(null);
+
+  const {data, error, loading} = useQuery(
+    QUERY_NOTES_IN_BOUNDS, 
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: 3000,
+      variables: {...mapBounds}
+    }
+  );
   
   // this fixes google chrome mobile issue with page height being > screen height
   const mapStyle = useMemo(() => ({
@@ -72,21 +85,18 @@ export default function MapContainer() {
   const onIdle = useCallback(() => {
     const bounds = googleMap.getBounds();
 
-    dispatch({
-      type: UPDATE_GOOGLE_MAP_BOUNDS,
-      mapBounds: {
-        swLat: bounds.getSouthWest().lat(), 
-        swLng: bounds.getSouthWest().lng(), 
-        neLat: bounds.getNorthEast().lat(), 
-        neLng: bounds.getNorthEast().lng()
-      }
+    setMapBounds({
+      swLat: bounds.getSouthWest().lat(), 
+      swLng: bounds.getSouthWest().lng(), 
+      neLat: bounds.getNorthEast().lat(), 
+      neLng: bounds.getNorthEast().lng()
     });
 
     // do not pan map if map is zoomed
     if (googleMap.getZoom() !== DEFAULT_ZOOM){
       setPanMap(false);
     }
-  },[googleMap, dispatch]);
+  },[googleMap]);
 
 
   useEffect(() => {
@@ -106,11 +116,23 @@ export default function MapContainer() {
 
   // pan map only if previous action was not a modal
   useEffect(() => {
-    if (userAction === 'location' && 
-      !['signIn', 'signUp', 'create'].includes(prevUserAction)) {
+    if (menuAction === 'location'){
       setPanMap(true);
+      dispatch({
+        type: UPDATE_MENU_ACTION,
+        menuAction: null
+      });
     }
-  },[userAction, prevUserAction])  
+  },[menuAction, dispatch])  
+
+  useEffect(() => {
+    data?.notesInBounds && position &&
+    dispatch({
+      type: UPDATE_NOTES_IN_BOUNDS,
+      notesInBounds: data.notesInBounds,
+      position 
+    });
+  },[position, data, dispatch]);
 
 
   return (
@@ -124,25 +146,41 @@ export default function MapContainer() {
           onDragEnd={onDragEnd}
         >
           <Marker
-            position={{lat: position.coords.latitude, lng: position.coords.longitude}} 
+            position={{
+              lat: Math.round(position.coords.latitude * 1000000) / 1000000, 
+              lng: Math.round(position.coords.longitude * 1000000) / 1000000
+            }} 
             icon={{...userIcon, path: window.google.maps.SymbolPath.CIRCLE}}
           />
 
-          <NoteMarkers />
+          { data?.notesInBounds.length <= MAX_NOTES &&
+            data?.notesInBounds.map((note, idx) => 
+              <NoteMarker key={idx} note={note} />) }
+
+          { data?.notesInBounds.length > MAX_NOTES &&
+            <Alert variant="filled" severity="error" sx={alertStyle}>
+              {`There are over ${MAX_NOTES} notes in map bounds. Please zoom in for better results...`}
+            </Alert> }
+
+          
+          {(!isLoaded || !position || loading) && 
+            <CircularProgress/>}     
+
+          { error &&
+            <Alert variant="filled" severity="error" sx={alertStyle}>
+              {error.name}: {error.message}
+            </Alert>}
+
+          {gpsError && 
+            <Alert variant="filled" severity="error" sx={alertStyle}>
+                {gpsError.name}: {gpsError.message}
+            </Alert>} 
+
+          {loadError && 
+          <Alert variant="filled" severity="error" sx={alertStyle}>
+              useJsApiLoader: {loadError.message}
+          </Alert>} 
         </GoogleMap>}
-
-      {(!isLoaded || !position) && 
-        <CircularProgress/>}
-
-      {gpsError && 
-        <Alert variant="filled" severity="error" sx={alertStyle}>
-            {gpsError.name}: {gpsError.message}
-        </Alert>} 
-
-      {loadError && 
-      <Alert variant="filled" severity="error" sx={alertStyle}>
-          useJsApiLoader: {loadError.message}
-      </Alert>} 
     </>
   )
 }
