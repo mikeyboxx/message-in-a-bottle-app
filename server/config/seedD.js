@@ -3,7 +3,7 @@ const seedDaemon = require('../utils/seedDaemon');
 
 db.once('open', async () => {
   seedDaemon({
-    distanceInMeters: 546,
+    distanceInMeters: 5046,
     userTargetArr: [
       { // h
         lat: 40.573546,
