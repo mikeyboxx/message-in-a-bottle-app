@@ -52,7 +52,7 @@ export default function CreateNote() {
 
       dispatch({
         type: UPDATE_MENU_ACTION,
-        menuAction: 'location'
+        menuAction: null
       });
 
     } catch (e) {
