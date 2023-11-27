@@ -13,7 +13,7 @@
     "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm start\"",
     "install": "cd server && npm i && cd ../client && npm i",
     "seed": "cd server && npm run seed",
-    "seedD": "cd server && npm run seedD",
+    "seedD": "cd server && npm run seedD -- $lat $lng",
     "moveD": "cd server && npm run moveD"
   },
   "keywords": [],
