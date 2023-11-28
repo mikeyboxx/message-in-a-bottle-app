@@ -21,7 +21,7 @@ db.once('open', async () => {
       lng: Number(process.argv[3]) || -74.005546
     });
 
-    // console.log(userTargetArr);
+    console.log(userTargetArr);
 
   seedDaemon({
     distanceInMeters: 5046,
