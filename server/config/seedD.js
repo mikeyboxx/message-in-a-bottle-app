@@ -1,7 +1,7 @@
 const db = require('./connection');
 const seedDaemon = require('../utils/seedDaemon');
 
-// console.log(process.argv);
+console.log(process.argv);
 
 db.once('open', async () => {
   const userTargetArr = [

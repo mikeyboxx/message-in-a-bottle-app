@@ -8,7 +8,7 @@
     "watch": "nodemon",
     "seed": "node config/seeds.js",
     "moveD": "node config/moveD.js",
-    "seedD": "node config/seedD.js $lat $lng"
+    "seedD": "node config/seedD.js"
   },
   "keywords": [],
   "author": "",
